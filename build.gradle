@@ -1,0 +1,43 @@
+plugins {
+	id 'java-library'
+	id 'jacoco'
+	id 'distribution'
+	id 'application'
+	id 'eclipse'
+}
+
+group = 'com.github.doip'
+version = '2.0.0'
+
+repositories {
+	mavenCentral()
+	maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-api',  version: '2.19.0'
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.19.0'
+
+	//implementation 'com.github.doip:doip-simulation-api:2.0.0'
+	implementation files(
+		'../doip-simulation-api/build/libs/doip-simulation-api-2.0.0.jar'
+	)
+
+	testImplementation 'com.github.starcode88:starcode88-jtest:1.1.0'
+}
+
+jar {
+	manifest {
+		attributes (
+			'Class-Path' : configurations.runtimeClasspath.collect { it.getName() }.join(' ')
+		)
+	}
+}
+
+test {
+	useJUnitPlatform()
+	systemProperty 'log4j.configurationFile', 'src/test/resources/log4j2.xml'
+}
+
+
+

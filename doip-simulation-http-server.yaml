@@ -1,0 +1,66 @@
+openapi: 3.0.3
+info:
+  title: DoIP Simulation
+  description: |-
+    REST API for DoIP Simulation
+  termsOfService: http://swagger.io/terms/
+  version: 1.0.0
+servers:
+  - url: https://localhost/doip-simulation
+paths:
+  /simulation:
+    get:
+      summary: Get information about current simulation
+      description: Get information about current simulation
+      operationId: getSimulation
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimulationStatus'          
+    put:
+      summary: Update the current simulation
+      description: Update the current simulation
+      operationId: updateSimulation
+      requestBody:
+        description: Status
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SimulationUpdate'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimulationStatus'          
+components:
+  schemas:
+    SimulationStatus:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the simulation
+          example: STAR 3.5
+        status:
+          type: string
+          description: Status of simulation
+          example: up
+          enum:
+            - up
+            - down
+    SimulationUpdate:
+      type: object
+      properties:
+        status:
+          type: string
+          description: Status of simulation
+          example: up
+          enum:
+            - up
+            - down
