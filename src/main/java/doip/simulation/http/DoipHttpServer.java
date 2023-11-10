@@ -184,6 +184,7 @@ class GetHandler implements HttpHandler {
 			OutputStream responseBody = exchange.getResponseBody();
 			responseBody.write(response.getBytes(StandardCharsets.UTF_8));
 			responseBody.close();
+
 		} else {
 			// Method not allowed
 			exchange.sendResponseHeaders(405, -1);
