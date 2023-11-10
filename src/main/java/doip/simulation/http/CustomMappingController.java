@@ -8,12 +8,9 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
-
-import doip.simulation.api.SimulationManager;
 
 /**
  * Controller for managing custom HTTP mappings using DoipHttpServer.
@@ -37,10 +34,12 @@ public class CustomMappingController {
 	/**
 	 * Starts an HTTP server with custom POST and GET mappings.
 	 *
-	 * @param simulationManager The simulation manager for handling
-	 *                          simulation-related functionality.
 	 */
-	public void startHttpServer(SimulationManager simulationManager) {
+	public void startHttpServer() {
+		if (this.httpServer.isRunning())
+		{
+			return;
+		}
 		try {
 			// Create custom POST and GET handlers
 			HttpHandler postHandler = new PostHandlerCustom();
@@ -68,7 +67,7 @@ public class CustomMappingController {
 			// TODO: Implement custom logic for handling POST requests
 			// Read request body, process data, and generate response
 			String response = "Custom POST request processed.";
-			sendResponse(exchange, response);
+			sendResponse(exchange, response, "text/plain", 200);
 		}
 	}
 
@@ -82,22 +81,26 @@ public class CustomMappingController {
 			// TODO: Implement custom logic for handling GET requests
 			// Process parameters, and generate response
 			String response = "Custom GET request processed.";
-			sendResponse(exchange, response);
+			sendResponse(exchange, response, "text/plain", 200);
 		}
 	}
 
 	/**
 	 * Sends a response to the client with the given message.
 	 *
-	 * @param exchange The HTTP exchange.
-	 * @param message  The message to send in the response.
+	 * @param exchange    The HTTP exchange.
+	 * @param message     The message to send in the response.
+	 * @param contantType The response contant Type
+	 * @param code        The response code to send
 	 * @throws IOException If an I/O error occurs while sending the response.
 	 */
-	private void sendResponse(HttpExchange exchange, String message) throws IOException {
-		exchange.getResponseHeaders().add("Content-Type", "text/plain");
-		exchange.sendResponseHeaders(200, message.getBytes(StandardCharsets.UTF_8).length);
+
+	private void sendResponse(HttpExchange exchange, String message, String contantType, int code) throws IOException {
+		exchange.getResponseHeaders().add("Content-Type", contantType);
+		exchange.sendResponseHeaders(code, message.getBytes(StandardCharsets.UTF_8).length);
 		try (OutputStream responseBody = exchange.getResponseBody()) {
 			responseBody.write(message.getBytes(StandardCharsets.UTF_8));
 		}
 	}
+
 }
