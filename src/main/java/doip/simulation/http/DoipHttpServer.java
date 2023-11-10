@@ -193,6 +193,33 @@ public class DoipHttpServer {
             throw e; // Re-throw the exception for higher-level handling
         }
     }
+	
+	/**
+	 * Reads the request body of an HTTP exchange and converts it to a String.
+	 *
+	 * @param exchange The HTTP exchange containing the request body.
+	 * @return The request body as a String.
+	 * @throws IOException If an I/O error occurs while reading the request body.
+	 */
+	public static String readRequestBodyAsString(HttpExchange exchange) throws IOException {
+	    // Get the input stream of the request body
+	    InputStream requestBody = exchange.getRequestBody();
+
+	    // Create a StringBuilder to accumulate the request body content
+	    StringBuilder requestStringBuilder = new StringBuilder();
+
+	    // Read each byte from the input stream and append it to the StringBuilder
+	    int byteRead;
+	    while ((byteRead = requestBody.read()) != -1) {
+	        requestStringBuilder.append((char) byteRead);
+	    }
+
+	    // Convert the StringBuilder content to a String
+	    String requestString = requestStringBuilder.toString();
+
+	    // Return the resulting String representing the request body
+	    return requestString;
+	}
 
 }
 
@@ -201,13 +228,7 @@ class PostHandler implements HttpHandler {
 	public void handle(HttpExchange exchange) throws IOException {
 		if ("POST".equals(exchange.getRequestMethod())) {
 			// Read the request body as a string
-			InputStream requestBody = exchange.getRequestBody();
-			StringBuilder requestStringBuilder = new StringBuilder();
-			int byteRead;
-			while ((byteRead = requestBody.read()) != -1) {
-				requestStringBuilder.append((char) byteRead);
-			}
-			String requestString = requestStringBuilder.toString();
+			String requestString = DoipHttpServer.readRequestBodyAsString(exchange);
 
 			// Process the request string
 			String response = "Received the following POST request: " + requestString;
