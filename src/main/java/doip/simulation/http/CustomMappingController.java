@@ -1,8 +1,6 @@
 package doip.simulation.http;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -10,7 +8,6 @@ import org.apache.logging.log4j.Logger;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpServer;
 
 /**
  * Controller for managing custom HTTP mappings using DoipHttpServer.
@@ -33,11 +30,10 @@ public class CustomMappingController {
 
 	/**
 	 * Starts an HTTP server with custom POST and GET mappings.
-	 *
 	 */
 	public void startHttpServer() {
-		if (this.httpServer.isRunning())
-		{
+		if (httpServer.isRunning()) {
+			logger.info("Server is already running.");
 			return;
 		}
 		try {
@@ -67,7 +63,7 @@ public class CustomMappingController {
 			// TODO: Implement custom logic for handling POST requests
 			// Read request body, process data, and generate response
 			String response = "Custom POST request processed.";
-			sendResponse(exchange, response, "text/plain", 200);
+			DoipHttpServer.sendResponse(exchange, response, "text/plain", 200);
 		}
 	}
 
@@ -81,25 +77,7 @@ public class CustomMappingController {
 			// TODO: Implement custom logic for handling GET requests
 			// Process parameters, and generate response
 			String response = "Custom GET request processed.";
-			sendResponse(exchange, response, "text/plain", 200);
-		}
-	}
-
-	/**
-	 * Sends a response to the client with the given message.
-	 *
-	 * @param exchange    The HTTP exchange.
-	 * @param message     The message to send in the response.
-	 * @param contantType The response contant Type
-	 * @param code        The response code to send
-	 * @throws IOException If an I/O error occurs while sending the response.
-	 */
-
-	private void sendResponse(HttpExchange exchange, String message, String contantType, int code) throws IOException {
-		exchange.getResponseHeaders().add("Content-Type", contantType);
-		exchange.sendResponseHeaders(code, message.getBytes(StandardCharsets.UTF_8).length);
-		try (OutputStream responseBody = exchange.getResponseBody()) {
-			responseBody.write(message.getBytes(StandardCharsets.UTF_8));
+			DoipHttpServer.sendResponse(exchange, response, "text/plain", 200);
 		}
 	}
 
