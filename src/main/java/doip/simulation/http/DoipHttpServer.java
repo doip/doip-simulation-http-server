@@ -88,23 +88,56 @@ public class DoipHttpServer {
 	}
 
 	/**
-	 * Adds a custom mapping context for handling HTTP requests.
+	 * Adds a custom mapping context for handling HTTP requests if it does not already exist.
 	 *
 	 * @param context The context path for the mapping.
-	 * @param handler The HTTP handler for processing requests in the specified
-	 *                context.
+	 * @param handler The HTTP handler for processing requests in the specified context.
 	 */
 	public void addMappingContext(String context, HttpHandler handler) {
-		handlers.add(new ContextHandler(context, handler));
+	    // Check if the context already exists in handlers
+	    if (!contextExists(context)) {
+	        handlers.add(new ContextHandler(context, handler));
+	        logger.info("Added mapping context: {}", context);
+	    } else {
+	        logger.warn("Mapping context '{}' already exists. Not adding it again.", context);
+	    }
 	}
 
+	
 	/**
 	 * Adds a list of custom mapping contexts for handling HTTP requests.
 	 *
 	 * @param customHandlers The list of custom context handlers.
 	 */
 	public void createMappingContexts(List<ContextHandler> customHandlers) {
-		handlers.addAll(customHandlers);
+	    for (ContextHandler customHandler : customHandlers) {
+	        // Check if the context already exists in handlers before adding
+	        if (!contextExists(customHandler.getContext())) {
+	            handlers.add(customHandler);
+	            logger.info("Added mapping context: {}", customHandler.getContext());
+	        } else {
+	            logger.warn("Mapping context '{}' already exists. Not adding it again.", customHandler.getContext());
+	        }
+	    }
+	}
+	
+//	/**
+//	 * Adds a list of custom mapping contexts for handling HTTP requests.
+//	 *
+//	 * @param customHandlers The list of custom context handlers.
+//	 */
+//	public void createMappingContextsAll(List<ContextHandler> customHandlers) {
+//		handlers.addAll(customHandlers);
+//	}
+	
+	/**
+	 * Checks if a context path already exists in the handlers.
+	 *
+	 * @param context The context path to check.
+	 * @return true if the context path already exists, false otherwise.
+	 */
+	private boolean contextExists(String context) {
+	    return handlers.stream().anyMatch(handler -> handler.getContext().equals(context));
 	}
 
 	/**
@@ -142,7 +175,7 @@ public class DoipHttpServer {
 	 *
 	 * @param exchange    The HTTP exchange.
 	 * @param message     The message to send in the response.
-	 * @param contantType The response contant Type
+	 * @param contentType The response content Type
 	 * @param code        The response code to send
 	 * @throws IOException If an I/O error occurs while sending the response.
 	 */
