@@ -137,6 +137,30 @@ public class DoipHttpServer {
 		}
 	}
 
+	/**
+	 * Sends a response to the client with the given message.
+	 *
+	 * @param exchange    The HTTP exchange.
+	 * @param message     The message to send in the response.
+	 * @param contantType The response contant Type
+	 * @param code        The response code to send
+	 * @throws IOException If an I/O error occurs while sending the response.
+	 */
+	public static void sendResponse(HttpExchange exchange, String message, String contentType, int code)
+            throws IOException {
+        try {
+            exchange.getResponseHeaders().add("Content-Type", contentType);
+            exchange.sendResponseHeaders(code, message.getBytes(StandardCharsets.UTF_8).length);
+
+            OutputStream responseBody = exchange.getResponseBody();
+            responseBody.write(message.getBytes(StandardCharsets.UTF_8));
+            responseBody.close();
+        } catch (IOException e) {
+            logger.error("Error sending response: {}", e.getMessage(), e);
+            throw e; // Re-throw the exception for higher-level handling
+        }
+    }
+
 }
 
 class PostHandler implements HttpHandler {
@@ -156,18 +180,15 @@ class PostHandler implements HttpHandler {
 			String response = "Received the following POST request: " + requestString;
 
 			// Set the response headers and body
-			exchange.getResponseHeaders().add("Content-Type", "text/plain");
-			exchange.sendResponseHeaders(200, response.getBytes(StandardCharsets.UTF_8).length);
+			DoipHttpServer.sendResponse(exchange, response, "text/plain", 200);
 
-			OutputStream responseBody = exchange.getResponseBody();
-			responseBody.write(response.getBytes(StandardCharsets.UTF_8));
-			responseBody.close();
 		} else {
 			// Method not allowed
 			exchange.sendResponseHeaders(405, -1);
 		}
 		exchange.close();
 	}
+
 }
 
 class GetHandler implements HttpHandler {
@@ -178,12 +199,7 @@ class GetHandler implements HttpHandler {
 			String response = "This is a GET request response.";
 
 			// Set the response headers and body
-			exchange.getResponseHeaders().add("Content-Type", "text/plain");
-			exchange.sendResponseHeaders(200, response.getBytes(StandardCharsets.UTF_8).length);
-
-			OutputStream responseBody = exchange.getResponseBody();
-			responseBody.write(response.getBytes(StandardCharsets.UTF_8));
-			responseBody.close();
+			DoipHttpServer.sendResponse(exchange, response, "text/plain", 200);
 
 		} else {
 			// Method not allowed
