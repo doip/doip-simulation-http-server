@@ -27,6 +27,11 @@ public class DoipHttpServer {
 	private static final int DEFAULT_PORT = 8080;
 	private HttpServer server;
 	private SimulationManager simulationManager = null;
+
+	public SimulationManager getSimulationManager() {
+		return simulationManager;
+	}
+
 	private List<ContextHandler> handlers;
 
 	/**
@@ -70,7 +75,7 @@ public class DoipHttpServer {
 
 		handlers = new ArrayList<ContextHandler>();
 
-		createMappingContexts();
+		createMappingContexts(); //TODO:
 
 		for (ContextHandler contextHandler : handlers) {
 			server.createContext(contextHandler.getContext(), contextHandler.getHandler());
@@ -83,44 +88,47 @@ public class DoipHttpServer {
 	 */
 
 	private void createMappingContexts() {
-		handlers = List.of(new ContextHandler("/post", new PostHandler()),
+		List<ContextHandler> defaultHandlers  = List.of(
+				new ContextHandler("/post", new PostHandler()),
 				new ContextHandler("/get", new GetHandler()));
+		createMappingContexts(defaultHandlers);
 	}
 
 	/**
-	 * Adds a custom mapping context for handling HTTP requests if it does not already exist.
+	 * Adds a custom mapping context for handling HTTP requests if it does not
+	 * already exist.
 	 *
 	 * @param context The context path for the mapping.
-	 * @param handler The HTTP handler for processing requests in the specified context.
+	 * @param handler The HTTP handler for processing requests in the specified
+	 *                context.
 	 */
 	public void addMappingContext(String context, HttpHandler handler) {
-	    // Check if the context already exists in handlers
-	    if (!contextExists(context)) {
-	        handlers.add(new ContextHandler(context, handler));
-	        logger.info("Added mapping context: {}", context);
-	    } else {
-	        logger.warn("Mapping context '{}' already exists. Not adding it again.", context);
-	    }
+		// Check if the context already exists in handlers
+		if (!contextExists(context)) {
+			handlers.add(new ContextHandler(context, handler));
+			logger.info("Added mapping context: {}", context);
+		} else {
+			logger.warn("Mapping context '{}' already exists. Not adding it again.", context);
+		}
 	}
 
-	
 	/**
 	 * Adds a list of custom mapping contexts for handling HTTP requests.
 	 *
 	 * @param customHandlers The list of custom context handlers.
 	 */
 	public void createMappingContexts(List<ContextHandler> customHandlers) {
-	    for (ContextHandler customHandler : customHandlers) {
-	        // Check if the context already exists in handlers before adding
-	        if (!contextExists(customHandler.getContext())) {
-	            handlers.add(customHandler);
-	            logger.info("Added mapping context: {}", customHandler.getContext());
-	        } else {
-	            logger.warn("Mapping context '{}' already exists. Not adding it again.", customHandler.getContext());
-	        }
-	    }
+		for (ContextHandler customHandler : customHandlers) {
+			// Check if the context already exists in handlers before adding
+			if (!contextExists(customHandler.getContext())) {
+				handlers.add(customHandler);
+				logger.info("Added mapping context: {}", customHandler.getContext());
+			} else {
+				logger.warn("Mapping context '{}' already exists. Not adding it again.", customHandler.getContext());
+			}
+		}
 	}
-	
+
 //	/**
 //	 * Adds a list of custom mapping contexts for handling HTTP requests.
 //	 *
@@ -129,7 +137,7 @@ public class DoipHttpServer {
 //	public void createMappingContextsAll(List<ContextHandler> customHandlers) {
 //		handlers.addAll(customHandlers);
 //	}
-	
+
 	/**
 	 * Checks if a context path already exists in the handlers.
 	 *
@@ -137,7 +145,7 @@ public class DoipHttpServer {
 	 * @return true if the context path already exists, false otherwise.
 	 */
 	private boolean contextExists(String context) {
-	    return handlers.stream().anyMatch(handler -> handler.getContext().equals(context));
+		return handlers.stream().anyMatch(handler -> handler.getContext().equals(context));
 	}
 
 	/**
@@ -180,20 +188,20 @@ public class DoipHttpServer {
 	 * @throws IOException If an I/O error occurs while sending the response.
 	 */
 	public static void sendResponse(HttpExchange exchange, String message, String contentType, int code)
-            throws IOException {
-        try {
-            exchange.getResponseHeaders().add("Content-Type", contentType);
-            exchange.sendResponseHeaders(code, message.getBytes(StandardCharsets.UTF_8).length);
+			throws IOException {
+		try {
+			exchange.getResponseHeaders().add("Content-Type", contentType);
+			exchange.sendResponseHeaders(code, message.getBytes(StandardCharsets.UTF_8).length);
 
-            OutputStream responseBody = exchange.getResponseBody();
-            responseBody.write(message.getBytes(StandardCharsets.UTF_8));
-            responseBody.close();
-        } catch (IOException e) {
-            logger.error("Error sending response: {}", e.getMessage(), e);
-            throw e; // Re-throw the exception for higher-level handling
-        }
-    }
-	
+			OutputStream responseBody = exchange.getResponseBody();
+			responseBody.write(message.getBytes(StandardCharsets.UTF_8));
+			responseBody.close();
+		} catch (IOException e) {
+			logger.error("Error sending response: {}", e.getMessage(), e);
+			throw e; // Re-throw the exception for higher-level handling
+		}
+	}
+
 	/**
 	 * Reads the request body of an HTTP exchange and converts it to a String.
 	 *
@@ -202,23 +210,28 @@ public class DoipHttpServer {
 	 * @throws IOException If an I/O error occurs while reading the request body.
 	 */
 	public static String readRequestBodyAsString(HttpExchange exchange) throws IOException {
-	    // Get the input stream of the request body
-	    InputStream requestBody = exchange.getRequestBody();
+		try {
+			// Get the input stream of the request body
+			InputStream requestBody = exchange.getRequestBody();
 
-	    // Create a StringBuilder to accumulate the request body content
-	    StringBuilder requestStringBuilder = new StringBuilder();
+			// Create a StringBuilder to accumulate the request body content
+			StringBuilder requestStringBuilder = new StringBuilder();
 
-	    // Read each byte from the input stream and append it to the StringBuilder
-	    int byteRead;
-	    while ((byteRead = requestBody.read()) != -1) {
-	        requestStringBuilder.append((char) byteRead);
-	    }
+			// Read each byte from the input stream and append it to the StringBuilder
+			int byteRead;
+			while ((byteRead = requestBody.read()) != -1) {
+				requestStringBuilder.append((char) byteRead);
+			}
 
-	    // Convert the StringBuilder content to a String
-	    String requestString = requestStringBuilder.toString();
+			// Convert the StringBuilder content to a String
+			String requestString = requestStringBuilder.toString();
 
-	    // Return the resulting String representing the request body
-	    return requestString;
+			// Return the resulting String representing the request body
+			return requestString;
+		} catch (IOException e) {
+			logger.error("Error reading request body: {}", e.getMessage(), e);
+			throw e; // Re-throw the exception for higher-level handling
+		}
 	}
 
 }
