@@ -37,21 +37,30 @@ public class CustomMappingController {
 			return;
 		}
 		try {
-			// Create custom POST and GET handlers
-			HttpHandler postHandler = new PostHandlerCustom();
-			HttpHandler getHandler = new GetHandlerCustom();
 
-			// Create custom mapping contexts
-			List<ContextHandler> customHandlers = List.of(new ContextHandler("/customPost", postHandler),
-					new ContextHandler("/customGet", getHandler));
-
-			// Create and configure the DoipHttpServer instance
-			httpServer.createMappingContexts(customHandlers);
+			addCustomMappings();
 			httpServer.start();
 		} catch (Exception e) {
 			logger.error("Error starting the server: {}", e.getMessage(), e);
 		}
 	}
+
+	 /**
+     * Adds custom mappings.
+     */
+    private void addCustomMappings() {
+        HttpHandler postHandler = new PostHandlerCustom();
+        HttpHandler getHandler = new GetHandlerCustom();
+
+        List<ContextHandler> customHandlers = List.of(
+                new ContextHandler("/customPost", postHandler),
+                new ContextHandler("/customGet", getHandler)
+        );
+
+        // Create and configure the DoipHttpServer instance
+        httpServer.createMappingContexts(customHandlers);
+        logger.info("Added custom POST and GET mappings.");
+    }
 
 	/**
 	 * Custom handler for processing POST requests in a custom context.
@@ -60,10 +69,15 @@ public class CustomMappingController {
 
 		@Override
 		public void handle(HttpExchange exchange) throws IOException {
-			// TODO: Implement custom logic for handling POST requests
-			// Read request body, process data, and generate response
-			String response = "Custom POST request processed.";
-			DoipHttpServer.sendResponse(exchange, response, "text/plain", 200);
+			 try {
+	                // TODO: Implement custom logic for handling POST requests
+	                // Read request body, process data, and generate response
+	                String response = "Custom POST request processed.";
+	                DoipHttpServer.sendResponse(exchange, response, "text/plain", 200);
+	            } catch (IOException e) {
+	                logger.error("Error processing POST request: {}", e.getMessage(), e);
+	                throw e;
+	            }
 		}
 	}
 
@@ -74,10 +88,17 @@ public class CustomMappingController {
 
 		@Override
 		public void handle(HttpExchange exchange) throws IOException {
-			// TODO: Implement custom logic for handling GET requests
-			// Process parameters, and generate response
-			String response = "Custom GET request processed.";
-			DoipHttpServer.sendResponse(exchange, response, "text/plain", 200);
+			 try {
+	                // TODO: Implement custom logic for handling GET requests
+	                // Process parameters, and generate response
+	                String response = "Custom GET request processed.";
+	                httpServer.getSimulationManager().start("Test");
+
+	                DoipHttpServer.sendResponse(exchange, response, "text/plain", 200);
+	            } catch (IOException e) {
+	                logger.error("Error processing GET request: {}", e.getMessage(), e);
+	                throw e;
+	            }
 		}
 	}
 
