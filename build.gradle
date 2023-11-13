@@ -19,11 +19,18 @@ dependencies {
 	implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.19.0'
 
 	//implementation 'com.github.doip:doip-simulation-api:2.0.0'
+	//implementation 'com.github.starcode88:starcode88-jhttp:2.0.0'
+	//implementation 'com.github.starcode88:starcode88-jutils:1.0.0'
 	implementation files(
-		'../doip-simulation-api/build/libs/doip-simulation-api-2.0.0.jar'
+		'../doip-simulation-api/build/libs/doip-simulation-api-2.0.0.jar',
+		'../starcode88-jhttp/build/libs/starcode88-jhttp-2.0.0.jar',
+		'../starcode88-jutils/build/libs/starcode88-jutils-1.0.0.jar'
 	)
 
 	testImplementation 'com.github.starcode88:starcode88-jtest:1.1.0'
+	
+	implementation 'org.junit.jupiter:junit-jupiter:5.7.1'
+	implementation 'org.junit.jupiter:junit-jupiter-params:5.7.1'
 }
 
 jar {
