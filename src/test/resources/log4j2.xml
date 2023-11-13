@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Configuration>
+	<Properties>
+		<Property name="customlayout">%d{HH:mm:ss.SSS} %-48logger %-20marker %-16level - %msg%ex{10}%n</Property>
+	</Properties>
+	<CustomLevels>
+		<CustomLevel name="ASSERTION_FAILED" intLevel="200"/>
+	</CustomLevels>
+	<Appenders>
+		<Console name="console" target="SYSTEM_OUT">
+			<PatternLayout pattern="${customlayout}" />
+		</Console>
+		<File name="trace" fileName="trace.log" append="false">
+			<!--<RegexFilter regex="A:.*|B:.*" onMatch="ACCEPT" onMismatch="DENY"/>-->
+			<!-- <MarkerFilter marker="THROWING" onMatch="DENY" onMismatch="NEUTRAL"/> -->
+			<PatternLayout pattern="${customlayout}"/>
+		</File>
+		<File name="info" fileName="info.log" append="false">
+			<PatternLayout pattern="${customlayout}" />
+		</File>
+		<File name="assert" fileName="assert.log" append="false">
+			<PatternLayout pattern="${customlayout}" />
+		</File>
+		<File name="html" fileName="report.html" append="false">
+			<HTMLLayout charset="UTF-8" title="Log4j 2 Demo" datePattern="HH:mm:ss.SSS"/>
+		</File>
+	</Appenders>
+	<Loggers>
+		<Root level="TRACE">
+			<AppenderRef ref="console" level="TRACE" />
+			<AppenderRef ref="trace"   level="TRACE" />
+			<AppenderRef ref="info"   level="INFO" />
+			<AppenderRef ref="html" level="INFO" />
+			<AppenderRef ref="assert"   level="ASSERTION_FAILED" />
+		</Root>
+	</Loggers>
+</Configuration>
