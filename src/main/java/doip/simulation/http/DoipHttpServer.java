@@ -7,6 +7,7 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.ArrayList;
 
@@ -14,6 +15,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import doip.simulation.api.SimulationManager;
+
+import com.starcode88.http.HttpUtils;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -330,6 +333,78 @@ public class DoipHttpServer {
         }
         return buffer.toByteArray();
     }
+    
+    /**
+     * Logs details of the HTTP response, including status code, headers, and optional response body.
+     *
+     * @param exchange     The HTTP exchange.
+     * @param responseCode The HTTP response status code.
+     * @param responseBody The optional response body.
+     * @param <T>          The type of the response body.
+     */
+    public static <T> void responseServerLogging(HttpExchange exchange, int responseCode, T responseBody) {
+        logger.info("--------------------------------------------------------------");
+        logger.info("Sent HTTP response:");
+        logger.info("    Status code = {} ({})", responseCode, HttpUtils.getStatusText(responseCode));
+
+        Headers headers = exchange.getResponseHeaders();
+
+        // Log the headers
+        headerLogging(headers);
+
+        // Log the response body if it is not null and is a String
+        if (responseBody != null && responseBody instanceof String) {
+            logger.info(" Response body = {}", responseBody);
+        }
+
+        logger.info("--------------------------------------------------------------");
+    }
+
+    /**
+     * Logs details of the HTTP request, including URI, method, headers, and optional request body.
+     *
+     * @param exchange   The HTTP exchange.
+     * @param requestBody The optional request body.
+     * @param <T>        The type of the request body.
+     */
+    public static <T> void requestServerLogging(HttpExchange exchange, T requestBody) {
+        logger.info("--------------------------------------------------------------");
+        logger.info("Received HTTP request:");
+        logger.info("    {}", exchange.getRequestURI());
+        String method = exchange.getRequestMethod();
+        logger.info("    " + method);
+
+        Headers headers = exchange.getRequestHeaders();
+
+        // Log the headers
+        headerLogging(headers);
+
+        // Log the request body if it is not null and is a String
+        if (requestBody != null && requestBody instanceof String) {
+            logger.info("  Request body = {}", requestBody);
+        }
+
+        logger.info("--------------------------------------------------------------");
+    }
+
+    /**
+     * Logs the headers of an HTTP request or response.
+     *
+     * @param headers The headers to log.
+     */
+    private static void headerLogging(Headers headers) {
+        logger.info("    Headers:");
+
+        for (Map.Entry<String, List<String>> header : headers.entrySet()) {
+            String headerName = header.getKey();
+            List<String> headerValues = header.getValue();
+
+            // Join the header values into a comma-separated string
+            String headerValueString = String.join(", ", headerValues);
+
+            logger.info("        {} = {}", headerName, headerValueString);
+        }
+    }
 
 }
 
@@ -340,12 +415,14 @@ class PostHandler implements HttpHandler {
 			// Read the request body as a string
 			//String requestString = DoipHttpServer.readRequestBodyAsString(exchange);
 			String requestString = DoipHttpServer.readRequestBody(exchange, String.class);
+			DoipHttpServer.requestServerLogging(exchange, requestString);
 
 			// Process the request string
 			String response = "Received the following POST request: " + requestString;
 
 			// Set the response headers and body
 			DoipHttpServer.sendResponse(exchange, response, "text/plain", 200);
+			DoipHttpServer.responseServerLogging(exchange, 200, response);
 		
 		} else {
 			// Method not allowed
@@ -365,6 +442,7 @@ class GetHandler implements HttpHandler {
 
 			// Set the response headers and body
 			DoipHttpServer.sendResponse(exchange, response, "text/plain", 200);
+			DoipHttpServer.responseServerLogging(exchange, 200, response);
 
 		} else {
 			// Method not allowed
