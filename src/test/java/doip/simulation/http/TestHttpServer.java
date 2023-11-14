@@ -83,7 +83,7 @@ class TestHttpServer {
 		assertEquals(200, statusCode, "The HTTP status code is not 200");
 		String body = response.body();
 		assertNotNull(body, "The response from server is null");
-		logger.info("    Body = {}", body);
+		
 		logger.info("--------------------------------------------------------------");
 	}
 
@@ -97,7 +97,7 @@ class TestHttpServer {
 		assertEquals(200, statusCode, "The HTTP status code is not 200");
 		String body = response.body();
 		assertNotNull(body, "The response from server is null");
-		logger.info("    Body = {}", body);
+		
 		logger.info("--------------------------------------------------------------");
 	}
 
