@@ -1,4 +1,4 @@
-package doip.simulation.http;
+package doip.simulation.http.helpers;
 import com.sun.net.httpserver.HttpExchange;
 import com.starcode88.http.HttpUtils;
 import com.sun.net.httpserver.Headers;

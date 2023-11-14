@@ -1,23 +1,17 @@
 package doip.simulation.http;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.InetSocketAddress;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
 import java.util.ArrayList;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import doip.simulation.api.SimulationManager;
+import doip.simulation.http.helpers.HttpServerHelper;
 
 import com.starcode88.http.HttpUtils;
-import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
