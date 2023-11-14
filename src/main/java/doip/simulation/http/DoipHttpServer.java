@@ -1,11 +1,13 @@
 package doip.simulation.http;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Scanner;
 import java.util.ArrayList;
 
 import org.apache.logging.log4j.LogManager;
@@ -187,7 +189,7 @@ public class DoipHttpServer {
 	 * @param code        The response code to send
 	 * @throws IOException If an I/O error occurs while sending the response.
 	 */
-	public static void sendResponse(HttpExchange exchange, String message, String contentType, int code)
+	public static void sendResponseAsString(HttpExchange exchange, String message, String contentType, int code)
 			throws IOException {
 		try {
 			exchange.getResponseHeaders().add("Content-Type", contentType);
@@ -201,6 +203,44 @@ public class DoipHttpServer {
 			throw e; // Re-throw the exception for higher-level handling
 		}
 	}
+	
+	/**
+     * Sends a response to the client with the given message.
+     *
+     * @param exchange    The HTTP exchange.
+     * @param message     The message to send in the response.
+     * @param contentType The response content Type.
+     * @param code        The response code to send.
+     * @param <T>         The type of the message.
+     * @throws IOException If an I/O error occurs while sending the response.
+     */
+    public static <T> void sendResponse(HttpExchange exchange, T message, String contentType, int code)
+            throws IOException {
+        try {
+            // Convert the message to bytes based on its type
+            byte[] messageBytes;
+            if (message instanceof String) {
+                messageBytes = ((String) message).getBytes(StandardCharsets.UTF_8);
+            } else if (message instanceof byte[]) {
+                messageBytes = (byte[]) message;
+            } else {
+                // Handle other types or throw an exception based on your requirements
+                throw new IllegalArgumentException("Unsupported message type: " + message.getClass().getName());
+            }
+
+            // Set response headers
+            exchange.getResponseHeaders().add("Content-Type", contentType);
+            exchange.sendResponseHeaders(code, messageBytes.length);
+
+            // Write the message bytes to the response body
+            try (OutputStream responseBody = exchange.getResponseBody()) {
+                responseBody.write(messageBytes);
+            }
+        } catch (IOException e) {
+            logger.error("Error sending response: {}", e.getMessage(), e);
+            throw e; // Re-throw the exception for higher-level handling
+        }
+    }
 
 	/**
 	 * Reads the request body of an HTTP exchange and converts it to a String.
@@ -233,6 +273,63 @@ public class DoipHttpServer {
 			throw e; // Re-throw the exception for higher-level handling
 		}
 	}
+	
+	 /**
+     * Reads the request body of an HTTP exchange and converts it to the specified type.
+     * 
+     * Usage : 
+     * String requestString = readRequestBody(exchange, String.class);
+     * int intValue = readRequestBody(exchange, Integer.class);
+     * byte[] byteArrayRequestBody = DoipHttpServer.readRequestBody(exchange, byte[].class);
+     * 
+     * @param exchange The HTTP exchange containing the request body.
+     * @param targetType The target type class.
+     * @param <T> The generic type of the target.
+     * @return The request body converted to the specified type.
+     * @throws IOException If an I/O error occurs while reading the request body.
+     */
+	public static <T> T readRequestBody(HttpExchange exchange, Class<T> targetType) throws IOException {
+        try {
+            InputStream requestBody = exchange.getRequestBody();
+
+            // For byte array target type
+            if (targetType == byte[].class) {
+                return targetType.cast(readBytesFromStream(requestBody));
+            }
+
+            // For other types, read as a string and convert
+            Scanner scanner = new Scanner(requestBody, StandardCharsets.UTF_8.name()).useDelimiter("\\A");
+
+            if (scanner.hasNext()) {
+                String requestString = scanner.next();
+                // Use custom logic to convert the requestString to the targetType
+                return targetType.cast(requestString);
+            } else {
+                throw new IOException("Empty request body");
+            }
+        } catch (IOException e) {
+            logger.error("Error reading request body: {}", e.getMessage(), e);
+            throw e;
+        }
+    }
+
+	
+	/**
+     * Reads bytes from an input stream.
+     *
+     * @param inputStream The input stream.
+     * @return The byte array read from the input stream.
+     * @throws IOException If an I/O error occurs.
+     */
+    private static byte[] readBytesFromStream(InputStream inputStream) throws IOException {
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        int bytesRead;
+        byte[] data = new byte[1024];
+        while ((bytesRead = inputStream.read(data, 0, data.length)) != -1) {
+            buffer.write(data, 0, bytesRead);
+        }
+        return buffer.toByteArray();
+    }
 
 }
 
@@ -241,14 +338,15 @@ class PostHandler implements HttpHandler {
 	public void handle(HttpExchange exchange) throws IOException {
 		if ("POST".equals(exchange.getRequestMethod())) {
 			// Read the request body as a string
-			String requestString = DoipHttpServer.readRequestBodyAsString(exchange);
+			//String requestString = DoipHttpServer.readRequestBodyAsString(exchange);
+			String requestString = DoipHttpServer.readRequestBody(exchange, String.class);
 
 			// Process the request string
 			String response = "Received the following POST request: " + requestString;
 
 			// Set the response headers and body
 			DoipHttpServer.sendResponse(exchange, response, "text/plain", 200);
-
+		
 		} else {
 			// Method not allowed
 			exchange.sendResponseHeaders(405, -1);
