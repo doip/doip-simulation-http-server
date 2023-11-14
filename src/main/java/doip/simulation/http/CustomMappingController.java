@@ -9,6 +9,9 @@ import org.apache.logging.log4j.Logger;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
+import doip.simulation.http.helpers.HttpServerHelper;
+
+
 /**
  * Controller for managing custom HTTP mappings using DoipHttpServer.
  */
@@ -73,7 +76,7 @@ public class CustomMappingController {
 	                // TODO: Implement custom logic for handling POST requests
 	                // Read request body, process data, and generate response
 	                String response = "Custom POST request processed.";
-	                DoipHttpServer.sendResponse(exchange, response, "text/plain", 200);
+	                HttpServerHelper.sendResponse(exchange, response, "text/plain", 200);
 	            } catch (IOException e) {
 	                logger.error("Error processing POST request: {}", e.getMessage(), e);
 	                throw e;
@@ -94,7 +97,7 @@ public class CustomMappingController {
 	                String response = "Custom GET request processed.";
 	                httpServer.getSimulationManager().start("Test");
 
-	                DoipHttpServer.sendResponse(exchange, response, "text/plain", 200);
+	                HttpServerHelper.sendResponse(exchange, response, "text/plain", 200);
 	            } catch (IOException e) {
 	                logger.error("Error processing GET request: {}", e.getMessage(), e);
 	                throw e;
