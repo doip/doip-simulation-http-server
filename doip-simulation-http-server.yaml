@@ -2,65 +2,178 @@ openapi: 3.0.3
 info:
   title: DoIP Simulation
   description: |-
-    REST API for DoIP Simulation
+    REST API for DoIP simulation server
   termsOfService: http://swagger.io/terms/
   version: 1.0.0
 servers:
-  - url: https://localhost/doip-simulation
+  - url: http://myserver.com/doip-simulation
 paths:
-  /simulation:
+  /:
     get:
-      summary: Get information about current simulation
-      description: Get information about current simulation
-      operationId: getSimulation
+      summary: Get overview about the DoIP simulation server
+      parameters:
+        - name: status
+          in: query
+          description: Will filter the platforms and gateways by the given status.
+            For example if status is "RUNNING" then only platforms and gateways with
+            state "RUNNING" will be displayed
+          schema:
+            $ref: '#/components/schemas/ServiceStatus'
       responses:
         '200':
           description: Successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SimulationStatus'          
-    put:
-      summary: Update the current simulation
-      description: Update the current simulation
-      operationId: updateSimulation
-      requestBody:
-        description: Status
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SimulationUpdate'
-        required: true
+                $ref: '#/components/schemas/ServerInfo'
+  /platform/{platformId}:
+    get:
+      summary: Get information of a specific platform
+      parameters:
+        - $ref: '#/components/parameters/platformId'
       responses:
         '200':
           description: Successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SimulationStatus'          
+                $ref: '#/components/schemas/Platform'
+    post:
+      summary: Update or run an action for the platform given by the platformId
+        The structure of the body of the request needs to be defined.
+      parameters:
+        - $ref: '#/components/parameters/platformId'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Platform'
+  /platform/{platformId}/gateway/{gatewayId}:
+    get:
+      summary: Get information about a specific gateway
+      parameters:
+        - $ref: '#/components/parameters/platformId'
+        - $ref: '#/components/parameters/gatewayId'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GatewayDetails'
 components:
+  parameters:
+    platformId:
+      name: platformId
+      in: path
+      required: true
+      schema:
+        type: string
+    gatewayId:
+      name: gatewayId
+      in: path
+      required: true
+      schema:
+        type: string
   schemas:
-    SimulationStatus:
+    ServiceStatus:
+      type: string
+      enum:
+        - RUNNING
+        - STOPPED
+        - ERROR
+    Platform:
       type: object
       properties:
         name:
           type: string
-          description: Name of the simulation
-          example: STAR 3.5
-        status:
+          example: "X2024"
+        url:
           type: string
-          description: Status of simulation
-          example: up
-          enum:
-            - up
-            - down
-    SimulationUpdate:
+          format: url
+          example: "http://myserver.com/doip-simulation/platform/X2024"
+        status:
+          $ref: '#/components/schemas/ServiceStatus'
+        gateways:
+          type: array
+          description: List of all DoIP gateways within this platform
+          items:
+            $ref: '#/components/schemas/Gateway'
+    Gateway:
       type: object
       properties:
-        status:
+        name:
           type: string
-          description: Status of simulation
-          example: up
-          enum:
-            - up
-            - down
+        url:
+          type: string
+          format: url
+          example: "http://myserver.com/doip-simulation/platform/X2024/gateway/GW"
+        status:
+            $ref: '#/components/schemas/ServiceStatus'
+        error:
+          type: string
+          description: 
+            Contains the error message when starting of gateway did fail.
+            If there was no error then this property will not be present.
+          example: "Can't bind to port 13400 because it is already usedby other gateway"
+      required:
+        - name
+        - url
+        - status
+    GatewayDetails:
+      allOf:
+        - $ref: '#/components/schemas/Gateway'
+        - type: object
+          properties:
+            ecus:
+              type: array
+              description: List of all ECUs which are connected to this gateway
+              items:
+                $ref: '#/components/schemas/Ecu'
+    Ecu:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "EMS"
+        url:
+          type: string
+          format: url
+          example: "http://myserver.com/doip-simulation/platform/X2024/gateway/GW/ecu/EMS"
+        configuredLookupTable:
+          $ref: '#/components/schemas/LookupTable'
+        runtimeLookupTable:
+          $ref: '#/components/schemas/LookupTable'
+    LookupTable:
+      type: object
+      properties:
+        lookupEntries:
+          type: array
+          description: List of lookup entries within this lookup table
+          items:
+            $ref: '#/components/schemas/LookupEntry'
+    LookupEntry:
+      type: object
+      properties:
+        regex:
+          type: string
+          example: "10 03"
+        result:
+          type: string
+          example: "50 03 00 32 01 F4"
+        modifiers:
+          type: array
+          items: 
+            $ref: '#/components/schemas/LookupEntry'
+          example: [{regex: "22 F1 86", result: "62 F1 86 03"}]
+    ServerInfo:
+      type: object
+      description: Information about the simulation server
+      properties:
+        platforms:
+          type: array
+          description: List of all available vehicle platforms
+          items:
+            $ref: '#/components/schemas/Platform'
