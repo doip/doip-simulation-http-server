@@ -74,7 +74,8 @@ public class DoipHttpServer {
 
 		handlers = new ArrayList<ContextHandler>();
 
-		createMappingContexts(); // TODO:
+		// TODO: Possibly create default mapping contexts here if needed
+		createMappingContexts();
 
 	}
 
@@ -146,10 +147,17 @@ public class DoipHttpServer {
 	 * Starts the HTTP server.
 	 */
 	public void start() {
+		// Set the executor before registering context handlers
+		server.setExecutor(null); // Use the default executor
+
+		// Register context handlers
 		for (ContextHandler contextHandler : handlers) {
 			server.createContext(contextHandler.getContext(), contextHandler.getHandler());
 		}
-		server.setExecutor(null); // Use the default executor
+		
+		 // Log the registered contexts and handlers
+	    logRegisteredHandlers();
+
 		synchronized (lock) {
 			try {
 				if (server != null && !isRunning) {
@@ -176,7 +184,15 @@ public class DoipHttpServer {
 		}
 	}
 
-	
+	/**
+	 * Method to log registered handlers
+	 */
+	private void logRegisteredHandlers() {
+		logger.info("Registered Handlers:");
+		for (ContextHandler contextHandler : handlers) {
+			logger.info("Context: {}, Handler: {}", contextHandler.getContext(), contextHandler.getHandler());
+		}
+	}
 }
 
 class PostHandler implements HttpHandler {
