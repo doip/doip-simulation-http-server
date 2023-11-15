@@ -154,9 +154,9 @@ public class DoipHttpServer {
 		for (ContextHandler contextHandler : handlers) {
 			server.createContext(contextHandler.getContext(), contextHandler.getHandler());
 		}
-		
-		 // Log the registered contexts and handlers
-	    logRegisteredHandlers();
+
+		// Log the registered contexts and handlers
+		logRegisteredHandlers();
 
 		synchronized (lock) {
 			try {

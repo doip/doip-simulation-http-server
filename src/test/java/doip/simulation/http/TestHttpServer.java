@@ -61,14 +61,6 @@ class TestHttpServer {
 		}
 	}
 
-	@BeforeEach
-	void setUp() throws Exception {
-	}
-
-	@AfterEach
-	void tearDown() throws Exception {
-	}
-
 	@Test
 	void testDoipPOST() throws HttpStatusCodeException, URISyntaxException, IOException, InterruptedException,
 			HttpInvalidRequestBodyType, HttpInvalidResponseBodyType {
