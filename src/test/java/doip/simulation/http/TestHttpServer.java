@@ -19,6 +19,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.starcode88.http.HttpClient;
+import com.starcode88.http.HttpUtils;
 import com.starcode88.http.exception.HttpInvalidRequestBodyType;
 import com.starcode88.http.exception.HttpInvalidResponseBodyType;
 import com.starcode88.http.exception.HttpStatusCodeException;
@@ -26,16 +27,14 @@ import com.starcode88.http.exception.HttpStatusCodeException;
 import doip.simulation.api.SimulationManager;
 
 class TestHttpServer {
-	
+
 	private static Logger logger = LogManager.getLogger(TestHttpServer.class);
 
 	private static DoipHttpServer server = null;
 
 	private static HttpClient clientForLocalHost = null;
 
-	
 	private static final int PORT = 8080;
-
 
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
@@ -45,8 +44,8 @@ class TestHttpServer {
 //		config.loadFromFile(path);		
 //		CustomGateway gateway = new CustomGateway(config);		
 //		server = new DoipHttpServer(gateway);
-		
-		SimulationManager  mockSimulation =  new SimulationManagerMock();
+
+		SimulationManager mockSimulation = new SimulationManagerMock();
 
 		server = new DoipHttpServer(PORT, mockSimulation);
 
@@ -74,8 +73,9 @@ class TestHttpServer {
 	void testDoipPOST() throws HttpStatusCodeException, URISyntaxException, IOException, InterruptedException,
 			HttpInvalidRequestBodyType, HttpInvalidResponseBodyType {
 		logger.info("---------------------------  testDoipPOST -----------------------------------");
-	
-		HttpResponse<String> response = clientForLocalHost.POST("/post", "How are you?", String.class);
+
+		String postMessage = "How are you?";
+		HttpResponse<String> response = clientForLocalHost.POST("/posttest", postMessage, String.class);
 
 		assertNotNull(response, "The response from server is null");
 
@@ -83,7 +83,8 @@ class TestHttpServer {
 		assertEquals(200, statusCode, "The HTTP status code is not 200");
 		String body = response.body();
 		assertNotNull(body, "The response from server is null");
-		
+		assertTrue(body.contains(postMessage), "The response from server is not completely");
+
 		logger.info("--------------------------------------------------------------");
 	}
 
@@ -91,14 +92,40 @@ class TestHttpServer {
 	void testDoipGET() throws HttpStatusCodeException, HttpInvalidResponseBodyType, URISyntaxException, IOException,
 			InterruptedException {
 		logger.info("---------------------------  testDoipGet -----------------------------------");
-		HttpResponse<String> response = clientForLocalHost.GET("/get", String.class);
-		
+		HttpResponse<String> response = clientForLocalHost.GET("/gettest", String.class);
+
 		int statusCode = response.statusCode();
 		assertEquals(200, statusCode, "The HTTP status code is not 200");
 		String body = response.body();
 		assertNotNull(body, "The response from server is null");
-		
+
 		logger.info("--------------------------------------------------------------");
 	}
+/*
+	@Test
+	void testCheckWrongHttpMethod() throws HttpStatusCodeException, HttpInvalidResponseBodyType, URISyntaxException,
+			IOException, InterruptedException, HttpInvalidRequestBodyType {
+		logger.info("---------------------------  testCheckWrongHttpMethod -----------------------------------");
+		
 
+//		HttpStatusCodeException e = assertThrows(HttpStatusCodeException.class, () -> clientForLocalHost.POST("/gettest","??????", String.class));
+//		int statusCode = e.getResponse().statusCode();
+//		String statusText = HttpUtils.getStatusText(statusCode);
+//		logger.info("Status code = {} ({})", statusCode, statusText);
+//		assertEquals(405, e.getResponse().statusCode(), "The status code does not match the value 405");
+
+		int statusCode = 0;
+		try {
+			clientForLocalHost.POST("/gettest", "??????", String.class);
+		} catch (HttpStatusCodeException e) {
+			statusCode = e.getResponse().statusCode();
+			String statusText = HttpUtils.getStatusText(statusCode);
+			logger.info("Status code = {} ({})", statusCode, statusText);
+		}
+
+		assertEquals(405, statusCode, "The status code does not match the value 405");
+
+		logger.info("--------------------------------------------------------------");
+	}
+*/
 }

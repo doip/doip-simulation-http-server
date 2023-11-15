@@ -87,8 +87,8 @@ public class DoipHttpServer {
 	 */
 
 	private void createMappingContexts() {
-		List<ContextHandler> defaultHandlers = List.of(new ContextHandler("/post", new PostHandler()),
-				new ContextHandler("/get", new GetHandler()));
+		List<ContextHandler> defaultHandlers = List.of(new ContextHandler("/posttest", new PostHandler()),
+				new ContextHandler("/gettest", new GetHandler()));
 		createMappingContexts(defaultHandlers);
 	}
 
