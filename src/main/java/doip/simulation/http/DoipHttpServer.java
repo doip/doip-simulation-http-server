@@ -76,10 +76,6 @@ public class DoipHttpServer {
 
 		createMappingContexts(); // TODO:
 
-		for (ContextHandler contextHandler : handlers) {
-			server.createContext(contextHandler.getContext(), contextHandler.getHandler());
-		}
-		server.setExecutor(null); // Use the default executor
 	}
 
 	/**
@@ -150,6 +146,10 @@ public class DoipHttpServer {
 	 * Starts the HTTP server.
 	 */
 	public void start() {
+		for (ContextHandler contextHandler : handlers) {
+			server.createContext(contextHandler.getContext(), contextHandler.getHandler());
+		}
+		server.setExecutor(null); // Use the default executor
 		synchronized (lock) {
 			try {
 				if (server != null && !isRunning) {
