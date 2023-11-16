@@ -17,6 +17,10 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import doip.simulation.http.lib.Gateway;
+import doip.simulation.http.lib.ServerInfo;
+import doip.simulation.http.lib.SimulationStatus;
+
 public class GetSimulationOverviewHandler implements HttpHandler {
 	private final DoipHttpServer doipHttpServer;
 	private final ObjectMapper objectMapper = new ObjectMapper();
@@ -24,26 +28,6 @@ public class GetSimulationOverviewHandler implements HttpHandler {
 	// Constructor to receive the DoipHttpServer instance
 	public GetSimulationOverviewHandler(DoipHttpServer doipHttpServer) {
 		this.doipHttpServer = doipHttpServer;
-	}
-
-	@JsonInclude(JsonInclude.Include.NON_NULL)
-	public static class Gateway {
-		public String name;
-		public String url;
-		public String status;
-		public String error;
-	}
-
-	@JsonInclude(JsonInclude.Include.NON_NULL)
-	public static class ServerInfo {
-		public String name;
-		public String url;
-		public String status;
-		public List<Gateway> gateways;
-	}
-
-	public enum SimulationStatus {
-		RUNNING, STOPPED, ERROR
 	}
 
 	@Override
@@ -79,7 +63,6 @@ public class GetSimulationOverviewHandler implements HttpHandler {
 			HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json", 200);
 			HttpServerHelper.responseServerLogging(exchange, 200, jsonResponse);
 		
-			//sendJsonResponse(exchange, jsonResponse);
 			
 		} catch (Exception e) {
 			// Handle exceptions and send an appropriate response
@@ -87,21 +70,6 @@ public class GetSimulationOverviewHandler implements HttpHandler {
 		}
 	}
 
-	private void sendJsonResponse(HttpExchange exchange, String jsonResponse) throws IOException {
-		// Set response headers
-		exchange.getResponseHeaders().set("Content-Type", "application/json");
-		exchange.sendResponseHeaders(200, jsonResponse.length());
-
-		// Write the JSON response to the output stream
-		try (OutputStream os = exchange.getResponseBody()) {
-			os.write(jsonResponse.getBytes());
-		}
-	}
-
-//	    private boolean isValidStatus(String status) {
-//	        // Validate the 'status' parameter against the allowed values
-//	        return status.equals("RUNNING") || status.equals("STOPPED") || status.equals("ERROR");
-//	    }
 
 	private boolean isValidStatus(String status) {
 		// Validate the 'status' parameter against the allowed values

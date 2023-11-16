@@ -1,5 +1,6 @@
 package doip.simulation.http;
 
+/*
 import doip.simulation.api.Gateway;
 import doip.simulation.api.Simulation;
 
@@ -60,3 +61,4 @@ public class SimulationMock implements Simulation {
 	    }
 
 }
+*/
