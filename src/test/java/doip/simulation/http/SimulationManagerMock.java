@@ -1,34 +1,47 @@
 package doip.simulation.http;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import doip.simulation.api.SimulationManager;
+import doip.simulation.api.Platform;
 
 public class SimulationManagerMock implements SimulationManager {
 
-    private boolean startCalled = false;
-    private boolean stopCalled = false;
-    private String startedPlatform;
+    private List<Platform> platforms = new ArrayList<>();
 
     @Override
     public void start(String platform) {
-        startCalled = true;
-        startedPlatform = platform;
+        // Implement the logic for starting a simulation for the specified platform
+        System.out.println("Starting simulation for platform: " + platform);
+    }
+
+    @Override
+    public void start(String platform, String host) {
+        // Implement the logic for starting a simulation for the specified platform and host
+        System.out.println("Starting simulation for platform: " + platform + " on host: " + host);
     }
 
     @Override
     public void stop() {
-        stopCalled = true;
+        // Implement the logic for stopping the simulation
+        System.out.println("Stopping simulation");
     }
 
-    // Additional methods or getters for testing purposes
-    public boolean isStartCalled() {
-        return startCalled;
+    @Override
+    public Platform getPlatformByName(String name) {
+        // Implement the logic for retrieving a platform by name
+        for (Platform platform : platforms) {
+            if (platform.getName().equals(name)) {
+                return platform;
+            }
+        }
+        return null;
     }
 
-    public boolean isStopCalled() {
-        return stopCalled;
-    }
-
-    public String getStartedPlatform() {
-        return startedPlatform;
+    @Override
+    public List<Platform> getPlatforms() {
+        // Implement the logic for retrieving all platforms
+        return platforms;
     }
 }
