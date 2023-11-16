@@ -102,6 +102,9 @@ public class CustomMappingController {
 			if ("GET".equals(exchange.getRequestMethod())) {
 				// Create the GET response
 				String response = "Custom GET request processed.";
+				
+				//TODO:
+				//httpServer.getSimulationManager().start("Test");
 
 				// Set the response headers and body
 				HttpServerHelper.sendResponse(exchange, response, "text/plain", 200);
