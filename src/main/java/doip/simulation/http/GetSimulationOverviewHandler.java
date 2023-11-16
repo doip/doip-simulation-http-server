@@ -75,17 +75,26 @@ public class GetSimulationOverviewHandler implements HttpHandler {
 			// Build the JSON response based on the status
 			String jsonResponse = buildJsonResponse(status);
 
-			// Set response headers
-			exchange.getResponseHeaders().set("Content-Type", "application/json");
-			exchange.sendResponseHeaders(200, jsonResponse.length());
-
-			// Write the JSON response to the output stream
-			try (OutputStream os = exchange.getResponseBody()) {
-				os.write(jsonResponse.getBytes());
-			}
+			// Set the response headers and body
+			HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json", 200);
+			HttpServerHelper.responseServerLogging(exchange, 200, jsonResponse);
+		
+			//sendJsonResponse(exchange, jsonResponse);
+			
 		} catch (Exception e) {
 			// Handle exceptions and send an appropriate response
 			exchange.sendResponseHeaders(500, -1); // Internal Server Error
+		}
+	}
+
+	private void sendJsonResponse(HttpExchange exchange, String jsonResponse) throws IOException {
+		// Set response headers
+		exchange.getResponseHeaders().set("Content-Type", "application/json");
+		exchange.sendResponseHeaders(200, jsonResponse.length());
+
+		// Write the JSON response to the output stream
+		try (OutputStream os = exchange.getResponseBody()) {
+			os.write(jsonResponse.getBytes());
 		}
 	}
 
@@ -105,6 +114,17 @@ public class GetSimulationOverviewHandler implements HttpHandler {
 	}
 
 	private String buildJsonResponse(String status) throws IOException {
+		
+		//TODO !!!
+		//doipHttpServer.getSimulationManager().start("Test");
+		
+		ServerInfo serverInfo = createSampleJson(status);
+
+		// Convert the ServerInfo object to JSON
+		return objectMapper.writeValueAsString(serverInfo);
+	}
+
+	private ServerInfo createSampleJson(String status) {
 		// Build a JSON response based on the specified 'status'
 		ServerInfo serverInfo = new ServerInfo();
 		serverInfo.name = "X2024";
@@ -123,9 +143,7 @@ public class GetSimulationOverviewHandler implements HttpHandler {
 		}
 
 		serverInfo.gateways = Collections.singletonList(gateway);
-
-		// Convert the ServerInfo object to JSON
-		return objectMapper.writeValueAsString(serverInfo);
+		return serverInfo;
 	}
 
 }
