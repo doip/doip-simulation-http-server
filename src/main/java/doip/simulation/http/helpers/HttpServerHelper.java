@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -242,6 +243,55 @@ public class HttpServerHelper {
 			logger.info("        {} = {}", headerName, headerValueString);
 		}
 	}
+	
+	 /**
+     * Parses query parameters from the given query string.
+     *
+     * @param query The query string containing parameters.
+     * @return A Map representing the parsed query parameters.
+     */
+    public static Map<String, String> parseQueryParameters(String query) {
+        // Initialize a Map to store the parsed parameters
+        Map<String, String> queryParams = new HashMap<>();
+
+        if (query != null && !query.isEmpty()) {
+            // Split the query string into individual parameter pairs
+            String[] pairs = query.split("&");
+
+            // Iterate through each parameter pair
+            for (String pair : pairs) {
+                // Split the parameter pair into key and value
+                String[] keyValue = pair.split("=");
+
+                // Check if the parameter has both key and value
+                if (keyValue.length == 2) {
+                    // URL-decode key and value and put them into the Map
+                    String key = urlDecode(keyValue[0]);
+                    String value = urlDecode(keyValue[1]);
+                    queryParams.put(key, value);
+                }
+            }
+        }
+
+        // Return the parsed query parameters
+        return queryParams;
+    }
+    
+    /**
+     * URL-decodes the given string.
+     *
+     * @param value The string to URL-decode.
+     * @return The URL-decoded string.
+     */
+    private static String urlDecode(String value) {
+        try {
+            // Use java.net.URLDecoder to decode the URL-encoded string
+            return java.net.URLDecoder.decode(value, "UTF-8");
+        } catch (java.io.UnsupportedEncodingException e) {
+            // Handle the exception if encoding is not supported
+            throw new RuntimeException("UTF-8 encoding is not supported.", e);
+        }
+    }
 
 
 }
