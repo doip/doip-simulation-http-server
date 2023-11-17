@@ -5,3 +5,4 @@
 .settings/
 /build/
 /bin/
+assert.log info.log trace.log
