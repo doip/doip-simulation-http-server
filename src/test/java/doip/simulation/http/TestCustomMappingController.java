@@ -9,10 +9,9 @@ import java.net.http.HttpResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import com.starcode88.http.HttpClient;
 import com.starcode88.http.exception.HttpInvalidRequestBodyType;
@@ -35,9 +34,11 @@ class TestCustomMappingController {
 
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
-		SimulationManager mockSimulation = new SimulationManagerMock();
+		// SimulationManagerMock mockSimulationManager = new SimulationManagerMock();
+		// Create a mock instance of SimulationManager
+		SimulationManager mockSimulationManager = Mockito.mock(SimulationManager.class);
 
-		server = new DoipHttpServer(PORT, mockSimulation);
+		server = new DoipHttpServer(PORT, mockSimulationManager);
 
 		customMapping = new CustomMappingController(server);
 
