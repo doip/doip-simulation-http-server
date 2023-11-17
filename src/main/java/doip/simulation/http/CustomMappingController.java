@@ -18,7 +18,7 @@ public class CustomMappingController {
 
 	private static Logger logger = LogManager.getLogger(CustomMappingController.class);
 
-	private final DoipHttpServer httpServer;
+	private final DoipHttpServer doipHttpServer;
 
 	/**
 	 * Constructs a CustomMappingController with the specified DoipHttpServer
@@ -27,21 +27,21 @@ public class CustomMappingController {
 	 * @param httpServer The DoipHttpServer instance to use.
 	 */
 	public CustomMappingController(DoipHttpServer httpServer) {
-		this.httpServer = httpServer;
+		this.doipHttpServer = httpServer;
 	}
 
 	/**
 	 * Starts an HTTP server with custom POST and GET mappings.
 	 */
 	public void startHttpServer() {
-		if (httpServer.isRunning()) {
+		if (doipHttpServer.isRunning()) {
 			logger.info("Server is already running.");
 			return;
 		}
 		try {
 
-			addCustomMappings();
-			httpServer.start();
+			configureCustomMappings();
+			doipHttpServer.start();
 		} catch (Exception e) {
 			logger.error("Error starting the server: {}", e.getMessage(), e);
 		}
@@ -50,16 +50,35 @@ public class CustomMappingController {
 	/**
 	 * Adds custom mappings.
 	 */
-	private void addCustomMappings() {
+	private void configureCustomMappings() {
 		HttpHandler postHandler = new PostHandlerCustom();
 		HttpHandler getHandler = new GetHandlerCustom();
 
-		List<ContextHandler> customHandlers = List.of(new ContextHandler("/customPost", postHandler),
-				new ContextHandler("/customGet", getHandler));
+		List<ContextHandler> customHandlers = List.of(
+				new ContextHandler("/customPost", postHandler),
+				new ContextHandler("/customGet", getHandler)
+				//,new ContextHandler("/", new GetSimulationOverviewHandler(doipHttpServer))
+				);
 
 		// Create and configure the DoipHttpServer instance
-		httpServer.createMappingContexts(customHandlers);
+		doipHttpServer.createMappingContexts(customHandlers);
 		logger.info("Added custom POST and GET mappings.");
+	}
+
+	/**
+	 * Adds an external HTTP handler with the specified context path.
+	 *
+	 * @param contextPath The context path for the handler.
+	 * @param handler     The HTTP handler to be added.
+	 */
+	public void addExternalHandler(String contextPath, HttpHandler handler) {
+		if (contextPath != null && handler != null) {
+			
+			doipHttpServer.addMappingContext(contextPath, handler);
+			logger.info("Added external handler for context path: {}", contextPath);
+		} else {
+			logger.warn("Invalid parameters for adding external handler.");
+		}
 	}
 
 	/**
@@ -102,9 +121,9 @@ public class CustomMappingController {
 			if ("GET".equals(exchange.getRequestMethod())) {
 				// Create the GET response
 				String response = "Custom GET request processed.";
-				
-				//TODO:
-				//httpServer.getSimulationManager().start("Test");
+
+				// TODO:
+				// httpServer.getSimulationManager().start("Test");
 
 				// Set the response headers and body
 				HttpServerHelper.sendResponse(exchange, response, "text/plain", 200);
