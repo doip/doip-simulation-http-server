@@ -11,20 +11,22 @@ import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
+import org.mockito.Mockito;
 
 import com.starcode88.http.HttpClient;
 import com.starcode88.http.exception.HttpInvalidRequestBodyType;
 import com.starcode88.http.exception.HttpInvalidResponseBodyType;
 import com.starcode88.http.exception.HttpStatusCodeException;
 
+import doip.simulation.api.SimulationManager;
+
 class TestOverviewHandler {
-	
+
 	private static Logger logger = LogManager.getLogger(TestOverviewHandler.class);
 
 	private static DoipHttpServer server = null;
 
-	private static CustomMappingController customController  = null;
+	private static CustomMappingController customController = null;
 
 	private static HttpClient clientForLocalHost = null;
 
@@ -32,12 +34,14 @@ class TestOverviewHandler {
 
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
-		SimulationManagerMock mockSimulation = new SimulationManagerMock();
+		// SimulationManagerMock mockSimulationManager = new SimulationManagerMock();
+		// Create a mock instance of SimulationManager
+		SimulationManager mockSimulationManager = Mockito.mock(SimulationManager.class);
 
-		server = new DoipHttpServer(PORT, mockSimulation);
+		server = new DoipHttpServer(PORT, mockSimulationManager);
 
-		customController  = new CustomMappingController(server);
-		
+		customController = new CustomMappingController(server);
+
 		customController.addExternalHandler("/", new GetSimulationOverviewHandler(server));
 
 		customController.startHttpServer();
@@ -54,9 +58,10 @@ class TestOverviewHandler {
 	}
 
 	@Test
-	void testGetOverviewHandler() throws HttpStatusCodeException, HttpInvalidResponseBodyType, URISyntaxException, IOException, InterruptedException {
+	void testGetOverviewHandler() throws HttpStatusCodeException, HttpInvalidResponseBodyType, URISyntaxException,
+			IOException, InterruptedException {
 		logger.info("-------------------------- testGetOverviewHandler ------------------------------------");
-		
+
 		HttpResponse<String> response = clientForLocalHost.GET("/?status=RUNNING", String.class);
 
 		int statusCode = response.statusCode();

@@ -13,10 +13,9 @@ import java.net.http.HttpResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import com.starcode88.http.HttpClient;
 import com.starcode88.http.HttpUtils;
@@ -45,9 +44,11 @@ class TestHttpServer {
 //		CustomGateway gateway = new CustomGateway(config);		
 //		server = new DoipHttpServer(gateway);
 
-		SimulationManager mockSimulation = new SimulationManagerMock();
+		// SimulationManagerMock mockSimulationManager = new SimulationManagerMock();
+		// Create a mock instance of SimulationManager
+		SimulationManager mockSimulationManager = Mockito.mock(SimulationManager.class);
 
-		server = new DoipHttpServer(PORT, mockSimulation);
+		server = new DoipHttpServer(PORT, mockSimulationManager);
 
 		server.start();
 		clientForLocalHost = new HttpClient("http://localhost:" + PORT);
@@ -93,6 +94,7 @@ class TestHttpServer {
 
 		logger.info("--------------------------------------------------------------");
 	}
+	
 /*
 	@Test
 	void testCheckWrongHttpMethod() throws HttpStatusCodeException, HttpInvalidResponseBodyType, URISyntaxException,
