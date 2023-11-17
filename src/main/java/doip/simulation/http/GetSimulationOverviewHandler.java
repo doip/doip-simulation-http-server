@@ -10,7 +10,6 @@ import doip.simulation.http.helpers.HttpServerHelper;
 
 import java.io.OutputStream;
 import java.net.URI;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import doip.simulation.http.lib.Gateway;
 import doip.simulation.http.lib.ServerInfo;
 import doip.simulation.http.lib.SimulationStatus;
+import doip.simulation.http.lib.Platform;
 
 public class GetSimulationOverviewHandler implements HttpHandler {
 	private final DoipHttpServer doipHttpServer;
@@ -62,14 +62,12 @@ public class GetSimulationOverviewHandler implements HttpHandler {
 			// Set the response headers and body
 			HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json", 200);
 			HttpServerHelper.responseServerLogging(exchange, 200, jsonResponse);
-		
-			
+
 		} catch (Exception e) {
 			// Handle exceptions and send an appropriate response
 			exchange.sendResponseHeaders(500, -1); // Internal Server Error
 		}
 	}
-
 
 	private boolean isValidStatus(String status) {
 		// Validate the 'status' parameter against the allowed values
@@ -82,10 +80,10 @@ public class GetSimulationOverviewHandler implements HttpHandler {
 	}
 
 	private String buildJsonResponse(String status) throws IOException {
-		
-		//TODO !!!
-		//doipHttpServer.getSimulationManager().start("Test");
-		
+
+		// TODO !!!
+		// doipHttpServer.getSimulationManager().getPlatforms();
+
 		ServerInfo serverInfo = createSampleJson(status);
 
 		// Convert the ServerInfo object to JSON
@@ -95,11 +93,14 @@ public class GetSimulationOverviewHandler implements HttpHandler {
 	private ServerInfo createSampleJson(String status) {
 		// Build a JSON response based on the specified 'status'
 		ServerInfo serverInfo = new ServerInfo();
-		serverInfo.name = "X2024";
-		serverInfo.url = "http://myserver.com/doip-simulation/platform/X2024";
-		serverInfo.status = status;
 
-		// Add gateway information
+		// Create a Platform
+		Platform platform = new Platform();
+		platform.name = "X2024";
+		platform.url = "http://myserver.com/doip-simulation/platform/X2024";
+		platform.status = status;
+
+		// Create a Gateway
 		Gateway gateway = new Gateway();
 		gateway.name = "string";
 		gateway.url = "http://myserver.com/doip-simulation/platform/X2024/gateway/GW";
@@ -110,7 +111,12 @@ public class GetSimulationOverviewHandler implements HttpHandler {
 			gateway.error = "Can't bind to port 13400 because it is already used by another gateway";
 		}
 
-		serverInfo.gateways = Collections.singletonList(gateway);
+		// Add the gateway to the platform's gateways list
+		platform.gateways = List.of(gateway);
+
+		// Add the platform to the serverInfo's platforms list
+		serverInfo.platforms = List.of(platform);
+
 		return serverInfo;
 	}
 
