@@ -3,6 +3,7 @@ package doip.simulation.http;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.ArrayList;
 
 import org.apache.logging.log4j.LogManager;
@@ -75,18 +76,22 @@ public class DoipHttpServer {
 		handlers = new ArrayList<ContextHandler>();
 
 		// TODO: Possibly create default mapping contexts here if needed
-		createMappingContexts();
+		createTestMappingContexts();
 
 	}
 
 	/**
 	 * Creates default mapping contexts for POST and GET requests.
 	 */
-
-	private void createMappingContexts() {
-		List<ContextHandler> defaultHandlers = List.of(new ContextHandler("/posttest", new PostHandler()),
-				new ContextHandler("/gettest", new GetHandler()));
-		createMappingContexts(defaultHandlers);
+	private void createTestMappingContexts() {
+		// Check if the server is running before creating test mapping contexts
+		if (isRunning == false) {
+			List<ContextHandler> defaultHandlers = List.of(new ContextHandler("/posttest", new PostHandler()),
+					new ContextHandler("/gettest", new GetHandler()));
+			createMappingContexts(defaultHandlers);
+		} else {
+			logger.warn("Server is running. Test mapping contexts not created.");
+		}
 	}
 
 	/**
@@ -98,12 +103,17 @@ public class DoipHttpServer {
 	 *                context.
 	 */
 	public void addMappingContext(String context, HttpHandler handler) {
-		// Check if the context already exists in handlers
-		if (!contextExists(context)) {
-			handlers.add(new ContextHandler(context, handler));
-			logger.info("Added mapping context: {}", context);
+		// Check if the server is running before adding mapping context
+		if (isRunning == false) {
+			// Check if the context already exists in handlers
+			if (!contextExists(context)) {
+				handlers.add(new ContextHandler(context, handler));
+				logger.info("Added mapping context: {}", context);
+			} else {
+				logger.warn("Mapping context '{}' already exists. Not adding it again.", context);
+			}
 		} else {
-			logger.warn("Mapping context '{}' already exists. Not adding it again.", context);
+			logger.warn("Server is running. Mapping context not added.");
 		}
 	}
 
@@ -113,14 +123,20 @@ public class DoipHttpServer {
 	 * @param customHandlers The list of custom context handlers.
 	 */
 	public void createMappingContexts(List<ContextHandler> customHandlers) {
-		for (ContextHandler customHandler : customHandlers) {
-			// Check if the context already exists in handlers before adding
-			if (!contextExists(customHandler.getContext())) {
-				handlers.add(customHandler);
-				logger.info("Added mapping context: {}", customHandler.getContext());
-			} else {
-				logger.warn("Mapping context '{}' already exists. Not adding it again.", customHandler.getContext());
+		//Check if the server is running before creating custom mapping contexts
+		if (isRunning == false) {
+			for (ContextHandler customHandler : customHandlers) {
+				// Check if the context already exists in handlers before adding
+				if (!contextExists(customHandler.getContext())) {
+					handlers.add(customHandler);
+					logger.info("Added mapping context: {}", customHandler.getContext());
+				} else {
+					logger.warn("Mapping context '{}' already exists. Not adding it again.",
+							customHandler.getContext());
+				}
 			}
+		} else {
+			logger.warn("Server is running. Custom mapping contexts not created.");
 		}
 	}
 
@@ -141,6 +157,15 @@ public class DoipHttpServer {
 	 */
 	private boolean contextExists(String context) {
 		return handlers.stream().anyMatch(handler -> handler.getContext().equals(context));
+	}
+
+	/**
+	 * Gets the list of registered context paths
+	 * 
+	 * @return A list of strings representing the context paths.
+	 */
+	public List<String> getRegisteredContextPaths() {
+		return handlers.stream().map(ContextHandler::getContext).collect(Collectors.toList());
 	}
 
 	/**
