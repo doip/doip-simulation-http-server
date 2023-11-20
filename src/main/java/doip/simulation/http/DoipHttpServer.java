@@ -139,6 +139,24 @@ public class DoipHttpServer {
 			logger.warn("Server is running. Custom mapping contexts not created.");
 		}
 	}
+	
+	/**
+	 * Dynamically adds a custom mapping context for handling HTTP requests.
+	 *
+	 * @param context The context path for the mapping.
+	 * @param handler The HTTP handler for processing requests in the specified
+	 *                context.
+	 */
+	public void addDynamicContext(String contextPath, HttpHandler handler) {
+        // Stop the server
+        stop();
+
+        // Modify the context configuration
+        addMappingContext(contextPath, handler);
+
+        // Restart the server
+        start();
+    }
 
 //	/**
 //	 * Adds a list of custom mapping contexts for handling HTTP requests.
