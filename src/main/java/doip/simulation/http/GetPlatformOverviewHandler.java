@@ -22,7 +22,6 @@ import doip.simulation.http.lib.Ecu;
 import doip.simulation.http.lib.LookupEntry;
 import doip.simulation.http.lib.Modifier;
 
-
 //Define a handler for the "/doip-simulation/platform" path
 public class GetPlatformOverviewHandler implements HttpHandler {
 	private static Logger logger = LogManager.getLogger(GetPlatformOverviewHandler.class);
@@ -43,9 +42,42 @@ public class GetPlatformOverviewHandler implements HttpHandler {
 			handleGetGatewayRequest(exchange);
 		} else if ("GET".equals(exchange.getRequestMethod())) {
 			handleGetPlatformRequest(exchange);
+		} else if ("POST".equals(exchange.getRequestMethod())) {
+			handlePostPlatformRequest(exchange);
 		} else {
 			// Respond with 405 Method Not Allowed for non-GET requests
 			exchange.sendResponseHeaders(405, -1);
+		}
+	}
+
+	private void handlePostPlatformRequest(HttpExchange exchange) throws IOException {
+		try {
+			// Extract platform parameter from the path
+			String requestPath = exchange.getRequestURI().getPath();
+			String platformParam = HttpServerHelper.getPathParam(requestPath, "platform");
+			if (platformParam != null) {
+
+				String requestInfo = String.format("This is a POST request for platform: %s", platformParam);
+				logger.info(requestInfo);
+				
+				String requestString = HttpServerHelper.readRequestBodyAsString(exchange);
+				HttpServerHelper.requestServerLogging(exchange, requestString);
+
+
+				// Build the JSON response
+				String jsonResponse = buildPlatformJsonResponse();
+
+				// Set the response headers and body
+				HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json", 200);
+				HttpServerHelper.responseServerLogging(exchange, 200, jsonResponse);
+			} else {
+				// Invalid URL parameters
+				exchange.sendResponseHeaders(400, -1); // Bad Request
+			}
+
+		} catch (Exception e) {
+			// Handle exceptions and send an appropriate response
+			exchange.sendResponseHeaders(500, -1); // Internal Server Error
 		}
 	}
 
@@ -59,10 +91,11 @@ public class GetPlatformOverviewHandler implements HttpHandler {
 			String gateway = HttpServerHelper.getPathParam(requestUri, "gateway");
 
 			if (platform != null && gateway != null) {
-				// Process the platform and gateway information 
-				String requestInfo = String.format("This is a GET request for Platform: %s Gateway: %s",platform, gateway);
+				// Process the platform and gateway information
+				String requestInfo = String.format("This is a GET request for Platform: %s Gateway: %s", platform,
+						gateway);
 				logger.info(requestInfo);
-				
+
 				// Build the JSON response
 				String jsonResponse = buildGatewayJsonResponse();
 
@@ -87,10 +120,10 @@ public class GetPlatformOverviewHandler implements HttpHandler {
 			String requestPath = exchange.getRequestURI().getPath();
 			String platformParam = HttpServerHelper.getPathParam(requestPath, "platform");
 			if (platformParam != null) {
-				
-				String requestInfo = String.format("This is a GET request for platform: %s",platformParam);
+
+				String requestInfo = String.format("This is a GET request for platform: %s", platformParam);
 				logger.info(requestInfo);
-				
+
 				// Build the JSON response
 				String jsonResponse = buildPlatformJsonResponse();
 
@@ -108,7 +141,6 @@ public class GetPlatformOverviewHandler implements HttpHandler {
 		}
 	}
 
-
 	private String buildPlatformJsonResponse() throws IOException {
 
 		// TODO !!!
@@ -119,20 +151,20 @@ public class GetPlatformOverviewHandler implements HttpHandler {
 		// Convert theobject to JSON
 		return buildJsonResponse(platformInfo);
 	}
-	
+
 	private String buildGatewayJsonResponse() throws IOException {
 
 		// TODO !!!
 		// doipHttpServer.getSimulationManager().getPlatforms();
 
-		Gateway  gatawayInfo = createGatewaySampleJson();
+		Gateway gatawayInfo = createGatewaySampleJson();
 
 		// Convert the object to JSON
 		return buildJsonResponse(gatawayInfo);
 	}
-	
+
 	private String buildJsonResponse(Object info) throws IOException {
-	    return objectMapper.writeValueAsString(info);
+		return objectMapper.writeValueAsString(info);
 	}
 
 	private Platform createPlatformSampleJson() {
@@ -157,41 +189,40 @@ public class GetPlatformOverviewHandler implements HttpHandler {
 
 		return platform;
 	}
-	
 
-	private Gateway  createGatewaySampleJson() {
+	private Gateway createGatewaySampleJson() {
 
 		// Create an instance of your classes and populate them with data
-        Gateway gateway = new Gateway();
-        gateway.name = "string";
-        gateway.url = "http://myserver.com/doip-simulation/platform/X2024/gateway/GW";
-        gateway.status = "RUNNING";
-        gateway.error = "Can't bind to port 13400 because it is already used by other gateway";
+		Gateway gateway = new Gateway();
+		gateway.name = "string";
+		gateway.url = "http://myserver.com/doip-simulation/platform/X2024/gateway/GW";
+		gateway.status = "RUNNING";
+		gateway.error = "Can't bind to port 13400 because it is already used by other gateway";
 
-        List<Ecu> ecus = new ArrayList<>();
-        Ecu ecu = new Ecu();
-        ecu.name = "EMS";
-        ecu.url = "http://myserver.com/doip-simulation/platform/X2024/gateway/GW/ecu/EMS";
+		List<Ecu> ecus = new ArrayList<>();
+		Ecu ecu = new Ecu();
+		ecu.name = "EMS";
+		ecu.url = "http://myserver.com/doip-simulation/platform/X2024/gateway/GW/ecu/EMS";
 
-        List<LookupEntry> lookupEntries = new ArrayList<>();
-        LookupEntry lookupEntry = new LookupEntry();
-        lookupEntry.regex = "10 03";
-        lookupEntry.result = "50 03 00 32 01 F4";
+		List<LookupEntry> lookupEntries = new ArrayList<>();
+		LookupEntry lookupEntry = new LookupEntry();
+		lookupEntry.regex = "10 03";
+		lookupEntry.result = "50 03 00 32 01 F4";
 
-        List<Modifier> modifiers = new ArrayList<>();
-        Modifier modifier = new Modifier();
-        modifier.regex = "22 F1 86";
-        modifier.result = "62 F1 86 03";
-        modifiers.add(modifier);
+		List<Modifier> modifiers = new ArrayList<>();
+		Modifier modifier = new Modifier();
+		modifier.regex = "22 F1 86";
+		modifier.result = "62 F1 86 03";
+		modifiers.add(modifier);
 
-        lookupEntry.modifiers = modifiers;
-        lookupEntries.add(lookupEntry);
+		lookupEntry.modifiers = modifiers;
+		lookupEntries.add(lookupEntry);
 
-        ecu.configuredLookupTable = lookupEntries;
-        ecu.runtimeLookupTable = lookupEntries;
+		ecu.configuredLookupTable = lookupEntries;
+		ecu.runtimeLookupTable = lookupEntries;
 
-        ecus.add(ecu);
-        gateway.ecus = ecus;
+		ecus.add(ecu);
+		gateway.ecus = ecus;
 
 		return gateway;
 	}

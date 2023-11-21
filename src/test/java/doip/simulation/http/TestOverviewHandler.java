@@ -115,5 +115,24 @@ class TestOverviewHandler {
 
 		logger.info("Custom GET test completed.");
 	}
+	
+	@Test
+	void testPostPlatformOverviewHandler() throws HttpStatusCodeException, HttpInvalidResponseBodyType, URISyntaxException,
+			IOException, InterruptedException, HttpInvalidRequestBodyType {
+		logger.info("-------------------------- testPostPlatformOverviewHandler ------------------------------------");
+		
+		String postMessage = "Update or run an action for the platform given by the platformId The structure of the body of the request needs to be defined.";
+		HttpResponse<String> response = clientForLocalHost.POST("/doip-simulation/platform/X2024", postMessage, String.class);
+
+		int statusCode = response.statusCode();
+		assertEquals(200, statusCode, "The HTTP status code is not 200");
+
+		String responseBody = response.body();
+		assertNotNull(responseBody, "The response body from server is null");
+
+		// TODO Add more assertions if needed
+
+		logger.info("Custom GET test completed.");
+	}
 
 }
