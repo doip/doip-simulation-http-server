@@ -13,6 +13,9 @@ import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -22,6 +25,8 @@ import doip.simulation.http.lib.SimulationStatus;
 import doip.simulation.http.lib.Platform;
 
 public class GetSimulationOverviewHandler implements HttpHandler {
+	private static Logger logger = LogManager.getLogger(GetSimulationOverviewHandler.class);
+	
 	private final DoipHttpServer doipHttpServer;
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -65,6 +70,7 @@ public class GetSimulationOverviewHandler implements HttpHandler {
 
 		} catch (Exception e) {
 			// Handle exceptions and send an appropriate response
+			logger.error("Error processing request: {}", e.getMessage(), e);
 			exchange.sendResponseHeaders(500, -1); // Internal Server Error
 		}
 	}

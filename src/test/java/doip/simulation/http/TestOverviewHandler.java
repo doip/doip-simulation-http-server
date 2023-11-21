@@ -31,6 +31,9 @@ class TestOverviewHandler {
 	private static HttpClient clientForLocalHost = null;
 
 	private static final int PORT = 8080;
+	
+	private static final String PLATFORM_PATH = "/doip-simulation/platform";
+	private static final String DOIP_SIMULATION_PATH = "/doip-simulation/";
 
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
@@ -42,8 +45,8 @@ class TestOverviewHandler {
 
 		customController = new CustomMappingController(server);
 
-		customController.addExternalHandler("/doip-simulation/", new GetSimulationOverviewHandler(server));
-		customController.addExternalHandler("/doip-simulation/platform", new GetPlatformOverviewHandler(server));
+		customController.addExternalHandler(DOIP_SIMULATION_PATH, new GetSimulationOverviewHandler(server));
+		customController.addExternalHandler(PLATFORM_PATH, new GetPlatformOverviewHandler(server));
 
 		customController.startHttpServer();
 
@@ -83,6 +86,24 @@ class TestOverviewHandler {
 		logger.info("-------------------------- testGetPlatformOverviewHandler ------------------------------------");
 
 		HttpResponse<String> response = clientForLocalHost.GET("/doip-simulation/platform/X2024", String.class);
+
+		int statusCode = response.statusCode();
+		assertEquals(200, statusCode, "The HTTP status code is not 200");
+
+		String responseBody = response.body();
+		assertNotNull(responseBody, "The response body from server is null");
+
+		// TODO Add more assertions if needed
+
+		logger.info("Custom GET test completed.");
+	}
+	
+	@Test
+	void testGetGatewayOverviewHandler() throws HttpStatusCodeException, HttpInvalidResponseBodyType, URISyntaxException,
+			IOException, InterruptedException {
+		logger.info("-------------------------- testGetGatewayOverviewHandler ------------------------------------");
+
+		HttpResponse<String> response = clientForLocalHost.GET("/doip-simulation/platform/X2024/gateway/GW", String.class);
 
 		int statusCode = response.statusCode();
 		assertEquals(200, statusCode, "The HTTP status code is not 200");
