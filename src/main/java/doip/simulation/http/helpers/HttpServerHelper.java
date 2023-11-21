@@ -292,6 +292,27 @@ public class HttpServerHelper {
             throw new RuntimeException("UTF-8 encoding is not supported.", e);
         }
     }
+    
+    /**
+     * Extracts a path parameter from the given URL path.
+     *
+     * @param path      The URL path to extract the parameter from.
+     * @param paramName The name of the parameter to extract.
+     * @return The value of the specified parameter, or null if the parameter is not found.
+     */
+    public static String getPathParam(String path, String paramName) {
+        // Split the path into segments
+        String[] segments = path.split("/");
 
+        // Find the index of the parameter in the path
+        for (int i = 0; i < segments.length - 1; i++) {
+            if (paramName.equals(segments[i])) {
+                return segments[i + 1];
+            }
+        }
+
+        // Parameter not found in the path
+        return null;
+    }
 
 }

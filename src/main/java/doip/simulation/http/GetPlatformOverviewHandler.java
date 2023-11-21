@@ -55,12 +55,12 @@ public class GetPlatformOverviewHandler implements HttpHandler {
 			String requestUri = exchange.getRequestURI().toString();
 
 			// Extract platform and gateway from the path
-			String platform = getPathParam(requestUri, "platform");
-			String gateway = getPathParam(requestUri, "gateway");
+			String platform = HttpServerHelper.getPathParam(requestUri, "platform");
+			String gateway = HttpServerHelper.getPathParam(requestUri, "gateway");
 
 			if (platform != null && gateway != null) {
 				// Process the platform and gateway information 
-				String requestInfo = "Platform: " + platform + ", Gateway: " + gateway;
+				String requestInfo = String.format("This is a GET request for Platform: %s Gateway: %s",platform, gateway);
 				logger.info(requestInfo);
 				
 				// Build the JSON response
@@ -85,10 +85,10 @@ public class GetPlatformOverviewHandler implements HttpHandler {
 		try {
 			// Extract platform parameter from the path
 			String requestPath = exchange.getRequestURI().getPath();
-			String platformParam = getPathParam(requestPath, "platform");
+			String platformParam = HttpServerHelper.getPathParam(requestPath, "platform");
 			if (platformParam != null) {
 				
-				String requestInfo = "This is a GET request for platform: " + platformParam;
+				String requestInfo = String.format("This is a GET request for platform: %s",platformParam);
 				logger.info(requestInfo);
 				
 				// Build the JSON response
@@ -108,20 +108,6 @@ public class GetPlatformOverviewHandler implements HttpHandler {
 		}
 	}
 
-	// Helper method to extract the parameter from the path
-	private String getPathParam(String path, String paramName) {
-		// Split the path into segments
-		String[] segments = path.split("/");
-
-		// Find the index of the parameter in the path
-		for (int i = 0; i < segments.length - 1; i++) {
-			if (paramName.equals(segments[i])) {
-				return segments[i + 1];
-			}
-		}
-
-		return null;
-	}
 
 	private String buildPlatformJsonResponse() throws IOException {
 
