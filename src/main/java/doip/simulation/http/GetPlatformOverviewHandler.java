@@ -10,7 +10,8 @@ import org.apache.logging.log4j.Logger;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpExchange;
 
@@ -56,7 +57,17 @@ public class GetPlatformOverviewHandler implements HttpHandler {
 			String requestPath = exchange.getRequestURI().getPath();
 			String platformParam = HttpServerHelper.getPathParam(requestPath, "platform");
 			if (platformParam != null) {
-
+				
+//				// Check the Content-Type header
+//	            String contentType = exchange.getRequestHeaders().getFirst("Content-Type");
+//	            if (contentType != null && contentType.equalsIgnoreCase("application/json")) {
+//	                // The request has a JSON content type
+//	            }
+//	            else {
+//	            	 // Invalid or missing Content-Type header
+//	                exchange.sendResponseHeaders(415, -1); // Unsupported Media Type
+//	            }
+	            
 				String requestInfo = String.format("This is a POST request for platform: %s", platformParam);
 				logger.info(requestInfo);
 				
@@ -64,12 +75,23 @@ public class GetPlatformOverviewHandler implements HttpHandler {
 				HttpServerHelper.requestServerLogging(exchange, requestString);
 
 
-				// Build the JSON response
-				String jsonResponse = buildPlatformJsonResponse();
+				// Deserialize the JSON string into a Platform object
+	            Platform receivedPlatform = deserializeJsonToObject(requestString, Platform.class);
 
-				// Set the response headers and body
-				HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json", 200);
-				HttpServerHelper.responseServerLogging(exchange, 200, jsonResponse);
+	            if (receivedPlatform != null) {
+	                // Process the received platform information as needed
+
+	                // Build the JSON response
+	                String jsonResponse = buildPlatformJsonResponse();
+
+	                // Set the response headers and body
+	                HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json", 200);
+	                HttpServerHelper.responseServerLogging(exchange, 200, jsonResponse);
+	            } else {
+	                // Invalid JSON structure
+	                exchange.sendResponseHeaders(400, -1); // Bad Request
+	            }
+	            
 			} else {
 				// Invalid URL parameters
 				exchange.sendResponseHeaders(400, -1); // Bad Request
@@ -226,5 +248,24 @@ public class GetPlatformOverviewHandler implements HttpHandler {
 
 		return gateway;
 	}
+	
+	private <T> T deserializeJsonToObject(String jsonString, Class<T> valueType) {
+	    try {
+	        // Create an ObjectMapper instance
+	        ObjectMapper objectMapper = new ObjectMapper();
+
+	        // Deserialize the JSON string into an object of the specified type
+	        return objectMapper.readValue(jsonString, valueType);
+	    } catch (JsonProcessingException e) {
+	        // Log or handle JsonProcessingException (e.g., invalid JSON syntax)
+	    	logger.error("Invalid JSON syntax: {}", e.getMessage(), e);
+	        return null;
+	    } catch (Exception e) {
+	        // Log or handle other exceptions
+	    	logger.error("Error processing request: {}", e.getMessage(), e);
+	        return null;
+	    }
+	}
+
 
 }

@@ -121,8 +121,10 @@ class TestOverviewHandler {
 			IOException, InterruptedException, HttpInvalidRequestBodyType {
 		logger.info("-------------------------- testPostPlatformOverviewHandler ------------------------------------");
 		
-		String postMessage = "Update or run an action for the platform given by the platformId The structure of the body of the request needs to be defined.";
-		HttpResponse<String> response = clientForLocalHost.POST("/doip-simulation/platform/X2024", postMessage, String.class);
+		//String postMessage = "Update or run an action for the platform given by the platformId The structure of the body of the request needs to be defined.";
+		String jsonPostString = "{\"name\":\"X2024\",\"url\":\"http://myserver.com/doip-simulation/platform/X2024\",\"status\":\"RUNNING\",\"gateways\":[{\"name\":\"string\",\"url\":\"http://myserver.com/doip-simulation/platform/X2024/gateway/GW\",\"status\":\"RUNNING\",\"error\":\"Can't bind to port 13400\"}]}";
+
+		HttpResponse<String> response = clientForLocalHost.POST("/doip-simulation/platform/X2024", jsonPostString, String.class);
 
 		int statusCode = response.statusCode();
 		assertEquals(200, statusCode, "The HTTP status code is not 200");
