@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import com.starcode88.http.HttpClient;
+import com.starcode88.http.HttpUtils;
 import com.starcode88.http.exception.HttpInvalidRequestBodyType;
 import com.starcode88.http.exception.HttpInvalidResponseBodyType;
 import com.starcode88.http.exception.HttpStatusCodeException;
@@ -31,7 +32,7 @@ class TestOverviewHandler {
 	private static HttpClient clientForLocalHost = null;
 
 	private static final int PORT = 8080;
-	
+
 	private static final String PLATFORM_PATH = "/doip-simulation/platform";
 	private static final String DOIP_SIMULATION_PATH = "/doip-simulation/";
 
@@ -78,11 +79,10 @@ class TestOverviewHandler {
 
 		logger.info("Custom GET test completed.");
 	}
-	
-	
+
 	@Test
-	void testGetPlatformOverviewHandler() throws HttpStatusCodeException, HttpInvalidResponseBodyType, URISyntaxException,
-			IOException, InterruptedException {
+	void testGetPlatformOverviewHandler() throws HttpStatusCodeException, HttpInvalidResponseBodyType,
+			URISyntaxException, IOException, InterruptedException {
 		logger.info("-------------------------- testGetPlatformOverviewHandler ------------------------------------");
 
 		HttpResponse<String> response = clientForLocalHost.GET("/doip-simulation/platform/X2024", String.class);
@@ -97,13 +97,14 @@ class TestOverviewHandler {
 
 		logger.info("Custom GET test completed.");
 	}
-	
+
 	@Test
-	void testGetGatewayOverviewHandler() throws HttpStatusCodeException, HttpInvalidResponseBodyType, URISyntaxException,
-			IOException, InterruptedException {
+	void testGetGatewayOverviewHandler() throws HttpStatusCodeException, HttpInvalidResponseBodyType,
+			URISyntaxException, IOException, InterruptedException {
 		logger.info("-------------------------- testGetGatewayOverviewHandler ------------------------------------");
 
-		HttpResponse<String> response = clientForLocalHost.GET("/doip-simulation/platform/X2024/gateway/GW", String.class);
+		HttpResponse<String> response = clientForLocalHost.GET("/doip-simulation/platform/X2024/gateway/GW",
+				String.class);
 
 		int statusCode = response.statusCode();
 		assertEquals(200, statusCode, "The HTTP status code is not 200");
@@ -115,16 +116,18 @@ class TestOverviewHandler {
 
 		logger.info("Custom GET test completed.");
 	}
-	
+
 	@Test
-	void testPostPlatformOverviewHandler() throws HttpStatusCodeException, HttpInvalidResponseBodyType, URISyntaxException,
-			IOException, InterruptedException, HttpInvalidRequestBodyType {
+	void testPostPlatformOverviewHandler() throws HttpStatusCodeException, HttpInvalidResponseBodyType,
+			URISyntaxException, IOException, InterruptedException, HttpInvalidRequestBodyType {
 		logger.info("-------------------------- testPostPlatformOverviewHandler ------------------------------------");
-		
-		//String postMessage = "Update or run an action for the platform given by the platformId The structure of the body of the request needs to be defined.";
+
 		String jsonPostString = "{\"name\":\"X2024\",\"url\":\"http://myserver.com/doip-simulation/platform/X2024\",\"status\":\"RUNNING\",\"gateways\":[{\"name\":\"string\",\"url\":\"http://myserver.com/doip-simulation/platform/X2024/gateway/GW\",\"status\":\"RUNNING\",\"error\":\"Can't bind to port 13400\"}]}";
 
-		HttpResponse<String> response = clientForLocalHost.POST("/doip-simulation/platform/X2024", jsonPostString, String.class);
+		HttpClient clientForPost = new HttpClient("http://localhost:" + PORT);
+		clientForPost.addHeader("Content-Type", "application/json");
+		HttpResponse<String> response = clientForPost.POST("/doip-simulation/platform/X2024", jsonPostString,
+				String.class);
 
 		int statusCode = response.statusCode();
 		assertEquals(200, statusCode, "The HTTP status code is not 200");
@@ -134,7 +137,36 @@ class TestOverviewHandler {
 
 		// TODO Add more assertions if needed
 
-		logger.info("Custom GET test completed.");
+		logger.info("Custom POST test completed.");
+	}
+
+	@Test
+	void testPostPlatformWrongBodyType() throws HttpStatusCodeException, HttpInvalidResponseBodyType,
+			URISyntaxException, IOException, InterruptedException, HttpInvalidRequestBodyType {
+		logger.info("-------------------------- testPostPlatformWrongBodyType ------------------------------------");
+
+		String postMessage = "Update or run an action for the platform given by the platformId";
+
+		HttpClient clientForPost = new HttpClient("http://localhost:" + PORT);
+		clientForPost.addHeader("Content-Type", "application/json");
+
+		int statusCode = 0;
+		HttpResponse<String> response = null;
+		try {
+			
+			response = clientForPost.POST("/doip-simulation/platform/X2024", postMessage, String.class);
+
+		} catch (HttpStatusCodeException e) {
+			statusCode = e.getResponse().statusCode();
+			String statusText = HttpUtils.getStatusText(statusCode);
+			logger.info("Status code = {} ({})", statusCode, statusText);
+		}
+		assertEquals(400, statusCode, "The status code does not match the value 400");
+
+		//logger.info("response {}", response);
+		assertNull(response, "The response from server is not null");
+
+		logger.info("Custom POST test completed.");
 	}
 
 }
