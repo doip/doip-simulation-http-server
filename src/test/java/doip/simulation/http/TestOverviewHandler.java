@@ -168,5 +168,24 @@ class TestOverviewHandler {
 
 		logger.info("Custom POST test completed.");
 	}
+	
+	@Test
+	void testPostPlatformWrongRequestJson() throws HttpStatusCodeException, HttpInvalidResponseBodyType,
+			URISyntaxException, IOException, InterruptedException, HttpInvalidRequestBodyType {
+		logger.info("-------------------------- testPostPlatformWrongRequestJson ------------------------------------");
+
+		String jsonPostString = "{\"urlurl\":\"http://myserver.com/doip-simulation/platform/X2024\",\"status\":\"RUNNING\",\"gateways\":[{\"name\":\"string\",\"url\":\"http://myserver.com/doip-simulation/platform/X2024/gateway/GW\",\"status\":\"RUNNING\",\"error\":\"Can't bind to port 13400\"}]}";
+
+		HttpClient clientForPost = new HttpClient("http://localhost:" + PORT);
+		clientForPost.addHeader("Content-Type", "application/json");
+		
+		HttpStatusCodeException e = assertThrows(HttpStatusCodeException.class, () -> clientForPost.POST("/doip-simulation/platform/X2024", jsonPostString, String.class));
+		int statusCode = e.getResponse().statusCode();
+		String statusText = HttpUtils.getStatusText(statusCode);
+		logger.info("Status code = {} ({})", statusCode, statusText);
+		assertEquals(400, e.getResponse().statusCode(), "The status code does not match the value 400");
+
+		logger.info("Custom POST test completed.");
+	}
 
 }
