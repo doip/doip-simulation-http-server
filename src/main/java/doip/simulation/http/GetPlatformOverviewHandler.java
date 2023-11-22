@@ -44,6 +44,7 @@ public class GetPlatformOverviewHandler implements HttpHandler {
 			handlePostPlatformRequest(exchange);
 		} else {
 			// Respond with 405 Method Not Allowed for non-GET requests
+			logger.error("Method not allowed. Received a {} request.", exchange.getRequestMethod());
 			exchange.sendResponseHeaders(405, -1);
 		}
 	}
@@ -55,15 +56,14 @@ public class GetPlatformOverviewHandler implements HttpHandler {
 			String platformParam = HttpServerHelper.getPathParam(requestPath, "platform");
 			if (platformParam != null) {
 
-//				// Check the Content-Type header
-//	            String contentType = exchange.getRequestHeaders().getFirst("Content-Type");
-//	            if (contentType != null && contentType.equalsIgnoreCase("application/json")) {
-//	                // The request has a JSON content type
-//	            }
-//	            else {
-//	            	 // Invalid or missing Content-Type header
-//	                exchange.sendResponseHeaders(415, -1); // Unsupported Media Type
-//	            }
+				// Check the Content-Type header
+				String contentType = exchange.getRequestHeaders().getFirst("Content-Type");
+				if (contentType == null || !contentType.equalsIgnoreCase("application/json")) {
+					// Invalid or missing Content-Type header
+					// exchange.sendResponseHeaders(415, -1); // Unsupported Media Type
+					// Log a warning for invalid or missing Content-Type header
+					logger.warn("Invalid or missing Content-Type header. Actual Content-Type: {}. Proceeding with the request.", contentType);
+				}
 
 				String requestInfo = String.format("This is a POST request for platform: %s", platformParam);
 				logger.info(requestInfo);
@@ -84,17 +84,20 @@ public class GetPlatformOverviewHandler implements HttpHandler {
 					HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json", 200);
 					HttpServerHelper.responseServerLogging(exchange, 200, jsonResponse);
 				} else {
-					// Invalid JSON structure
+					// Invalid JSON structure  Platform deserialization failed.
+					logger.error("Received JSON structure is invalid.");
 					exchange.sendResponseHeaders(400, -1); // Bad Request
 				}
 
 			} else {
-				// Invalid URL parameters
+				// Invalid URL parameters. Platform parameter is missing or invalid.
+				logger.error("Invalid URL parameters for POST request.");
 				exchange.sendResponseHeaders(400, -1); // Bad Request
 			}
 
 		} catch (Exception e) {
 			// Handle exceptions and send an appropriate response
+			logger.error("Error processing request: {}", e.getMessage(), e);
 			exchange.sendResponseHeaders(500, -1); // Internal Server Error
 		}
 	}
@@ -122,6 +125,7 @@ public class GetPlatformOverviewHandler implements HttpHandler {
 				HttpServerHelper.responseServerLogging(exchange, 200, jsonResponse);
 			} else {
 				// Invalid URL parameters
+				logger.error("Invalid URL parameters for POST request.");
 				exchange.sendResponseHeaders(400, -1); // Bad Request
 			}
 		} catch (Exception e) {
@@ -150,11 +154,13 @@ public class GetPlatformOverviewHandler implements HttpHandler {
 				HttpServerHelper.responseServerLogging(exchange, 200, jsonResponse);
 			} else {
 				// Invalid URL parameters
+				logger.error("Invalid URL parameters for POST request.");
 				exchange.sendResponseHeaders(400, -1); // Bad Request
 			}
 
 		} catch (Exception e) {
 			// Handle exceptions and send an appropriate response
+			logger.error("Error processing request: {}", e.getMessage(), e);
 			exchange.sendResponseHeaders(500, -1); // Internal Server Error
 		}
 	}

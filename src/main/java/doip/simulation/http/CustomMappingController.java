@@ -104,6 +104,7 @@ public class CustomMappingController {
 
 			} else {
 				// Method not allowed
+				logger.error("Method not allowed. Received a {} request.", exchange.getRequestMethod());
 				exchange.sendResponseHeaders(405, -1);
 			}
 			exchange.close();
@@ -131,6 +132,7 @@ public class CustomMappingController {
 
 			} else {
 				// Method not allowed
+				logger.error("Method not allowed. Received a {} request.", exchange.getRequestMethod());
 				exchange.sendResponseHeaders(405, -1);
 			}
 			exchange.close();

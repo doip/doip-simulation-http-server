@@ -41,6 +41,7 @@ public class GetSimulationOverviewHandler implements HttpHandler {
 			handleGetRequest(exchange);
 		} else {
 			// Respond with 405 Method Not Allowed for non-GET requests
+			logger.error("Method not allowed. Received a {} request.", exchange.getRequestMethod());
 			exchange.sendResponseHeaders(405, -1);
 		}
 	}

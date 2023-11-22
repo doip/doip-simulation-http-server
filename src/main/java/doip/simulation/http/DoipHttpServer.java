@@ -123,7 +123,7 @@ public class DoipHttpServer {
 	 * @param customHandlers The list of custom context handlers.
 	 */
 	public void createMappingContexts(List<ContextHandler> customHandlers) {
-		//Check if the server is running before creating custom mapping contexts
+		// Check if the server is running before creating custom mapping contexts
 		if (isRunning == false) {
 			for (ContextHandler customHandler : customHandlers) {
 				// Check if the context already exists in handlers before adding
@@ -139,7 +139,7 @@ public class DoipHttpServer {
 			logger.warn("Server is running. Custom mapping contexts not created.");
 		}
 	}
-	
+
 	/**
 	 * Dynamically adds a custom mapping context for handling HTTP requests.
 	 *
@@ -148,15 +148,15 @@ public class DoipHttpServer {
 	 *                context.
 	 */
 	public void addDynamicContext(String contextPath, HttpHandler handler) {
-        // Stop the server
-        stop();
+		// Stop the server
+		stop();
 
-        // Modify the context configuration
-        addMappingContext(contextPath, handler);
+		// Modify the context configuration
+		addMappingContext(contextPath, handler);
 
-        // Restart the server
-        start();
-    }
+		// Restart the server
+		start();
+	}
 
 //	/**
 //	 * Adds a list of custom mapping contexts for handling HTTP requests.
@@ -236,49 +236,52 @@ public class DoipHttpServer {
 			logger.info("Context: {}, Handler: {}", contextHandler.getContext(), contextHandler.getHandler());
 		}
 	}
-}
 
-class PostHandler implements HttpHandler {
-	@Override
-	public void handle(HttpExchange exchange) throws IOException {
-		if ("POST".equals(exchange.getRequestMethod())) {
-			// Read the request body as a string
-			// String requestString = DoipHttpServer.readRequestBodyAsString(exchange);
-			String requestString = HttpServerHelper.readRequestBody(exchange, String.class);
-			HttpServerHelper.requestServerLogging(exchange, requestString);
+	class PostHandler implements HttpHandler {
+		@Override
+		public void handle(HttpExchange exchange) throws IOException {
+			if ("POST".equals(exchange.getRequestMethod())) {
+				// Read the request body as a string
+				// String requestString = DoipHttpServer.readRequestBodyAsString(exchange);
+				String requestString = HttpServerHelper.readRequestBody(exchange, String.class);
+				HttpServerHelper.requestServerLogging(exchange, requestString);
 
-			// Process the request string
-			String response = "Received the following POST request: " + requestString;
+				// Process the request string
+				String response = "Received the following POST request: " + requestString;
 
-			// Set the response headers and body
-			HttpServerHelper.sendResponse(exchange, response, "text/plain", 200);
-			HttpServerHelper.responseServerLogging(exchange, 200, response);
+				// Set the response headers and body
+				HttpServerHelper.sendResponse(exchange, response, "text/plain", 200);
+				HttpServerHelper.responseServerLogging(exchange, 200, response);
 
-		} else {
-			// Method not allowed
-			exchange.sendResponseHeaders(405, -1);
+			} else {
+				// Method not allowed
+				logger.error("Method not allowed. Received a {} request.", exchange.getRequestMethod());
+				exchange.sendResponseHeaders(405, -1);
+			}
+			exchange.close();
 		}
-		exchange.close();
+
 	}
 
-}
+	class GetHandler implements HttpHandler {
+		@Override
+		public void handle(HttpExchange exchange) throws IOException {
+			if ("GET".equals(exchange.getRequestMethod())) {
+				// Create the GET response
+				String response = "This is a GET request response.";
 
-class GetHandler implements HttpHandler {
-	@Override
-	public void handle(HttpExchange exchange) throws IOException {
-		if ("GET".equals(exchange.getRequestMethod())) {
-			// Create the GET response
-			String response = "This is a GET request response.";
+				// Set the response headers and body
+				HttpServerHelper.sendResponse(exchange, response, "text/plain", 200);
+				HttpServerHelper.responseServerLogging(exchange, 200, response);
 
-			// Set the response headers and body
-			HttpServerHelper.sendResponse(exchange, response, "text/plain", 200);
-			HttpServerHelper.responseServerLogging(exchange, 200, response);
-
-		} else {
-			// Method not allowed
-			exchange.sendResponseHeaders(405, -1);
+			} else {
+				// Method not allowed
+				logger.error("Method not allowed. Received a {} request.", exchange.getRequestMethod());
+				exchange.sendResponseHeaders(405, -1);
+			}
+			exchange.close();
 		}
-		exchange.close();
+
 	}
 
 }
