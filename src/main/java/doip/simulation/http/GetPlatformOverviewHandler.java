@@ -10,8 +10,6 @@ import org.apache.logging.log4j.Logger;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpExchange;
 
@@ -21,7 +19,6 @@ import doip.simulation.http.lib.Modifier;
 import doip.simulation.http.lib.Platform;
 import doip.simulation.http.lib.Ecu;
 import doip.simulation.http.lib.LookupEntry;
-import doip.simulation.http.lib.Modifier;
 
 //Define a handler for the "/doip-simulation/platform" path
 public class GetPlatformOverviewHandler implements HttpHandler {
@@ -57,7 +54,7 @@ public class GetPlatformOverviewHandler implements HttpHandler {
 			String requestPath = exchange.getRequestURI().getPath();
 			String platformParam = HttpServerHelper.getPathParam(requestPath, "platform");
 			if (platformParam != null) {
-				
+
 //				// Check the Content-Type header
 //	            String contentType = exchange.getRequestHeaders().getFirst("Content-Type");
 //	            if (contentType != null && contentType.equalsIgnoreCase("application/json")) {
@@ -67,31 +64,30 @@ public class GetPlatformOverviewHandler implements HttpHandler {
 //	            	 // Invalid or missing Content-Type header
 //	                exchange.sendResponseHeaders(415, -1); // Unsupported Media Type
 //	            }
-	            
+
 				String requestInfo = String.format("This is a POST request for platform: %s", platformParam);
 				logger.info(requestInfo);
-				
+
 				String requestString = HttpServerHelper.readRequestBodyAsString(exchange);
 				HttpServerHelper.requestServerLogging(exchange, requestString);
 
-
 				// Deserialize the JSON string into a Platform object
-	            Platform receivedPlatform = deserializeJsonToObject(requestString, Platform.class);
+				Platform receivedPlatform = HttpServerHelper.deserializeJsonToObject(requestString, Platform.class);
 
-	            if (receivedPlatform != null) {
-	                // Process the received platform information as needed
+				if (receivedPlatform != null) {
+					// Process the received platform information as needed
 
-	                // Build the JSON response
-	                String jsonResponse = buildPlatformJsonResponse();
+					// Build the JSON response
+					String jsonResponse = buildPlatformJsonResponse(platformParam);
 
-	                // Set the response headers and body
-	                HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json", 200);
-	                HttpServerHelper.responseServerLogging(exchange, 200, jsonResponse);
-	            } else {
-	                // Invalid JSON structure
-	                exchange.sendResponseHeaders(400, -1); // Bad Request
-	            }
-	            
+					// Set the response headers and body
+					HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json", 200);
+					HttpServerHelper.responseServerLogging(exchange, 200, jsonResponse);
+				} else {
+					// Invalid JSON structure
+					exchange.sendResponseHeaders(400, -1); // Bad Request
+				}
+
 			} else {
 				// Invalid URL parameters
 				exchange.sendResponseHeaders(400, -1); // Bad Request
@@ -109,17 +105,17 @@ public class GetPlatformOverviewHandler implements HttpHandler {
 			String requestUri = exchange.getRequestURI().toString();
 
 			// Extract platform and gateway from the path
-			String platform = HttpServerHelper.getPathParam(requestUri, "platform");
-			String gateway = HttpServerHelper.getPathParam(requestUri, "gateway");
+			String platformParam = HttpServerHelper.getPathParam(requestUri, "platform");
+			String gatewayParam = HttpServerHelper.getPathParam(requestUri, "gateway");
 
-			if (platform != null && gateway != null) {
+			if (platformParam != null && gatewayParam != null) {
 				// Process the platform and gateway information
-				String requestInfo = String.format("This is a GET request for Platform: %s Gateway: %s", platform,
-						gateway);
+				String requestInfo = String.format("This is a GET request for Platform: %s Gateway: %s", platformParam,
+						gatewayParam);
 				logger.info(requestInfo);
 
 				// Build the JSON response
-				String jsonResponse = buildGatewayJsonResponse();
+				String jsonResponse = buildGatewayJsonResponse(platformParam, gatewayParam);
 
 				// Set the response headers and body
 				HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json", 200);
@@ -147,7 +143,7 @@ public class GetPlatformOverviewHandler implements HttpHandler {
 				logger.info(requestInfo);
 
 				// Build the JSON response
-				String jsonResponse = buildPlatformJsonResponse();
+				String jsonResponse = buildPlatformJsonResponse(platformParam);
 
 				// Set the response headers and body
 				HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json", 200);
@@ -163,10 +159,11 @@ public class GetPlatformOverviewHandler implements HttpHandler {
 		}
 	}
 
-	private String buildPlatformJsonResponse() throws IOException {
+	private String buildPlatformJsonResponse(String platformName) throws IOException {
 
 		// TODO !!!
 		// doipHttpServer.getSimulationManager().getPlatforms();
+		// doipHttpServer.getSimulationManager().getPlatformByName("X2024");
 
 		Platform platformInfo = createPlatformSampleJson();
 
@@ -174,10 +171,10 @@ public class GetPlatformOverviewHandler implements HttpHandler {
 		return buildJsonResponse(platformInfo);
 	}
 
-	private String buildGatewayJsonResponse() throws IOException {
+	private String buildGatewayJsonResponse(String platformName, String gatewayName) throws IOException {
 
 		// TODO !!!
-		// doipHttpServer.getSimulationManager().getPlatforms();
+		// doipHttpServer.getSimulationManager().getPlatformByName("X2024").getGatewayByName("GW");
 
 		Gateway gatawayInfo = createGatewaySampleJson();
 
@@ -248,24 +245,5 @@ public class GetPlatformOverviewHandler implements HttpHandler {
 
 		return gateway;
 	}
-	
-	private <T> T deserializeJsonToObject(String jsonString, Class<T> valueType) {
-	    try {
-	        // Create an ObjectMapper instance
-	        ObjectMapper objectMapper = new ObjectMapper();
-
-	        // Deserialize the JSON string into an object of the specified type
-	        return objectMapper.readValue(jsonString, valueType);
-	    } catch (JsonProcessingException e) {
-	        // Log or handle JsonProcessingException (e.g., invalid JSON syntax)
-	    	logger.error("Invalid JSON syntax: {}", e.getMessage(), e);
-	        return null;
-	    } catch (Exception e) {
-	        // Log or handle other exceptions
-	    	logger.error("Error processing request: {}", e.getMessage(), e);
-	        return null;
-	    }
-	}
-
 
 }

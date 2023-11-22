@@ -1,5 +1,7 @@
 package doip.simulation.http.helpers;
 import com.sun.net.httpserver.HttpExchange;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.starcode88.http.HttpUtils;
 import com.sun.net.httpserver.Headers;
 
@@ -314,5 +316,31 @@ public class HttpServerHelper {
         // Parameter not found in the path
         return null;
     }
+    
+    /**
+     * Deserialize a JSON string into an object of the specified type.
+     *
+     * @param jsonString The JSON string to be deserialized.
+     * @param valueType  The class of the target type.
+     * @param <T>        The type of the target class.
+     * @return An object of the specified type, or null if there's an error during deserialization.
+     */
+    public static <T> T deserializeJsonToObject(String jsonString, Class<T> valueType) {
+        try {
+            // Create an ObjectMapper instance
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            // Deserialize the JSON string into an object of the specified type
+            return objectMapper.readValue(jsonString, valueType);
+        } catch (JsonProcessingException e) {
+             logger.error("Invalid JSON syntax: {}", e.getMessage(), e);
+            return null;
+        } catch (Exception e) {
+            // Log or handle other exceptions
+            logger.error("Error processing request: {}", e.getMessage(), e);
+            return null;
+        }
+    }
+
 
 }
