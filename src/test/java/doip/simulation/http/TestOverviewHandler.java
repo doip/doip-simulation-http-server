@@ -67,7 +67,8 @@ class TestOverviewHandler {
 			IOException, InterruptedException {
 		logger.info("-------------------------- testGetOverviewHandler ------------------------------------");
 
-		HttpResponse<String> response = clientForLocalHost.GET("/doip-simulation/?status=RUNNING", String.class);
+		//"/doip-simulation/?status=RUNNING"
+		HttpResponse<String> response = clientForLocalHost.GET(DOIP_SIMULATION_PATH + "?status=RUNNING", String.class);
 		int statusCode = response.statusCode();
 		assertEquals(200, statusCode, "The HTTP status code is not 200");
 
@@ -75,7 +76,7 @@ class TestOverviewHandler {
 		assertNotNull(responseBody, "The response body from server is null");
 		
 		//it must work without query parameters
-		response = clientForLocalHost.GET("/doip-simulation/", String.class);
+		response = clientForLocalHost.GET(DOIP_SIMULATION_PATH, String.class);
 
 		assertEquals(200, response.statusCode(), "The HTTP status code is not 200");
 
@@ -91,8 +92,9 @@ class TestOverviewHandler {
 	void testGetPlatformOverviewHandler() throws HttpStatusCodeException, HttpInvalidResponseBodyType,
 			URISyntaxException, IOException, InterruptedException {
 		logger.info("-------------------------- testGetPlatformOverviewHandler ------------------------------------");
-
-		HttpResponse<String> response = clientForLocalHost.GET("/doip-simulation/platform/X2024", String.class);
+		
+		//"/doip-simulation/platform/X2024"
+		HttpResponse<String> response = clientForLocalHost.GET(PLATFORM_PATH + "/X2024", String.class); 
 
 		int statusCode = response.statusCode();
 		assertEquals(200, statusCode, "The HTTP status code is not 200");
@@ -110,7 +112,8 @@ class TestOverviewHandler {
 			URISyntaxException, IOException, InterruptedException {
 		logger.info("-------------------------- testGetGatewayOverviewHandler ------------------------------------");
 
-		HttpResponse<String> response = clientForLocalHost.GET("/doip-simulation/platform/X2024/gateway/GW",
+		//"/doip-simulation/platform/X2024/gateway/GW"
+		HttpResponse<String> response = clientForLocalHost.GET(PLATFORM_PATH + "/X2024/gateway/GW",
 				String.class);
 
 		int statusCode = response.statusCode();
@@ -133,7 +136,8 @@ class TestOverviewHandler {
 
 		HttpClient clientForPost = new HttpClient("http://localhost:" + PORT);
 		clientForPost.addHeader("Content-Type", "application/json");
-		HttpResponse<String> response = clientForPost.POST("/doip-simulation/platform/X2024", jsonPostString,
+		//"/doip-simulation/platform/X2024"
+		HttpResponse<String> response = clientForPost.POST(PLATFORM_PATH + "/X2024", jsonPostString,
 				String.class);
 
 		int statusCode = response.statusCode();
@@ -155,7 +159,9 @@ class TestOverviewHandler {
 		String jsonPostString = "";
 		HttpClient clientForPost = new HttpClient("http://localhost:" + PORT);
 		clientForPost.addHeader("Content-Type", "application/json");
-		HttpResponse<String> response = clientForPost.POST("/doip-simulation/platform/X2024", jsonPostString,
+		
+		//"/doip-simulation/platform/X2024"
+		HttpResponse<String> response = clientForPost.POST(PLATFORM_PATH + "/X2024", jsonPostString,
 				String.class);
 
 		int statusCode = response.statusCode();
@@ -182,8 +188,8 @@ class TestOverviewHandler {
 		int statusCode = 0;
 		HttpResponse<String> response = null;
 		try {
-			
-			response = clientForPost.POST("/doip-simulation/platform/X2024", postMessage, String.class);
+			//"/doip-simulation/platform/X2024"
+			response = clientForPost.POST(PLATFORM_PATH + "/X2024", postMessage, String.class);
 
 		} catch (HttpStatusCodeException e) {
 			statusCode = e.getResponse().statusCode();
@@ -207,8 +213,8 @@ class TestOverviewHandler {
 
 		HttpClient clientForPost = new HttpClient("http://localhost:" + PORT);
 		clientForPost.addHeader("Content-Type", "application/json");
-		
-		HttpStatusCodeException e = assertThrows(HttpStatusCodeException.class, () -> clientForPost.POST("/doip-simulation/platform/X2024", jsonPostString, String.class));
+		//"/doip-simulation/platform/X2024"
+		HttpStatusCodeException e = assertThrows(HttpStatusCodeException.class, () -> clientForPost.POST(PLATFORM_PATH + "/X2024", jsonPostString, String.class));
 		int statusCode = e.getResponse().statusCode();
 		String statusText = HttpUtils.getStatusText(statusCode);
 		logger.info("Status code = {} ({})", statusCode, statusText);
