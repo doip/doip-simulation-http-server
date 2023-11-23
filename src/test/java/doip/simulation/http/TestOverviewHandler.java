@@ -139,6 +139,28 @@ class TestOverviewHandler {
 
 		logger.info("Custom POST test completed.");
 	}
+	
+	@Test
+	void testPostPlatformEmptyRequestJson() throws HttpStatusCodeException, HttpInvalidResponseBodyType,
+			URISyntaxException, IOException, InterruptedException, HttpInvalidRequestBodyType {
+		logger.info("-------------------------- testPostPlatformEmptyRequestJson ------------------------------------");
+
+		String jsonPostString = "";
+		HttpClient clientForPost = new HttpClient("http://localhost:" + PORT);
+		clientForPost.addHeader("Content-Type", "application/json");
+		HttpResponse<String> response = clientForPost.POST("/doip-simulation/platform/X2024", jsonPostString,
+				String.class);
+
+		int statusCode = response.statusCode();
+		assertEquals(200, statusCode, "The HTTP status code is not 200");
+
+		String responseBody = response.body();
+		assertNotNull(responseBody, "The response body from server is null");
+
+		// TODO Add more assertions if needed
+
+		logger.info("Custom POST test completed.");
+	}
 
 	@Test
 	void testPostPlatformWrongBodyType() throws HttpStatusCodeException, HttpInvalidResponseBodyType,

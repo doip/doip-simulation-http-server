@@ -62,7 +62,9 @@ public class GetPlatformOverviewHandler implements HttpHandler {
 					// Invalid or missing Content-Type header
 					// exchange.sendResponseHeaders(415, -1); // Unsupported Media Type
 					// Log a warning for invalid or missing Content-Type header
-					logger.warn("Invalid or missing Content-Type header. Actual Content-Type: {}. Proceeding with the request.", contentType);
+					logger.warn(
+							"Invalid or missing Content-Type header. Actual Content-Type: {}. Proceeding with the request.",
+							contentType);
 				}
 
 				String requestInfo = String.format("This is a POST request for platform: %s", platformParam);
@@ -71,22 +73,41 @@ public class GetPlatformOverviewHandler implements HttpHandler {
 				String requestString = HttpServerHelper.readRequestBodyAsString(exchange);
 				HttpServerHelper.requestServerLogging(exchange, requestString);
 
-				// Deserialize the JSON string into a Platform object
-				Platform receivedPlatform = HttpServerHelper.deserializeJsonToObject(requestString, Platform.class);
-
-				if (receivedPlatform != null) {
-					// Process the received platform information as needed
-
+				// Check if the requestString is empty or null
+				if (requestString == null || requestString.trim().isEmpty()) {
+					// Empty JSON request
+//TODO:					
+//	                logger.warn("Received an empty JSON request.");
+//	                exchange.sendResponseHeaders(400, -1); // Bad Request
+//	                return;
+					
+					//If an empty request JSON is allowed 
 					// Build the JSON response
 					String jsonResponse = buildPlatformJsonResponse(platformParam);
 
 					// Set the response headers and body
 					HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json", 200);
 					HttpServerHelper.responseServerLogging(exchange, 200, jsonResponse);
+					
 				} else {
-					// Invalid JSON structure  Platform deserialization failed.
-					logger.error("Received JSON structure is invalid.");
-					exchange.sendResponseHeaders(400, -1); // Bad Request
+
+					// Deserialize the JSON string into a Platform object
+					Platform receivedPlatform = HttpServerHelper.deserializeJsonToObject(requestString, Platform.class);
+
+					if (receivedPlatform != null) {
+						// Process the received platform information as needed
+
+						// Build the JSON response
+						String jsonResponse = buildPlatformJsonResponse(platformParam);
+
+						// Set the response headers and body
+						HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json", 200);
+						HttpServerHelper.responseServerLogging(exchange, 200, jsonResponse);
+					} else {
+						// Invalid JSON structure Platform deserialization failed.
+						logger.error("Received JSON structure is invalid.");
+						exchange.sendResponseHeaders(400, -1); // Bad Request
+					}
 				}
 
 			} else {
