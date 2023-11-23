@@ -24,10 +24,15 @@ import doip.simulation.http.lib.ServerInfo;
 import doip.simulation.http.lib.SimulationStatus;
 import doip.simulation.http.lib.Platform;
 
+/**
+ * Define a handler for the "/doip-simulation/" path
+ */
 public class GetSimulationOverviewHandler implements HttpHandler {
 	private static Logger logger = LogManager.getLogger(GetSimulationOverviewHandler.class);
 	
+	// Reference to the DoipHttpServer instance
 	private final DoipHttpServer doipHttpServer;
+	
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	// Constructor to receive the DoipHttpServer instance
@@ -35,6 +40,11 @@ public class GetSimulationOverviewHandler implements HttpHandler {
 		this.doipHttpServer = doipHttpServer;
 	}
 
+	/**
+	 * Handle method for processing incoming HTTP requests
+	 * /doip-simulation/?status=RUNNING'
+	 * /doip-simulation/
+	 */
 	@Override
 	public void handle(HttpExchange exchange) throws IOException {
 		if ("GET".equals(exchange.getRequestMethod())) {
@@ -52,14 +62,21 @@ public class GetSimulationOverviewHandler implements HttpHandler {
 			URI uri = exchange.getRequestURI();
 			String query = uri.getQuery();
 
-			// Parse query parameters
-			Map<String, String> queryParams = HttpServerHelper.parseQueryParameters(query);
+			logger.info("Returns the decoded query component of this URI: {}", query);
+			
+			String status = "";
 
-			// Validate and process the 'status' parameter
-			String status = queryParams.get("status");
-			if (status == null || !isValidStatus(status)) {
-				exchange.sendResponseHeaders(400, -1); // Bad Request
-				return;
+			if (query != null && !query.trim().isEmpty()) {
+
+				// Parse query parameters
+				Map<String, String> queryParams = HttpServerHelper.parseQueryParameters(query);
+
+				// Validate and process the 'status' parameter
+				status = queryParams.get("status");
+				if (status == null || !isValidStatus(status)) {
+					exchange.sendResponseHeaders(400, -1); // Bad Request
+					return;
+				}
 			}
 
 			// Build the JSON response based on the status
@@ -96,7 +113,8 @@ public class GetSimulationOverviewHandler implements HttpHandler {
 		// Convert the ServerInfo object to JSON
 		return objectMapper.writeValueAsString(serverInfo);
 	}
-
+	
+	// Method to build a sample JSON response
 	private ServerInfo createSampleJson(String status) {
 		// Build a JSON response based on the specified 'status'
 		ServerInfo serverInfo = new ServerInfo();
