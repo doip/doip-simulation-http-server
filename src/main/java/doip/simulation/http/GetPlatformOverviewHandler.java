@@ -20,11 +20,15 @@ import doip.simulation.http.lib.Platform;
 import doip.simulation.http.lib.Ecu;
 import doip.simulation.http.lib.LookupEntry;
 
-//Define a handler for the "/doip-simulation/platform" path
+/**
+ * Define a handler for the "/doip-simulation/platform" path
+ */
 public class GetPlatformOverviewHandler implements HttpHandler {
 	private static Logger logger = LogManager.getLogger(GetPlatformOverviewHandler.class);
 
+	// Reference to the DoipHttpServer instance
 	private final DoipHttpServer doipHttpServer;
+	
 	private final ObjectMapper objectMapper = new ObjectMapper();
 	private static final String GATEWAY_PATH = "/gateway";
 
@@ -32,7 +36,13 @@ public class GetPlatformOverviewHandler implements HttpHandler {
 	public GetPlatformOverviewHandler(DoipHttpServer doipHttpServer) {
 		this.doipHttpServer = doipHttpServer;
 	}
-
+	
+	/**
+	 * Handle method for processing incoming HTTP requests
+	 * /doip-simulation/platform/{platformId} (GET)
+	 * /doip-simulation/platform/{platformId} (POST)
+	 * /doip-simulation/platform/{platformId}/gateway/{gatewayId}  (GET)
+	 */
 	@Override
 	public void handle(HttpExchange exchange) throws IOException {
 		String requestPath = exchange.getRequestURI().getPath();

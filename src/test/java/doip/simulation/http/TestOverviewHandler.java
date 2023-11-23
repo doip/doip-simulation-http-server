@@ -68,12 +68,19 @@ class TestOverviewHandler {
 		logger.info("-------------------------- testGetOverviewHandler ------------------------------------");
 
 		HttpResponse<String> response = clientForLocalHost.GET("/doip-simulation/?status=RUNNING", String.class);
-
 		int statusCode = response.statusCode();
 		assertEquals(200, statusCode, "The HTTP status code is not 200");
 
 		String responseBody = response.body();
 		assertNotNull(responseBody, "The response body from server is null");
+		
+		//it must work without query parameters
+		response = clientForLocalHost.GET("/doip-simulation/", String.class);
+
+		assertEquals(200, response.statusCode(), "The HTTP status code is not 200");
+
+		assertNotNull(response.body(), "The response body from server is null");
+				
 
 		// TODO Add more assertions if needed
 
