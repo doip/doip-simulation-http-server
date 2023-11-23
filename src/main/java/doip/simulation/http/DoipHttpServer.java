@@ -76,7 +76,7 @@ public class DoipHttpServer {
 		handlers = new ArrayList<ContextHandler>();
 
 		// TODO: Possibly create default mapping contexts here if needed
-		createTestMappingContexts();
+		//createTestMappingContexts();
 
 	}
 
@@ -173,7 +173,7 @@ public class DoipHttpServer {
 	 * @param context The context path to check.
 	 * @return true if the context path already exists, false otherwise.
 	 */
-	private boolean contextExists(String context) {
+	public boolean contextExists(String context) {
 		return handlers.stream().anyMatch(handler -> handler.getContext().equals(context));
 	}
 
