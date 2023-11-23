@@ -5,7 +5,7 @@ import java.util.List;
 
 import doip.simulation.api.SimulationManager;
 import doip.simulation.api.Platform;
-
+/*
 public class SimulationManagerMock implements SimulationManager {
 
     private List<Platform> platforms = new ArrayList<>();
@@ -45,3 +45,4 @@ public class SimulationManagerMock implements SimulationManager {
         return platforms;
     }
 }
+*/

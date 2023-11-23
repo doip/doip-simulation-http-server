@@ -51,14 +51,12 @@ public class CustomMappingController {
 	 * Adds custom mappings.
 	 */
 	private void configureCustomMappings() {
-		HttpHandler postHandler = new PostHandlerCustom();
-		HttpHandler getHandler = new GetHandlerCustom();
 
 		List<ContextHandler> customHandlers = List.of(
-				new ContextHandler("/customPost", postHandler),
-				new ContextHandler("/customGet", getHandler)
-				//,new ContextHandler("/", new GetSimulationOverviewHandler(doipHttpServer))
-				);
+		// new ContextHandler("/customPost", new PostHandlerCustom()),
+		// new ContextHandler("/customGet", new GetHandlerCustom())
+		// ,new ContextHandler("/", new GetSimulationOverviewHandler(doipHttpServer))
+		);
 
 		// Create and configure the DoipHttpServer instance
 		doipHttpServer.createMappingContexts(customHandlers);
@@ -73,7 +71,7 @@ public class CustomMappingController {
 	 */
 	public void addExternalHandler(String contextPath, HttpHandler handler) {
 		if (contextPath != null && handler != null) {
-			
+
 			doipHttpServer.addMappingContext(contextPath, handler);
 			logger.info("Added external handler for context path: {}", contextPath);
 		} else {

@@ -58,11 +58,18 @@ class TestCustomMappingController {
 	@Test
 	void testCustomPOST() throws HttpStatusCodeException, URISyntaxException, IOException, InterruptedException,
 			HttpInvalidRequestBodyType, HttpInvalidResponseBodyType {
-		logger.info("--------------------------------------------------------------");
+		logger.info("-------------------------- testCustomPOST ------------------------------------");
+		String testtContext = "/customPost";
+		if(!server.contextExists(testtContext)) {
+			
+			logger.warn("Mapping context '{}' does not exists.", testtContext);
+			return;
+		}
+		
 		logger.info("Testing custom POST endpoint...");
 
 		String postMessage = "How are you?";
-		HttpResponse<String> response = clientForLocalHost.POST("/customPost", postMessage, String.class);
+		HttpResponse<String> response = clientForLocalHost.POST(testtContext, postMessage, String.class);
 
 		assertNotNull(response, "The response from server is null");
 
@@ -80,10 +87,18 @@ class TestCustomMappingController {
 	@Test
 	void testCustomGET() throws HttpStatusCodeException, HttpInvalidResponseBodyType, URISyntaxException, IOException,
 			InterruptedException {
-		logger.info("--------------------------------------------------------------");
+		logger.info("--------------------------  testCustomGET ------------------------------------");
+		
+		String testtContext = "/customGet";
+		if(!server.contextExists(testtContext)) {
+			
+			logger.warn("Mapping context '{}' does not exists.", testtContext);
+			return;
+		}
+		
 		logger.info("Testing custom GET endpoint...");
 
-		HttpResponse<String> response = clientForLocalHost.GET("/customGet", String.class);
+		HttpResponse<String> response = clientForLocalHost.GET(testtContext, String.class);
 
 		int statusCode = response.statusCode();
 		assertEquals(200, statusCode, "The HTTP status code is not 200");

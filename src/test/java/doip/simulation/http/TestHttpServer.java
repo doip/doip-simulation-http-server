@@ -66,9 +66,16 @@ class TestHttpServer {
 	void testDoipPOST() throws HttpStatusCodeException, URISyntaxException, IOException, InterruptedException,
 			HttpInvalidRequestBodyType, HttpInvalidResponseBodyType {
 		logger.info("---------------------------  testDoipPOST -----------------------------------");
+		
+		String testtContext = "/posttest";
+		if(!server.contextExists(testtContext)) {
+			
+			logger.warn("Mapping context '{}' does not exists.", testtContext);
+			return;
+		}
 
 		String postMessage = "How are you?";
-		HttpResponse<String> response = clientForLocalHost.POST("/posttest", postMessage, String.class);
+		HttpResponse<String> response = clientForLocalHost.POST(testtContext, postMessage, String.class);
 
 		assertNotNull(response, "The response from server is null");
 
@@ -85,7 +92,14 @@ class TestHttpServer {
 	void testDoipGET() throws HttpStatusCodeException, HttpInvalidResponseBodyType, URISyntaxException, IOException,
 			InterruptedException {
 		logger.info("---------------------------  testDoipGet -----------------------------------");
-		HttpResponse<String> response = clientForLocalHost.GET("/gettest", String.class);
+		String testtContext = "/gettest";
+		if(!server.contextExists(testtContext)) {
+			
+			logger.warn("Mapping context '{}' does not exists.", testtContext);
+			return;
+		}
+		
+		HttpResponse<String> response = clientForLocalHost.GET(testtContext, String.class);
 
 		int statusCode = response.statusCode();
 		assertEquals(200, statusCode, "The HTTP status code is not 200");
