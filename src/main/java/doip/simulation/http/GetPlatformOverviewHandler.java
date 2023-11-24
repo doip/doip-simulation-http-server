@@ -23,7 +23,7 @@ import doip.simulation.http.lib.LookupEntry;
 /**
  * Define a handler for the "/doip-simulation/platform" path
  */
-public class GetPlatformOverviewHandler implements HttpHandler {
+public class GetPlatformOverviewHandler extends SimulationConnector implements HttpHandler {
 	private static Logger logger = LogManager.getLogger(GetPlatformOverviewHandler.class);
 
 	// Reference to the DoipHttpServer instance
@@ -34,6 +34,7 @@ public class GetPlatformOverviewHandler implements HttpHandler {
 
 	// Constructor to receive the DoipHttpServer instance
 	public GetPlatformOverviewHandler(DoipHttpServer doipHttpServer) {
+		super(doipHttpServer.getSimulationManager());
 		this.doipHttpServer = doipHttpServer;
 	}
 	
@@ -199,9 +200,17 @@ public class GetPlatformOverviewHandler implements HttpHandler {
 	private String buildPlatformJsonResponse(String platformName) throws IOException {
 
 		// TODO !!!
-		// doipHttpServer.getSimulationManager().getPlatforms();
 		// doipHttpServer.getSimulationManager().getPlatformByName("X2024");
-
+		doip.simulation.api.Platform platform = getPlatformByName(platformName); 
+		if (platform != null) {
+		    // Process the retrieved platform
+		   
+		} else {
+		    // Handle the case where platform is null
+		    logger.error("The specified platform name {} does not exist", platformName);
+		}
+		
+        //TODO:
 		Platform platformInfo = createPlatformSampleJson();
 
 		// Convert theobject to JSON
@@ -212,7 +221,17 @@ public class GetPlatformOverviewHandler implements HttpHandler {
 
 		// TODO !!!
 		// doipHttpServer.getSimulationManager().getPlatformByName("X2024").getGatewayByName("GW");
-
+		
+		doip.simulation.api.Gateway gateway = getGatewayByName(platformName, gatewayName); 
+		if (gateway != null) {
+		    // Process the retrieved gateway
+		   
+		} else {
+		    // Handle the case where platform is null
+		    logger.error("The specified gateway name {} does not exist", gatewayName);
+		}
+		
+        //TODO:
 		Gateway gatawayInfo = createGatewaySampleJson();
 
 		// Convert the object to JSON

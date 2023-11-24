@@ -27,23 +27,23 @@ import doip.simulation.http.lib.Platform;
 /**
  * Define a handler for the "/doip-simulation/" path
  */
-public class GetSimulationOverviewHandler implements HttpHandler {
+public class GetSimulationOverviewHandler extends SimulationConnector implements HttpHandler {
 	private static Logger logger = LogManager.getLogger(GetSimulationOverviewHandler.class);
-	
+
 	// Reference to the DoipHttpServer instance
 	private final DoipHttpServer doipHttpServer;
-	
+
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	// Constructor to receive the DoipHttpServer instance
 	public GetSimulationOverviewHandler(DoipHttpServer doipHttpServer) {
+		super(doipHttpServer.getSimulationManager());
 		this.doipHttpServer = doipHttpServer;
 	}
 
 	/**
 	 * Handle method for processing incoming HTTP requests
-	 * /doip-simulation/?status=RUNNING'
-	 * /doip-simulation/
+	 * /doip-simulation/?status=RUNNING' /doip-simulation/
 	 */
 	@Override
 	public void handle(HttpExchange exchange) throws IOException {
@@ -63,7 +63,7 @@ public class GetSimulationOverviewHandler implements HttpHandler {
 			String query = uri.getQuery();
 
 			logger.info("Returns the decoded query component of this URI: {}", query);
-			
+
 			String status = "";
 
 			if (query != null && !query.trim().isEmpty()) {
@@ -107,15 +107,28 @@ public class GetSimulationOverviewHandler implements HttpHandler {
 
 		// TODO !!!
 		// doipHttpServer.getSimulationManager().getPlatforms();
+		
+		List<doip.simulation.api.Platform> platforms = getPlatformOverview(status);
+		
+		if (platforms != null) {
+		    // Process the retrieved platforms
+		    for (doip.simulation.api.Platform platform : platforms) {
+		        // Do something with the platform
+		    }
+		} else {
+		    // Handle the case where platforms is null
+		    logger.error("Failed to retrieve platform overview. Check logs for details.");
+		}
 
-		ServerInfo serverInfo = createSampleJson(status);
+		// TODO !!!
+		ServerInfo serverInfo = createSampleJson(platforms, status);
 
 		// Convert the ServerInfo object to JSON
 		return objectMapper.writeValueAsString(serverInfo);
 	}
-	
+
 	// Method to build a sample JSON response
-	private ServerInfo createSampleJson(String status) {
+	private ServerInfo createSampleJson(List<doip.simulation.api.Platform> platforms, String status) {
 		// Build a JSON response based on the specified 'status'
 		ServerInfo serverInfo = new ServerInfo();
 
