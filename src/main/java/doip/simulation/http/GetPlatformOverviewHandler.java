@@ -28,7 +28,7 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 
 	// Reference to the DoipHttpServer instance
 	private final DoipHttpServer doipHttpServer;
-	
+
 	private final ObjectMapper objectMapper = new ObjectMapper();
 	private static final String GATEWAY_PATH = "/gateway";
 
@@ -37,12 +37,12 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 		super(doipHttpServer.getSimulationManager());
 		this.doipHttpServer = doipHttpServer;
 	}
-	
+
 	/**
 	 * Handle method for processing incoming HTTP requests
 	 * /doip-simulation/platform/{platformId} (GET)
 	 * /doip-simulation/platform/{platformId} (POST)
-	 * /doip-simulation/platform/{platformId}/gateway/{gatewayId}  (GET)
+	 * /doip-simulation/platform/{platformId}/gateway/{gatewayId} (GET)
 	 */
 	@Override
 	public void handle(HttpExchange exchange) throws IOException {
@@ -91,15 +91,15 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 //	                logger.warn("Received an empty JSON request.");
 //	                exchange.sendResponseHeaders(400, -1); // Bad Request
 //	                return;
-					
-					//If an empty request JSON is allowed 
+
+					// If an empty request JSON is allowed
 					// Build the JSON response
 					String jsonResponse = buildPlatformJsonResponse(platformParam);
 
 					// Set the response headers and body
 					HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json", 200);
 					HttpServerHelper.responseServerLogging(exchange, 200, jsonResponse);
-					
+
 				} else {
 
 					// Deserialize the JSON string into a Platform object
@@ -201,19 +201,22 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 
 		// TODO !!!
 		// doipHttpServer.getSimulationManager().getPlatformByName("X2024");
-		doip.simulation.api.Platform platform = getPlatformByName(platformName); 
+
+		doip.simulation.api.Platform platform = getPlatformByName(platformName);
+
+		//Create real JSON object Platform
 		if (platform != null) {
-		    // Process the retrieved platform
-		   
+			// Process the retrieved platform
 		} else {
-		    // Handle the case where platform is null
-		    logger.error("The specified platform name {} does not exist", platformName);
+			// Handle the case where platform is null
+			logger.error("The specified platform name {} does not exist", platformName);
+			//return "{}"; // Return an empty JSON object or handle it as needed!
 		}
-		
-        //TODO:
+
+		// TODO: Create replacement JSON
 		Platform platformInfo = createPlatformSampleJson();
 
-		// Convert theobject to JSON
+		// Convert the object to JSON
 		return buildJsonResponse(platformInfo);
 	}
 
@@ -221,21 +224,23 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 
 		// TODO !!!
 		// doipHttpServer.getSimulationManager().getPlatformByName("X2024").getGatewayByName("GW");
+
+		doip.simulation.api.Gateway gateway = getGatewayByName(platformName, gatewayName);
 		
-		doip.simulation.api.Gateway gateway = getGatewayByName(platformName, gatewayName); 
+        //Create real JSON object Gateway
 		if (gateway != null) {
-		    // Process the retrieved gateway
-		   
+			// Process the retrieved gateway
 		} else {
-		    // Handle the case where platform is null
-		    logger.error("The specified gateway name {} does not exist", gatewayName);
+			// Handle the case where gateway is null
+			logger.error("The specified gateway name {} does not exist", gatewayName);
+			//return "{}"; // Return an empty JSON object or handle it as needed
 		}
-		
-        //TODO:
-		Gateway gatawayInfo = createGatewaySampleJson();
+
+		// TODO: Create replacement JSON
+		Gateway gatewayInfo = createGatewaySampleJson();
 
 		// Convert the object to JSON
-		return buildJsonResponse(gatawayInfo);
+		return buildJsonResponse(gatewayInfo);
 	}
 
 	private String buildJsonResponse(Object info) throws IOException {

@@ -107,20 +107,22 @@ public class GetSimulationOverviewHandler extends SimulationConnector implements
 
 		// TODO !!!
 		// doipHttpServer.getSimulationManager().getPlatforms();
-		
+
 		List<doip.simulation.api.Platform> platforms = getPlatformOverview(status);
-		
+
+		// Create ServerInfo for platforms
 		if (platforms != null) {
-		    // Process the retrieved platforms
-		    for (doip.simulation.api.Platform platform : platforms) {
-		        // Do something with the platform
-		    }
+			// Process the retrieved platforms
+			for (doip.simulation.api.Platform platform : platforms) {
+				// Do something with the platform
+			}
 		} else {
-		    // Handle the case where platforms is null
-		    logger.error("Failed to retrieve platform overview. Check logs for details.");
+			// Handle the case where platforms is null
+			logger.error("Failed to retrieve platform overview. Check logs for details.");
+			// return "{}"; // Return an empty JSON object or handle it as needed
 		}
 
-		// TODO !!!
+		// TODO !!! Create replacement JSON
 		ServerInfo serverInfo = createSampleJson(platforms, status);
 
 		// Convert the ServerInfo object to JSON
