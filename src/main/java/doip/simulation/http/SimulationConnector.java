@@ -101,69 +101,114 @@ public class SimulationConnector {
 		return gateway;
 	}
 
+	/**
+	 * Build a JSON response for the overview of platforms based on the specified status.
+	 *
+	 * @param status The status parameter.
+	 * @return The JSON response as a string.
+	 * @throws IOException If an I/O error occurs during the process.
+	 */
 	protected String buildOverviewJsonResponse(String status) throws IOException {
+	    try {
+	        // Initialize ServerInfo to hold platform overview
+	        ServerInfo serverInfo = new ServerInfo();
 
-		List<doip.simulation.api.Platform> platforms = getPlatformOverview(status);
+	        // Retrieve platform overview based on the status
+	        List<doip.simulation.api.Platform> platforms = getPlatformOverview(status);
 
-		if (platforms == null) {
+	        if (platforms == null) {
+	            // Log an error if platform overview retrieval fails
+	            logger.error("Failed to retrieve platform overview. Check logs for details.");
+	            return "{}"; // Return an empty JSON object or handle it as needed
+	        }
 
-			// Handle the case where platforms is null
-			logger.error("Failed to retrieve platform overview. Check logs for details.");
-			return "{}"; // Return an empty JSON object or handle it as needed
-		}
+	        // Process the retrieved platforms and populate serverInfo
+	        for (doip.simulation.api.Platform platform : platforms) {
+	            // Do something with each platform if needed
+	        }
 
-		// Create ServerInfo for platforms
-
-		// Build a JSON response based on the specified 'status'
-		ServerInfo serverInfo = new ServerInfo();
-
-		// Process the retrieved platforms
-		for (doip.simulation.api.Platform platform : platforms) {
-			// Do something with the platform
-		}
-
-		// Convert the ServerInfo object to JSON
-		return buildJsonResponse(serverInfo);
+	        // Convert the ServerInfo object to JSON
+	        return buildJsonResponse(serverInfo);
+	    } catch (Exception e) {
+	        // Log an error and return an empty JSON object in case of an exception
+	        logger.error("Error building overview JSON response: {}", e.getMessage(), e);
+	        return "{}";
+	    }
 	}
 
+	/**
+	 * Build a JSON response for a specific platform based on the specified platform name.
+	 *
+	 * @param platformName The name of the platform.
+	 * @return The JSON response as a string.
+	 * @throws IOException If an I/O error occurs during the process.
+	 */
 	protected String buildPlatformJsonResponse(String platformName) throws IOException {
+	    try {
+	        // Retrieve the platform based on the specified platform name
+	        doip.simulation.api.Platform platform = getPlatformByName(platformName);
 
-		doip.simulation.api.Platform platform = getPlatformByName(platformName);
+	        if (platform == null) {
+	            // Log an error if the specified platform is not found
+	            logger.error("The specified platform name {} does not exist", platformName);
+	            return "{}"; // Return an empty JSON object or handle it as needed!
+	        }
 
-		if (platform == null) {
-		
-			// Handle the case where platform is null
-			logger.error("The specified platform name {} does not exist", platformName);
-			return "{}"; // Return an empty JSON object or handle it as needed!
-		}
-		
-		// Create real JSON object Platform
-		// Process the retrieved platform
-		
-		doip.simulation.http.lib.Platform platformInfo = new doip.simulation.http.lib.Platform();
+	        // Process the retrieved platform and create a real JSON object Platform
+	        doip.simulation.http.lib.Platform platformInfo = processPlatform(platform);
 
-		// Convert the object to JSON
-		return buildJsonResponse(platformInfo);
+	        // Convert the object to JSON
+	        return buildJsonResponse(platformInfo);
+	    } catch (Exception e) {
+	        // Log an error and return an empty JSON object in case of an exception
+	        logger.error("Error building platform JSON response: {}", e.getMessage(), e);
+	        return "{}";
+	    }
 	}
 
+	/**
+	 * Build a JSON response for a specific gateway based on the specified platform and gateway names.
+	 *
+	 * @param platformName The name of the platform.
+	 * @param gatewayName  The name of the gateway.
+	 * @return The JSON response as a string.
+	 * @throws IOException If an I/O error occurs during the process.
+	 */
 	protected String buildGatewayJsonResponse(String platformName, String gatewayName) throws IOException {
+	    try {
+	        // Retrieve the gateway based on the specified platform and gateway names
+	        doip.simulation.api.Gateway gateway = getGatewayByName(platformName, gatewayName);
 
-		doip.simulation.api.Gateway gateway = getGatewayByName(platformName, gatewayName);
+	        if (gateway == null) {
+	            // Log an error if the specified gateway is not found
+	            logger.error("The specified gateway name {} does not exist", gatewayName);
+	            return "{}"; // Return an empty JSON object or handle it as needed
+	        }
 
-		if (gateway == null) {
+	        // Process the retrieved gateway and create a real JSON object Gateway
+	        doip.simulation.http.lib.Gateway gatewayInfo = processGateway(gateway);
 
-		} else {
-			// Handle the case where gateway is null
-			logger.error("The specified gateway name {} does not exist", gatewayName);
-			return "{}"; // Return an empty JSON object or handle it as needed
-		}
+	        // Convert the object to JSON
+	        return buildJsonResponse(gatewayInfo);
+	    } catch (Exception e) {
+	        // Log an error and return an empty JSON object in case of an exception
+	        logger.error("Error building gateway JSON response: {}", e.getMessage(), e);
+	        return "{}";
+	    }
+	}
 
-		// Create real JSON object Gateway
-		// Process the retrieved gateway
-		doip.simulation.http.lib.Gateway gatewayInfo = new doip.simulation.http.lib.Gateway();
+	
+	// Additional methods to process Platform and Gateway objects
+	private doip.simulation.http.lib.Platform processPlatform(doip.simulation.api.Platform platform) {
+	    // Implement the logic to process the platform and create a doip.simulation.http.lib.Platform object
+		//TODO:
+	    return new doip.simulation.http.lib.Platform();
+	}
 
-		// Convert the object to JSON
-		return buildJsonResponse(gatewayInfo);
+	private doip.simulation.http.lib.Gateway processGateway(doip.simulation.api.Gateway gateway) {
+	    // Implement the logic to process the gateway and create a doip.simulation.http.lib.Gateway object
+		//TODO:
+	    return new doip.simulation.http.lib.Gateway();
 	}
 	
 	public String buildJsonResponse(Object info) throws IOException {
