@@ -105,30 +105,33 @@ public class GetSimulationOverviewHandler extends SimulationConnector implements
 	
 	@Override
 	protected String buildOverviewJsonResponse(String status) throws IOException {
+	    try {
+	        // Retrieve platform overview based on the status
+	        List<doip.simulation.api.Platform> platforms = getPlatformOverview(status);
 
-		// TODO !!!
-		// doipHttpServer.getSimulationManager().getPlatforms();
+	        if (platforms == null) {
+	            // Log an error if platform overview retrieval fails
+	            logger.error("Failed to retrieve platform overview. Check logs for details.");
+	            // return "{}"; // Return an empty JSON object or handle it as needed
+	        }
 
-		List<doip.simulation.api.Platform> platforms = getPlatformOverview(status);
+	        // Create ServerInfo for platforms
+	        ServerInfo serverInfo = createSampleJson(platforms, status);
 
-		if (platforms == null) {
-			// Handle the case where platforms is null
-			logger.error("Failed to retrieve platform overview. Check logs for details.");
-			// return "{}"; // Return an empty JSON object or handle it as needed
-		}
+	        // Process the retrieved platforms if needed
+	        for (doip.simulation.api.Platform platform : platforms) {
+	            // Do something with each platform if needed
+	        }
 
-		// Create ServerInfo for platforms
-		// Process the retrieved platforms
-		for (doip.simulation.api.Platform platform : platforms) {
-			// Do something with the platform
-		}
-
-		// TODO !!! Create replacement JSON
-		ServerInfo serverInfo = createSampleJson(platforms, status);
-
-		// Convert the ServerInfo object to JSON
-		return buildJsonResponse(serverInfo);
+	        // Convert the ServerInfo object to JSON
+	        return buildJsonResponse(serverInfo);
+	    } catch (Exception e) {
+	        // Log an error and return an empty JSON object in case of an exception
+	        logger.error("Error building overview JSON response: {}", e.getMessage(), e);
+	        return "{}";
+	    }
 	}
+
 
 	// Method to build a sample JSON response
 	private ServerInfo createSampleJson(List<doip.simulation.api.Platform> platforms, String status) {
