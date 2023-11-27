@@ -197,45 +197,47 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 		}
 	}
 
-	private String buildPlatformJsonResponse(String platformName) throws IOException {
+	@Override
+	protected String buildPlatformJsonResponse(String platformName) throws IOException {
 
 		// TODO !!!
 		// doipHttpServer.getSimulationManager().getPlatformByName("X2024");
 
 		doip.simulation.api.Platform platform = getPlatformByName(platformName);
 
-		//Create real JSON object Platform
-		if (platform != null) {
-			// Process the retrieved platform
-		} else {
+		if (platform == null) {
 			// Handle the case where platform is null
 			logger.error("The specified platform name {} does not exist", platformName);
-			//return "{}"; // Return an empty JSON object or handle it as needed!
+			// return "{}"; // Return an empty JSON object or handle it as needed!
 		}
 
+		// Create real JSON object Platform
+		// Process the retrieved platform
+		
 		// TODO: Create replacement JSON
 		Platform platformInfo = createPlatformSampleJson();
 
 		// Convert the object to JSON
 		return buildJsonResponse(platformInfo);
 	}
-
-	private String buildGatewayJsonResponse(String platformName, String gatewayName) throws IOException {
+	
+	@Override
+	protected String buildGatewayJsonResponse(String platformName, String gatewayName) throws IOException {
 
 		// TODO !!!
 		// doipHttpServer.getSimulationManager().getPlatformByName("X2024").getGatewayByName("GW");
 
 		doip.simulation.api.Gateway gateway = getGatewayByName(platformName, gatewayName);
-		
-        //Create real JSON object Gateway
-		if (gateway != null) {
-			// Process the retrieved gateway
-		} else {
+	
+		if (gateway == null) {
 			// Handle the case where gateway is null
 			logger.error("The specified gateway name {} does not exist", gatewayName);
 			//return "{}"; // Return an empty JSON object or handle it as needed
 		}
-
+		
+		//Create real JSON object Gateway
+		// Process the retrieved gateway
+		
 		// TODO: Create replacement JSON
 		Gateway gatewayInfo = createGatewaySampleJson();
 
@@ -243,10 +245,7 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 		return buildJsonResponse(gatewayInfo);
 	}
 
-	private String buildJsonResponse(Object info) throws IOException {
-		return objectMapper.writeValueAsString(info);
-	}
-
+	
 	private Platform createPlatformSampleJson() {
 
 		// Create a Platform

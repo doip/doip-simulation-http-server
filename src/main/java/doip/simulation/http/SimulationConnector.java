@@ -9,11 +9,16 @@ import org.apache.logging.log4j.Logger;
 import doip.simulation.api.Platform;
 import doip.simulation.api.Gateway;
 import doip.simulation.api.SimulationManager;
+import doip.simulation.http.lib.ServerInfo;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class SimulationConnector {
 	private static final Logger logger = LogManager.getLogger(SimulationConnector.class);
 
 	protected SimulationManager simulationManager;
+	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	public SimulationConnector(SimulationManager simulationManager) {
 		this.simulationManager = simulationManager;
@@ -38,7 +43,7 @@ public class SimulationConnector {
 		} catch (Exception e) {
 			// Log the error and rethrow the exception
 			logger.error("Error retrieving platform overview: {}", e.getMessage(), e);
-			//throw e;
+			// throw e;
 		}
 		return platforms;
 	}
@@ -95,4 +100,75 @@ public class SimulationConnector {
 		}
 		return gateway;
 	}
+
+	protected String buildOverviewJsonResponse(String status) throws IOException {
+
+		List<doip.simulation.api.Platform> platforms = getPlatformOverview(status);
+
+		if (platforms == null) {
+
+			// Handle the case where platforms is null
+			logger.error("Failed to retrieve platform overview. Check logs for details.");
+			return "{}"; // Return an empty JSON object or handle it as needed
+		}
+
+		// Create ServerInfo for platforms
+
+		// Build a JSON response based on the specified 'status'
+		ServerInfo serverInfo = new ServerInfo();
+
+		// Process the retrieved platforms
+		for (doip.simulation.api.Platform platform : platforms) {
+			// Do something with the platform
+		}
+
+		// Convert the ServerInfo object to JSON
+		return buildJsonResponse(serverInfo);
+	}
+
+	protected String buildPlatformJsonResponse(String platformName) throws IOException {
+
+		doip.simulation.api.Platform platform = getPlatformByName(platformName);
+
+		if (platform == null) {
+		
+			// Handle the case where platform is null
+			logger.error("The specified platform name {} does not exist", platformName);
+			return "{}"; // Return an empty JSON object or handle it as needed!
+		}
+		
+		// Create real JSON object Platform
+		// Process the retrieved platform
+		
+		doip.simulation.http.lib.Platform platformInfo = new doip.simulation.http.lib.Platform();
+
+		// Convert the object to JSON
+		return buildJsonResponse(platformInfo);
+	}
+
+	protected String buildGatewayJsonResponse(String platformName, String gatewayName) throws IOException {
+
+		doip.simulation.api.Gateway gateway = getGatewayByName(platformName, gatewayName);
+
+		if (gateway == null) {
+
+		} else {
+			// Handle the case where gateway is null
+			logger.error("The specified gateway name {} does not exist", gatewayName);
+			return "{}"; // Return an empty JSON object or handle it as needed
+		}
+
+		// Create real JSON object Gateway
+		// Process the retrieved gateway
+		doip.simulation.http.lib.Gateway gatewayInfo = new doip.simulation.http.lib.Gateway();
+
+		// Convert the object to JSON
+		return buildJsonResponse(gatewayInfo);
+	}
+	
+	public String buildJsonResponse(Object info) throws IOException {
+		return objectMapper.writeValueAsString(info);
+	}
+
+
 }
