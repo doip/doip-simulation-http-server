@@ -80,7 +80,7 @@ public class GetSimulationOverviewHandler extends SimulationConnector implements
 			}
 
 			// Build the JSON response based on the status
-			String jsonResponse = buildJsonResponse(status);
+			String jsonResponse = buildOverviewJsonResponse(status);
 
 			// Set the response headers and body
 			HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json", 200);
@@ -102,31 +102,32 @@ public class GetSimulationOverviewHandler extends SimulationConnector implements
 			return false; // If an exception is thrown, the status is invalid
 		}
 	}
-
-	private String buildJsonResponse(String status) throws IOException {
+	
+	@Override
+	protected String buildOverviewJsonResponse(String status) throws IOException {
 
 		// TODO !!!
 		// doipHttpServer.getSimulationManager().getPlatforms();
 
 		List<doip.simulation.api.Platform> platforms = getPlatformOverview(status);
 
-		// Create ServerInfo for platforms
-		if (platforms != null) {
-			// Process the retrieved platforms
-			for (doip.simulation.api.Platform platform : platforms) {
-				// Do something with the platform
-			}
-		} else {
+		if (platforms == null) {
 			// Handle the case where platforms is null
 			logger.error("Failed to retrieve platform overview. Check logs for details.");
 			// return "{}"; // Return an empty JSON object or handle it as needed
+		}
+
+		// Create ServerInfo for platforms
+		// Process the retrieved platforms
+		for (doip.simulation.api.Platform platform : platforms) {
+			// Do something with the platform
 		}
 
 		// TODO !!! Create replacement JSON
 		ServerInfo serverInfo = createSampleJson(platforms, status);
 
 		// Convert the ServerInfo object to JSON
-		return objectMapper.writeValueAsString(serverInfo);
+		return buildJsonResponse(serverInfo);
 	}
 
 	// Method to build a sample JSON response
