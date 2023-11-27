@@ -199,53 +199,52 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 
 	@Override
 	protected String buildPlatformJsonResponse(String platformName) throws IOException {
+	    try {
+	        // Retrieve the platform based on the specified platform name
+	        doip.simulation.api.Platform platform = getPlatformByName(platformName);
 
-		// TODO !!!
-		// doipHttpServer.getSimulationManager().getPlatformByName("X2024");
+	        if (platform == null) {
+	            // Log an error if the specified platform is not found
+	            logger.error("The specified platform name {} does not exist", platformName);
+	            //return "{}"; // Return an empty JSON object or handle it as needed!
+	        }
 
-		doip.simulation.api.Platform platform = getPlatformByName(platformName);
+	        // Process the retrieved platform and create a real JSON object Platform
+	        Platform platformInfo = createPlatformSampleJson();
 
-		if (platform == null) {
-			// Handle the case where platform is null
-			logger.error("The specified platform name {} does not exist", platformName);
-			// return "{}"; // Return an empty JSON object or handle it as needed!
-		}
-
-		// Create real JSON object Platform
-		// Process the retrieved platform
-		
-		// TODO: Create replacement JSON
-		Platform platformInfo = createPlatformSampleJson();
-
-		// Convert the object to JSON
-		return buildJsonResponse(platformInfo);
+	        // Convert the object to JSON
+	        return buildJsonResponse(platformInfo);
+	    } catch (Exception e) {
+	        // Log an error and return an empty JSON object in case of an exception
+	        logger.error("Error building platform JSON response: {}", e.getMessage(), e);
+	        return "{}";
+	    }
 	}
-	
+
 	@Override
 	protected String buildGatewayJsonResponse(String platformName, String gatewayName) throws IOException {
+	    try {
+	        // Retrieve the gateway based on the specified platform and gateway names
+	        doip.simulation.api.Gateway gateway = getGatewayByName(platformName, gatewayName);
 
-		// TODO !!!
-		// doipHttpServer.getSimulationManager().getPlatformByName("X2024").getGatewayByName("GW");
+	        if (gateway == null) {
+	            // Log an error if the specified gateway is not found
+	            logger.error("The specified gateway name {} does not exist", gatewayName);
+	            //return "{}"; // Return an empty JSON object or handle it as needed
+	        }
 
-		doip.simulation.api.Gateway gateway = getGatewayByName(platformName, gatewayName);
-	
-		if (gateway == null) {
-			// Handle the case where gateway is null
-			logger.error("The specified gateway name {} does not exist", gatewayName);
-			//return "{}"; // Return an empty JSON object or handle it as needed
-		}
-		
-		//Create real JSON object Gateway
-		// Process the retrieved gateway
-		
-		// TODO: Create replacement JSON
-		Gateway gatewayInfo = createGatewaySampleJson();
+	        // Process the retrieved gateway and create a real JSON object Gateway
+	        Gateway gatewayInfo = createGatewaySampleJson();
 
-		// Convert the object to JSON
-		return buildJsonResponse(gatewayInfo);
+	        // Convert the object to JSON
+	        return buildJsonResponse(gatewayInfo);
+	    } catch (Exception e) {
+	        // Log an error and return an empty JSON object in case of an exception
+	        logger.error("Error building gateway JSON response: {}", e.getMessage(), e);
+	        return "{}";
+	    }
 	}
 
-	
 	private Platform createPlatformSampleJson() {
 
 		// Create a Platform
