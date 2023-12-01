@@ -6,12 +6,14 @@ import com.starcode88.http.HttpUtils;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
+import doip.simulation.api.ServiceState;
 import doip.simulation.http.helpers.HttpServerHelper;
 
 import java.io.OutputStream;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,6 +37,8 @@ public class GetSimulationOverviewHandler extends SimulationConnector implements
 
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
+	private String currentPath = null;
+
 	// Constructor to receive the DoipHttpServer instance
 	public GetSimulationOverviewHandler(DoipHttpServer doipHttpServer) {
 		super(doipHttpServer.getSimulationManager());
@@ -47,6 +51,7 @@ public class GetSimulationOverviewHandler extends SimulationConnector implements
 	 */
 	@Override
 	public void handle(HttpExchange exchange) throws IOException {
+
 		if ("GET".equals(exchange.getRequestMethod())) {
 			handleGetRequest(exchange);
 		} else {
@@ -61,6 +66,9 @@ public class GetSimulationOverviewHandler extends SimulationConnector implements
 			// Get the query from the URI
 			URI uri = exchange.getRequestURI();
 			String query = uri.getQuery();
+			if (currentPath == null) {
+				currentPath = exchange.getRequestURI().getPath();
+			}
 
 			logger.info("Returns the decoded query component of this URI: {}", query);
 
@@ -86,9 +94,17 @@ public class GetSimulationOverviewHandler extends SimulationConnector implements
 			HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json", 200);
 			HttpServerHelper.responseServerLogging(exchange, 200, jsonResponse);
 
+		} catch (IllegalArgumentException e) {
+			// Handle invalid status
+			logger.error("Invalid status provided: {}", e.getMessage());
+			exchange.sendResponseHeaders(400, -1); // Bad Request
+		} catch (IOException e) {
+			// Handle I/O errors
+			logger.error("I/O error processing request: {}", e.getMessage());
+			exchange.sendResponseHeaders(500, -1); // Internal Server Error
 		} catch (Exception e) {
-			// Handle exceptions and send an appropriate response
-			logger.error("Error processing request: {}", e.getMessage(), e);
+			// Catch unexpected exceptions
+			logger.error("Unexpected error processing request: {}", e.getMessage(), e);
 			exchange.sendResponseHeaders(500, -1); // Internal Server Error
 		}
 	}
@@ -96,58 +112,69 @@ public class GetSimulationOverviewHandler extends SimulationConnector implements
 	private boolean isValidStatus(String status) {
 		// Validate the 'status' parameter against the allowed values
 		try {
-			SimulationStatus simulationStatus = SimulationStatus.valueOf(status);
+			// SimulationStatus simulationStatus = SimulationStatus.valueOf(status);
+			ServiceState simulationStatus = ServiceState.valueOf(status);
 			return true; // If no exception is thrown, the status is valid
 		} catch (IllegalArgumentException e) {
 			return false; // If an exception is thrown, the status is invalid
 		}
 	}
-	
+
 	@Override
 	protected String buildOverviewJsonResponse(String status) throws IOException {
-	    try {
-	        // Retrieve platform overview based on the status
-	        List<doip.simulation.api.Platform> platforms = getPlatformOverview(status);
+		try {
+			// Retrieve platform overview based on the status
+			List<doip.simulation.api.Platform> platforms = getPlatformOverview(status);
 
-	        if (platforms == null) {
-	            // Log an error if platform overview retrieval fails
-	            logger.error("Failed to retrieve platform overview. Check logs for details.");
-	            // return "{}"; // Return an empty JSON object or handle it as needed
-	        }
+			if (platforms == null) {
+				// Log an error if platform overview retrieval fails
+				logger.error("Failed to retrieve platform overview. Check logs for details.");
+				// return "{}"; // Return an empty JSON object or handle it as needed
+			}
 
-	        // Create ServerInfo for platforms
-	        ServerInfo serverInfo = createSampleJson(platforms, status);
+			// Create ServerInfo for platforms
+			ServerInfo serverInfo = createSampleJson(platforms, status);
 
-	        // Process the retrieved platforms if needed
-	        for (doip.simulation.api.Platform platform : platforms) {
-	            // Do something with each platform if needed
-	        }
+			// Process the retrieved platforms if needed
+			for (doip.simulation.api.Platform platform : platforms) {
+				// Do something with each platform if needed
+			}
 
-	        // Convert the ServerInfo object to JSON
-	        return buildJsonResponse(serverInfo);
-	    } catch (Exception e) {
-	        // Log an error and return an empty JSON object in case of an exception
-	        logger.error("Error building overview JSON response: {}", e.getMessage(), e);
-	        return "{}";
-	    }
+			// Convert the ServerInfo object to JSON
+			return buildJsonResponse(serverInfo);
+		} catch (Exception e) {
+			// Log an error and return an empty JSON object in case of an exception
+			logger.error("Error building overview JSON response: {}", e.getMessage(), e);
+			return "{}";
+		}
 	}
-
 
 	// Method to build a sample JSON response
 	private ServerInfo createSampleJson(List<doip.simulation.api.Platform> platforms, String status) {
+		// Get the server name from the DoipHttpServer
+        String serverName = doipHttpServer.getServerName();
 		// Build a JSON response based on the specified 'status'
 		ServerInfo serverInfo = new ServerInfo();
 
 		// Create a Platform
 		Platform platform = new Platform();
 		platform.name = "X2024";
-		platform.url = "http://myserver.com/doip-simulation/platform/X2024";
+		
+		//platform.url = "http://myserver.com/doip-simulation/platform/X2024";
+		String currentPlatformUrl = serverName + currentPath + "/platform/" + platform.name ;
+		// Update platform URL using the current server name
+		platform.url = currentPlatformUrl;
+		
 		platform.status = status;
 
 		// Create a Gateway
 		Gateway gateway = new Gateway();
-		gateway.name = "string";
-		gateway.url = "http://myserver.com/doip-simulation/platform/X2024/gateway/GW";
+		gateway.name = "GW";
+		
+		//gateway.url = "http://myserver.com/doip-simulation/platform/X2024/gateway/GW";
+		String currentGatewayUrl = currentPlatformUrl + "/gateway/" + gateway.name ;
+		gateway.url = currentGatewayUrl;
+		
 		gateway.status = status;
 
 		// Add error information for the gateway (if applicable)
@@ -164,4 +191,52 @@ public class GetSimulationOverviewHandler extends SimulationConnector implements
 		return serverInfo;
 	}
 
+	private ServerInfo createSampleJson_real(List<doip.simulation.api.Platform> platforms, String status) {
+		// Get the server name from the DoipHttpServer
+        String serverName = doipHttpServer.getServerName();
+		// Build a JSON response based on the specified 'status'
+		ServerInfo serverInfo = new ServerInfo();
+
+		if (platforms != null) {
+			// Process each platform
+			List<Platform> modifiedPlatforms = new ArrayList<Platform>();
+			for (doip.simulation.api.Platform platform : platforms) {
+				Platform modifiedPlatform = new Platform();
+				modifiedPlatform.name = platform.getName();
+				modifiedPlatform.status = platform.getState().toString();
+
+				String currentPlatformUrl = serverName + currentPath + "/platform/" + platform.getName();
+				// Update platform URL using the current server name
+				modifiedPlatform.url = currentPlatformUrl;
+
+				// Process each gateway in the platform
+				List<Gateway> modifiedGateways = new ArrayList<>();
+				for (doip.simulation.api.Gateway gateway : platform.getGateways()) {
+					Gateway modifiedGateway = new Gateway();
+					modifiedGateway.name = gateway.getName();
+					modifiedGateway.status = gateway.getState().toString();
+
+					String currentGatewayUrl = currentPlatformUrl + "/gateway/" + gateway.getName();
+					// Update gateway URL using the current server name
+					modifiedGateway.url = currentGatewayUrl;
+					
+					// Add modified gateway to the list
+					modifiedGateways.add(modifiedGateway);
+				}
+
+				// Set modified gateways to the modified platform
+				modifiedPlatform.gateways = modifiedGateways;
+
+				// Add modified platform to the list
+				modifiedPlatforms.add(modifiedPlatform);
+			}
+
+			// Set modified platforms to the serverInfo
+			serverInfo.platforms = modifiedPlatforms;
+		}
+
+		return serverInfo;
+	}
+
+	
 }

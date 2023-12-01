@@ -1,7 +1,9 @@
 package doip.simulation.http;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.ArrayList;
@@ -26,8 +28,20 @@ public class DoipHttpServer {
 
 	private static final int DEFAULT_PORT = 8080;
 	private HttpServer server;
-	private SimulationManager simulationManager = null;
+	private String serverName;
+    private int port;
+    
+    // Add getter methods for serverName and port
+    public String getServerName() {
+        return serverName;
+    }
 
+    public int getPort() {
+        return port;
+    }
+
+	private SimulationManager simulationManager = null;
+	
 	public SimulationManager getSimulationManager() {
 		return simulationManager;
 	}
@@ -74,11 +88,31 @@ public class DoipHttpServer {
 		server = HttpServer.create(new InetSocketAddress(port), 0);
 
 		handlers = new ArrayList<ContextHandler>();
+		
+		 this.port = port;
+	     this.serverName = buildServerName(port);
 
 		// TODO: Possibly create default mapping contexts here if needed
 		//createTestMappingContexts();
 
 	}
+	
+	private String buildServerName(int port) {
+        try {
+            InetAddress localhost = InetAddress.getLocalHost();
+            //return "http://" + localhost.getHostAddress() + ":" + port;
+            // getHostName
+            //return "http://" + localhost.getHostName() + ":" + port;
+            //return "http://" + localhost.getCanonicalHostName() + ":" + port;
+            return "http://" + "localhost" + ":" + port;
+        } catch (UnknownHostException e) {
+            // Handle the case where the local host address is not available
+           
+        	logger.warn("Local host address is not available");
+            //return null; // Or return a default server name
+            return "http://localhost:" + port;
+        }
+    }
 
 	/**
 	 * Creates default mapping contexts for POST and GET requests.
