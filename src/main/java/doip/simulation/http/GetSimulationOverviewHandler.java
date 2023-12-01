@@ -37,7 +37,7 @@ public class GetSimulationOverviewHandler extends SimulationConnector implements
 
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
-	private String currentPath = null;
+	public static final String DOIP_SIMULATION_PATH = "/doip-simulation/";
 
 	// Constructor to receive the DoipHttpServer instance
 	public GetSimulationOverviewHandler(DoipHttpServer doipHttpServer) {
@@ -66,9 +66,8 @@ public class GetSimulationOverviewHandler extends SimulationConnector implements
 			// Get the query from the URI
 			URI uri = exchange.getRequestURI();
 			String query = uri.getQuery();
-			if (currentPath == null) {
-				currentPath = exchange.getRequestURI().getPath();
-			}
+			
+			logger.info("Path component of this URI :{} ", exchange.getRequestURI().getPath());
 
 			logger.info("Returns the decoded query component of this URI: {}", query);
 
@@ -161,7 +160,7 @@ public class GetSimulationOverviewHandler extends SimulationConnector implements
 		platform.name = "X2024";
 		
 		//platform.url = "http://myserver.com/doip-simulation/platform/X2024";
-		String currentPlatformUrl = serverName + currentPath + "/platform/" + platform.name ;
+		String currentPlatformUrl = serverName + DOIP_SIMULATION_PATH + "platform/" + platform.name ;
 		// Update platform URL using the current server name
 		platform.url = currentPlatformUrl;
 		
@@ -205,7 +204,7 @@ public class GetSimulationOverviewHandler extends SimulationConnector implements
 				modifiedPlatform.name = platform.getName();
 				modifiedPlatform.status = platform.getState().toString();
 
-				String currentPlatformUrl = serverName + currentPath + "/platform/" + platform.getName();
+				String currentPlatformUrl = serverName + DOIP_SIMULATION_PATH + "platform/" + platform.getName();
 				// Update platform URL using the current server name
 				modifiedPlatform.url = currentPlatformUrl;
 

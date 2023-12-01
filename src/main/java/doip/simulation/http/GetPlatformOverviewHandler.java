@@ -31,6 +31,8 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 
 	private final ObjectMapper objectMapper = new ObjectMapper();
 	private static final String GATEWAY_PATH = "/gateway";
+	
+	public static final String PLATFORM_PATH = "/doip-simulation/platform";
 
 	// Constructor to receive the DoipHttpServer instance
 	public GetPlatformOverviewHandler(DoipHttpServer doipHttpServer) {
@@ -64,6 +66,10 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 		try {
 			// Extract platform parameter from the path
 			String requestPath = exchange.getRequestURI().getPath();
+			
+			logger.info("Path component of this URI :{} ", requestPath);
+			
+			
 			String platformParam = HttpServerHelper.getPathParam(requestPath, "platform");
 			if (platformParam != null) {
 
@@ -199,64 +205,74 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 
 	@Override
 	protected String buildPlatformJsonResponse(String platformName) throws IOException {
-	    try {
-	        // Retrieve the platform based on the specified platform name
-	        doip.simulation.api.Platform platform = getPlatformByName(platformName);
+		try {
+			// Retrieve the platform based on the specified platform name
+			doip.simulation.api.Platform platform = getPlatformByName(platformName);
 
-	        if (platform == null) {
-	            // Log an error if the specified platform is not found
-	            logger.error("The specified platform name {} does not exist", platformName);
-	            //return "{}"; // Return an empty JSON object or handle it as needed!
-	        }
+			if (platform == null) {
+				// Log an error if the specified platform is not found
+				logger.error("The specified platform name {} does not exist", platformName);
+				// return "{}"; // Return an empty JSON object or handle it as needed!
+			}
 
-	        // Process the retrieved platform and create a real JSON object Platform
-	        Platform platformInfo = createPlatformSampleJson();
+			// Process the retrieved platform and create a real JSON object Platform
+			Platform platformInfo = createPlatformSampleJson(platform);
 
-	        // Convert the object to JSON
-	        return buildJsonResponse(platformInfo);
-	    } catch (Exception e) {
-	        // Log an error and return an empty JSON object in case of an exception
-	        logger.error("Error building platform JSON response: {}", e.getMessage(), e);
-	        return "{}";
-	    }
+			// Convert the object to JSON
+			return buildJsonResponse(platformInfo);
+		} catch (Exception e) {
+			// Log an error and return an empty JSON object in case of an exception
+			logger.error("Error building platform JSON response: {}", e.getMessage(), e);
+			return "{}";
+		}
 	}
 
 	@Override
 	protected String buildGatewayJsonResponse(String platformName, String gatewayName) throws IOException {
-	    try {
-	        // Retrieve the gateway based on the specified platform and gateway names
-	        doip.simulation.api.Gateway gateway = getGatewayByName(platformName, gatewayName);
+		try {
+			// Retrieve the gateway based on the specified platform and gateway names
+			doip.simulation.api.Gateway gateway = getGatewayByName(platformName, gatewayName);
 
-	        if (gateway == null) {
-	            // Log an error if the specified gateway is not found
-	            logger.error("The specified gateway name {} does not exist", gatewayName);
-	            //return "{}"; // Return an empty JSON object or handle it as needed
-	        }
+			if (gateway == null) {
+				// Log an error if the specified gateway is not found
+				logger.error("The specified gateway name {} does not exist", gatewayName);
+				// return "{}"; // Return an empty JSON object or handle it as needed
+			}
 
-	        // Process the retrieved gateway and create a real JSON object Gateway
-	        Gateway gatewayInfo = createGatewaySampleJson();
+			// Process the retrieved gateway and create a real JSON object Gateway
+			Gateway gatewayInfo = createGatewaySampleJson(gateway, platformName);
 
-	        // Convert the object to JSON
-	        return buildJsonResponse(gatewayInfo);
-	    } catch (Exception e) {
-	        // Log an error and return an empty JSON object in case of an exception
-	        logger.error("Error building gateway JSON response: {}", e.getMessage(), e);
-	        return "{}";
-	    }
+			// Convert the object to JSON
+			return buildJsonResponse(gatewayInfo);
+		} catch (Exception e) {
+			// Log an error and return an empty JSON object in case of an exception
+			logger.error("Error building gateway JSON response: {}", e.getMessage(), e);
+			return "{}";
+		}
 	}
 
-	private Platform createPlatformSampleJson() {
+	private Platform createPlatformSampleJson(doip.simulation.api.Platform platformCurrent) {
+		// Get the server name from the DoipHttpServer
+        String serverName = doipHttpServer.getServerName();
 
 		// Create a Platform
 		Platform platform = new Platform();
 		platform.name = "X2024";
-		platform.url = "http://myserver.com/doip-simulation/platform/X2024";
+		//platform.url = "http://myserver.com/doip-simulation/platform/X2024";
+		String currentPlatformUrl = serverName + PLATFORM_PATH +"/" + platform.name ;
+		// Update platform URL using the current server name
+		platform.url = currentPlatformUrl;
+		
 		platform.status = "RUNNING";
 
 		// Create a Gateway
 		Gateway gateway = new Gateway();
-		gateway.name = "string";
-		gateway.url = "http://myserver.com/doip-simulation/platform/X2024/gateway/GW";
+		gateway.name = "GW";
+		
+		//gateway.url = "http://myserver.com/doip-simulation/platform/X2024/gateway/GW";
+		String currentGatewayUrl = currentPlatformUrl + "/gateway/" + gateway.name ;
+		gateway.url = currentGatewayUrl;
+		
 		gateway.status = "RUNNING";
 
 		// Add error information for the gateway (if applicable)
@@ -268,19 +284,31 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 		return platform;
 	}
 
-	private Gateway createGatewaySampleJson() {
+	private Gateway createGatewaySampleJson(doip.simulation.api.Gateway gatewayCurrent, String platformName) {
+		
+		// Get the server name from the DoipHttpServer
+        String serverName = doipHttpServer.getServerName();
 
 		// Create an instance of your classes and populate them with data
 		Gateway gateway = new Gateway();
-		gateway.name = "string";
-		gateway.url = "http://myserver.com/doip-simulation/platform/X2024/gateway/GW";
+		gateway.name = "GW";
+		
+		//gateway.url = "http://myserver.com/doip-simulation/platform/X2024/gateway/GW";
+		String currentPlatformUrl = serverName + PLATFORM_PATH +"/" + platformName ;
+		String currentGatewayUrl = currentPlatformUrl + "/gateway/" + gateway.name ;
+		gateway.url = currentGatewayUrl;
+		
+		
 		gateway.status = "RUNNING";
 		gateway.error = "Can't bind to port 13400 because it is already used by other gateway";
 
 		List<Ecu> ecus = new ArrayList<>();
 		Ecu ecu = new Ecu();
 		ecu.name = "EMS";
-		ecu.url = "http://myserver.com/doip-simulation/platform/X2024/gateway/GW/ecu/EMS";
+		
+		//ecu.url = "http://myserver.com/doip-simulation/platform/X2024/gateway/GW/ecu/EMS";
+		String currentEcuUrl = currentGatewayUrl + "/ecu/" + ecu.name ;
+		ecu.url = currentEcuUrl;
 
 		List<LookupEntry> lookupEntries = new ArrayList<>();
 		LookupEntry lookupEntry = new LookupEntry();
