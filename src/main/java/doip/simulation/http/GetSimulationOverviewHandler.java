@@ -37,8 +37,6 @@ public class GetSimulationOverviewHandler extends SimulationConnector implements
 
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
-	public static final String DOIP_SIMULATION_PATH = "/doip-simulation/";
-
 	// Constructor to receive the DoipHttpServer instance
 	public GetSimulationOverviewHandler(DoipHttpServer doipHttpServer) {
 		super(doipHttpServer.getSimulationManager());

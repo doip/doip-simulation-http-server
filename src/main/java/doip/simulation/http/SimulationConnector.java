@@ -19,6 +19,8 @@ public class SimulationConnector {
 
 	protected SimulationManager simulationManager;
 	private final ObjectMapper objectMapper = new ObjectMapper();
+	public static final String PLATFORM_PATH = "/doip-simulation/platform";
+	public static final String DOIP_SIMULATION_PATH = "/doip-simulation/";
 
 	public SimulationConnector(SimulationManager simulationManager) {
 		this.simulationManager = simulationManager;

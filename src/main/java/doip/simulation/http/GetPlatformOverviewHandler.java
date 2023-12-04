@@ -32,8 +32,6 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 	private final ObjectMapper objectMapper = new ObjectMapper();
 	private static final String GATEWAY_PATH = "/gateway";
 	
-	public static final String PLATFORM_PATH = "/doip-simulation/platform";
-
 	// Constructor to receive the DoipHttpServer instance
 	public GetPlatformOverviewHandler(DoipHttpServer doipHttpServer) {
 		super(doipHttpServer.getSimulationManager());
