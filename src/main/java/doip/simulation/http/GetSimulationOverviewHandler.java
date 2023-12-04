@@ -38,7 +38,7 @@ public class GetSimulationOverviewHandler extends SimulationConnector implements
 
 	// Constructor to receive the DoipHttpServer instance
 	public GetSimulationOverviewHandler(DoipHttpServer doipHttpServer) {
-		super(doipHttpServer.getSimulationManager());
+		super(doipHttpServer.getSimulationManager(), doipHttpServer.getServerName());
 		this.doipHttpServer = doipHttpServer;
 	}
 
@@ -127,14 +127,18 @@ public class GetSimulationOverviewHandler extends SimulationConnector implements
 				logger.error("Failed to retrieve platform overview. Check logs for details.");
 				// return "{}"; // Return an empty JSON object or handle it as needed
 			}
-
+			
+			//TODO:
 			// Create ServerInfo for platforms
 			ServerInfo serverInfo = createSampleJson(platforms, status);
+			
+			// Create a real JSON object Platform
+			//ServerInfo serverInfo = processOverview(platforms, status);
 
 			// Process the retrieved platforms if needed
-			for (doip.simulation.api.Platform platform : platforms) {
-				// Do something with each platform if needed
-			}
+//			for (doip.simulation.api.Platform platform : platforms) {
+//				// Do something with each platform if needed
+//			}
 
 			// Convert the ServerInfo object to JSON
 			return buildJsonResponse(serverInfo);
@@ -187,7 +191,7 @@ public class GetSimulationOverviewHandler extends SimulationConnector implements
 		return serverInfo;
 	}
 
-	private ServerInfo createSampleJson_real(List<doip.simulation.api.Platform> platforms, String status) {
+	private ServerInfo createOverviewJson(List<doip.simulation.api.Platform> platforms, String status) {
 		// Get the server name from the DoipHttpServer
         String serverName = doipHttpServer.getServerName();
 		// Build a JSON response based on the specified 'status'
