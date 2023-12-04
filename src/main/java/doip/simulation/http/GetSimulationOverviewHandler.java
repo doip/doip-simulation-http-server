@@ -23,7 +23,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import doip.simulation.http.lib.Gateway;
 import doip.simulation.http.lib.ServerInfo;
-import doip.simulation.http.lib.SimulationStatus;
 import doip.simulation.http.lib.Platform;
 
 /**
