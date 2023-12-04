@@ -33,8 +33,8 @@ class TestOverviewHandler {
 
 	private static final int PORT = 8080;
 
-	private static final String PLATFORM_PATH = "/doip-simulation/platform";
-	private static final String DOIP_SIMULATION_PATH = "/doip-simulation/";
+	//private static final String PLATFORM_PATH = "/doip-simulation/platform";
+	//private static final String DOIP_SIMULATION_PATH = "/doip-simulation/";
 
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
@@ -46,8 +46,8 @@ class TestOverviewHandler {
 
 		customController = new CustomMappingController(server);
 
-		customController.addExternalHandler(DOIP_SIMULATION_PATH, new GetSimulationOverviewHandler(server));
-		customController.addExternalHandler(PLATFORM_PATH, new GetPlatformOverviewHandler(server));
+		customController.addExternalHandler(SimulationConnector.DOIP_SIMULATION_PATH, new GetSimulationOverviewHandler(server));
+		customController.addExternalHandler(SimulationConnector.PLATFORM_PATH, new GetPlatformOverviewHandler(server));
 
 		customController.startHttpServer();
 
@@ -68,7 +68,7 @@ class TestOverviewHandler {
 		logger.info("-------------------------- testGetOverviewHandler ------------------------------------");
 
 		//"/doip-simulation/?status=RUNNING"
-		HttpResponse<String> response = clientForLocalHost.GET(DOIP_SIMULATION_PATH + "?status=RUNNING", String.class);
+		HttpResponse<String> response = clientForLocalHost.GET(SimulationConnector.DOIP_SIMULATION_PATH + "?status=RUNNING", String.class);
 		int statusCode = response.statusCode();
 		assertEquals(200, statusCode, "The HTTP status code is not 200");
 
@@ -76,7 +76,7 @@ class TestOverviewHandler {
 		assertNotNull(responseBody, "The response body from server is null");
 		
 		//it must work without query parameters
-		response = clientForLocalHost.GET(DOIP_SIMULATION_PATH, String.class);
+		response = clientForLocalHost.GET(SimulationConnector.DOIP_SIMULATION_PATH, String.class);
 
 		assertEquals(200, response.statusCode(), "The HTTP status code is not 200");
 
@@ -94,7 +94,7 @@ class TestOverviewHandler {
 		logger.info("-------------------------- testGetPlatformOverviewHandler ------------------------------------");
 		
 		//"/doip-simulation/platform/X2024"
-		HttpResponse<String> response = clientForLocalHost.GET(PLATFORM_PATH + "/X2024", String.class); 
+		HttpResponse<String> response = clientForLocalHost.GET(SimulationConnector.PLATFORM_PATH + "/X2024", String.class); 
 
 		int statusCode = response.statusCode();
 		assertEquals(200, statusCode, "The HTTP status code is not 200");
@@ -113,7 +113,7 @@ class TestOverviewHandler {
 		logger.info("-------------------------- testGetGatewayOverviewHandler ------------------------------------");
 
 		//"/doip-simulation/platform/X2024/gateway/GW"
-		HttpResponse<String> response = clientForLocalHost.GET(PLATFORM_PATH + "/X2024/gateway/GW",
+		HttpResponse<String> response = clientForLocalHost.GET(SimulationConnector.PLATFORM_PATH + "/X2024/gateway/GW",
 				String.class);
 
 		int statusCode = response.statusCode();
@@ -137,7 +137,7 @@ class TestOverviewHandler {
 		HttpClient clientForPost = new HttpClient("http://localhost:" + PORT);
 		clientForPost.addHeader("Content-Type", "application/json");
 		//"/doip-simulation/platform/X2024"
-		HttpResponse<String> response = clientForPost.POST(PLATFORM_PATH + "/X2024", jsonPostString,
+		HttpResponse<String> response = clientForPost.POST(SimulationConnector.PLATFORM_PATH + "/X2024", jsonPostString,
 				String.class);
 
 		int statusCode = response.statusCode();
@@ -161,7 +161,7 @@ class TestOverviewHandler {
 		clientForPost.addHeader("Content-Type", "application/json");
 		
 		//"/doip-simulation/platform/X2024"
-		HttpResponse<String> response = clientForPost.POST(PLATFORM_PATH + "/X2024", jsonPostString,
+		HttpResponse<String> response = clientForPost.POST(SimulationConnector.PLATFORM_PATH + "/X2024", jsonPostString,
 				String.class);
 
 		int statusCode = response.statusCode();
@@ -189,7 +189,7 @@ class TestOverviewHandler {
 		HttpResponse<String> response = null;
 		try {
 			//"/doip-simulation/platform/X2024"
-			response = clientForPost.POST(PLATFORM_PATH + "/X2024", postMessage, String.class);
+			response = clientForPost.POST(SimulationConnector.PLATFORM_PATH + "/X2024", postMessage, String.class);
 
 		} catch (HttpStatusCodeException e) {
 			statusCode = e.getResponse().statusCode();
@@ -214,7 +214,7 @@ class TestOverviewHandler {
 		HttpClient clientForPost = new HttpClient("http://localhost:" + PORT);
 		clientForPost.addHeader("Content-Type", "application/json");
 		//"/doip-simulation/platform/X2024"
-		HttpStatusCodeException e = assertThrows(HttpStatusCodeException.class, () -> clientForPost.POST(PLATFORM_PATH + "/X2024", jsonPostString, String.class));
+		HttpStatusCodeException e = assertThrows(HttpStatusCodeException.class, () -> clientForPost.POST(SimulationConnector.PLATFORM_PATH + "/X2024", jsonPostString, String.class));
 		int statusCode = e.getResponse().statusCode();
 		String statusText = HttpUtils.getStatusText(statusCode);
 		logger.info("Status code = {} ({})", statusCode, statusText);
