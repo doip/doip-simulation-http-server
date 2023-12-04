@@ -34,7 +34,7 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 
 	// Constructor to receive the DoipHttpServer instance
 	public GetPlatformOverviewHandler(DoipHttpServer doipHttpServer) {
-		super(doipHttpServer.getSimulationManager());
+		super(doipHttpServer.getSimulationManager(), doipHttpServer.getServerName());
 		this.doipHttpServer = doipHttpServer;
 	}
 
@@ -212,8 +212,11 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 				// return "{}"; // Return an empty JSON object or handle it as needed!
 			}
 
-			// Process the retrieved platform and create a real JSON object Platform
+			//TODO:
 			Platform platformInfo = createPlatformSampleJson(platform);
+			
+			// Process the retrieved platform and create a real JSON object Platform
+			//Platform platformInfo = processPlatform(platform);
 
 			// Convert the object to JSON
 			return buildJsonResponse(platformInfo);
@@ -235,9 +238,12 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 				logger.error("The specified gateway name {} does not exist", gatewayName);
 				// return "{}"; // Return an empty JSON object or handle it as needed
 			}
-
-			// Process the retrieved gateway and create a real JSON object Gateway
+			
+			//TODO:
 			Gateway gatewayInfo = createGatewaySampleJson(gateway, platformName);
+			
+			// Process the retrieved gateway and create a real JSON object Gateway
+			//Gateway gatewayInfo = processGateway(gateway, platformName);
 
 			// Convert the object to JSON
 			return buildJsonResponse(gatewayInfo);
@@ -282,42 +288,7 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 		return platform;
 	}
 
-	private Platform createPlatformSampleJson_real(doip.simulation.api.Platform platformCurrent) {
-		// Get the server name from the DoipHttpServer
-		String serverName = doipHttpServer.getServerName();
-
-		Platform modifiedPlatform = new Platform();
-		modifiedPlatform.name = platformCurrent.getName();
-		modifiedPlatform.status = platformCurrent.getState().toString();
-
-		String currentPlatformUrl = serverName + PLATFORM_PATH + "/" + platformCurrent.getName();
-		// Update platform URL using the current server name
-		modifiedPlatform.url = currentPlatformUrl;
-
-		// Process each gateway in the platform
-		List<Gateway> modifiedGateways = new ArrayList<>();
-		for (doip.simulation.api.Gateway gateway : platformCurrent.getGateways()) {
-			Gateway modifiedGateway = new Gateway();
-			modifiedGateway.name = gateway.getName();
-			modifiedGateway.status = gateway.getState().toString();
-
-			// Add error information for the gateway (if applicable)
-			// modifiedGateway.error = gateway.getState()
-
-			String currentGatewayUrl = currentPlatformUrl + "/gateway/" + gateway.getName();
-			// Update gateway URL using the current server name
-			modifiedGateway.url = currentGatewayUrl;
-
-			// Add modified gateway to the list
-			modifiedGateways.add(modifiedGateway);
-		}
-
-		// Set modified gateways to the modified platform
-		modifiedPlatform.gateways = modifiedGateways;
-
-		return modifiedPlatform;
-	}
-
+	
 	private Gateway createGatewaySampleJson(doip.simulation.api.Gateway gatewayCurrent, String platformName) {
 
 		// Get the server name from the DoipHttpServer
@@ -367,8 +338,45 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 
 		return gateway;
 	}
+	
+	private Platform createPlatformJson(doip.simulation.api.Platform platformCurrent) {
+		// Get the server name from the DoipHttpServer
+		String serverName = doipHttpServer.getServerName();
 
-	private Gateway createGatewaySampleJson_real(doip.simulation.api.Gateway gatewayCurrent, String platformName) {
+		Platform modifiedPlatform = new Platform();
+		modifiedPlatform.name = platformCurrent.getName();
+		modifiedPlatform.status = platformCurrent.getState().toString();
+
+		String currentPlatformUrl = serverName + PLATFORM_PATH + "/" + platformCurrent.getName();
+		// Update platform URL using the current server name
+		modifiedPlatform.url = currentPlatformUrl;
+
+		// Process each gateway in the platform
+		List<Gateway> modifiedGateways = new ArrayList<>();
+		for (doip.simulation.api.Gateway gateway : platformCurrent.getGateways()) {
+			Gateway modifiedGateway = new Gateway();
+			modifiedGateway.name = gateway.getName();
+			modifiedGateway.status = gateway.getState().toString();
+
+			// Add error information for the gateway (if applicable)
+			// modifiedGateway.error = gateway.getState()
+
+			String currentGatewayUrl = currentPlatformUrl + "/gateway/" + gateway.getName();
+			// Update gateway URL using the current server name
+			modifiedGateway.url = currentGatewayUrl;
+
+			// Add modified gateway to the list
+			modifiedGateways.add(modifiedGateway);
+		}
+
+		// Set modified gateways to the modified platform
+		modifiedPlatform.gateways = modifiedGateways;
+
+		return modifiedPlatform;
+	}
+
+
+	private Gateway createGatewayJson(doip.simulation.api.Gateway gatewayCurrent, String platformName) {
 
 		// Get the server name from the DoipHttpServer
 		String serverName = doipHttpServer.getServerName();

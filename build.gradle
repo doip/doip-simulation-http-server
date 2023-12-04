@@ -29,6 +29,7 @@ dependencies {
 	//	'../starcode88-jhttp/build/libs/starcode88-jhttp-2.0.0.jar',
 	//	'../starcode88-jutils/build/libs/starcode88-jutils-1.0.0.jar',
 	//	'../doip-simulation-http-lib/build/libs/doip-simulation-http-lib-1.0.0.jar',
+	//  '../doip-library/build/libs/doip-library-2.0.0.jar',
 	//)
 
 	testImplementation 'com.github.starcode88:starcode88-jtest:1.1.0'
