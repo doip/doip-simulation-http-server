@@ -31,7 +31,7 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 
 	private final ObjectMapper objectMapper = new ObjectMapper();
 	private static final String GATEWAY_PATH = "/gateway";
-	
+
 	// Constructor to receive the DoipHttpServer instance
 	public GetPlatformOverviewHandler(DoipHttpServer doipHttpServer) {
 		super(doipHttpServer.getSimulationManager());
@@ -64,10 +64,9 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 		try {
 			// Extract platform parameter from the path
 			String requestPath = exchange.getRequestURI().getPath();
-			
+
 			logger.info("Path component of this URI :{} ", requestPath);
-			
-			
+
 			String platformParam = HttpServerHelper.getPathParam(requestPath, "platform");
 			if (platformParam != null) {
 
@@ -251,26 +250,27 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 
 	private Platform createPlatformSampleJson(doip.simulation.api.Platform platformCurrent) {
 		// Get the server name from the DoipHttpServer
-        String serverName = doipHttpServer.getServerName();
+		String serverName = doipHttpServer.getServerName();
 
 		// Create a Platform
 		Platform platform = new Platform();
 		platform.name = "X2024";
-		//platform.url = "http://myserver.com/doip-simulation/platform/X2024";
-		String currentPlatformUrl = serverName + PLATFORM_PATH +"/" + platform.name ;
+		// platform.url = "http://myserver.com/doip-simulation/platform/X2024";
+		String currentPlatformUrl = serverName + PLATFORM_PATH + "/" + platform.name;
 		// Update platform URL using the current server name
 		platform.url = currentPlatformUrl;
-		
+
 		platform.status = "RUNNING";
 
 		// Create a Gateway
 		Gateway gateway = new Gateway();
 		gateway.name = "GW";
-		
-		//gateway.url = "http://myserver.com/doip-simulation/platform/X2024/gateway/GW";
-		String currentGatewayUrl = currentPlatformUrl + "/gateway/" + gateway.name ;
+
+		// gateway.url =
+		// "http://myserver.com/doip-simulation/platform/X2024/gateway/GW";
+		String currentGatewayUrl = currentPlatformUrl + "/gateway/" + gateway.name;
 		gateway.url = currentGatewayUrl;
-		
+
 		gateway.status = "RUNNING";
 
 		// Add error information for the gateway (if applicable)
@@ -281,17 +281,16 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 
 		return platform;
 	}
-	
-	
+
 	private Platform createPlatformSampleJson_real(doip.simulation.api.Platform platformCurrent) {
 		// Get the server name from the DoipHttpServer
-        String serverName = doipHttpServer.getServerName();
+		String serverName = doipHttpServer.getServerName();
 
-        Platform modifiedPlatform = new Platform();
+		Platform modifiedPlatform = new Platform();
 		modifiedPlatform.name = platformCurrent.getName();
 		modifiedPlatform.status = platformCurrent.getState().toString();
 
-		String currentPlatformUrl = serverName + PLATFORM_PATH +"/" + platformCurrent.getName();
+		String currentPlatformUrl = serverName + PLATFORM_PATH + "/" + platformCurrent.getName();
 		// Update platform URL using the current server name
 		modifiedPlatform.url = currentPlatformUrl;
 
@@ -301,14 +300,14 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 			Gateway modifiedGateway = new Gateway();
 			modifiedGateway.name = gateway.getName();
 			modifiedGateway.status = gateway.getState().toString();
-			
+
 			// Add error information for the gateway (if applicable)
-			//modifiedGateway.error = gateway.getState()
+			// modifiedGateway.error = gateway.getState()
 
 			String currentGatewayUrl = currentPlatformUrl + "/gateway/" + gateway.getName();
 			// Update gateway URL using the current server name
 			modifiedGateway.url = currentGatewayUrl;
-			
+
 			// Add modified gateway to the list
 			modifiedGateways.add(modifiedGateway);
 		}
@@ -320,29 +319,30 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 	}
 
 	private Gateway createGatewaySampleJson(doip.simulation.api.Gateway gatewayCurrent, String platformName) {
-		
+
 		// Get the server name from the DoipHttpServer
-        String serverName = doipHttpServer.getServerName();
+		String serverName = doipHttpServer.getServerName();
 
 		// Create an instance of your classes and populate them with data
 		Gateway gateway = new Gateway();
 		gateway.name = "GW";
-		
-		//gateway.url = "http://myserver.com/doip-simulation/platform/X2024/gateway/GW";
-		String currentPlatformUrl = serverName + PLATFORM_PATH +"/" + platformName ;
-		String currentGatewayUrl = currentPlatformUrl + "/gateway/" + gateway.name ;
+
+		// gateway.url =
+		// "http://myserver.com/doip-simulation/platform/X2024/gateway/GW";
+		String currentPlatformUrl = serverName + PLATFORM_PATH + "/" + platformName;
+		String currentGatewayUrl = currentPlatformUrl + "/gateway/" + gateway.name;
 		gateway.url = currentGatewayUrl;
-		
-		
+
 		gateway.status = "RUNNING";
 		gateway.error = "Can't bind to port 13400 because it is already used by other gateway";
 
 		List<Ecu> ecus = new ArrayList<>();
 		Ecu ecu = new Ecu();
 		ecu.name = "EMS";
-		
-		//ecu.url = "http://myserver.com/doip-simulation/platform/X2024/gateway/GW/ecu/EMS";
-		String currentEcuUrl = currentGatewayUrl + "/ecu/" + ecu.name ;
+
+		// ecu.url =
+		// "http://myserver.com/doip-simulation/platform/X2024/gateway/GW/ecu/EMS";
+		String currentEcuUrl = currentGatewayUrl + "/ecu/" + ecu.name;
 		ecu.url = currentEcuUrl;
 
 		List<LookupEntry> lookupEntries = new ArrayList<>();
@@ -366,6 +366,82 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 		gateway.ecus = ecus;
 
 		return gateway;
+	}
+
+	private Gateway createGatewaySampleJson_real(doip.simulation.api.Gateway gatewayCurrent, String platformName) {
+
+		// Get the server name from the DoipHttpServer
+		String serverName = doipHttpServer.getServerName();
+
+		// Create an instance of your classes and populate them with data
+		Gateway gateway = new Gateway();
+		gateway.name = gatewayCurrent.getName();
+
+		// gateway.url =
+		// "http://myserver.com/doip-simulation/platform/X2024/gateway/GW";
+		String currentPlatformUrl = serverName + PLATFORM_PATH + "/" + platformName;
+		String currentGatewayUrl = currentPlatformUrl + "/gateway/" + gatewayCurrent.getName();
+		;
+		gateway.url = currentGatewayUrl;
+
+		gateway.status = gatewayCurrent.getState().toString();
+		// TODO:
+		// gateway.error = "Can't bind to port 13400 because it is already used by another gateway";
+		
+		List<Ecu> modifiedEcus = new ArrayList<>();
+		for (doip.simulation.api.Ecu ecu : gatewayCurrent.getEcus()) {
+
+			Ecu modifiedEcu = new Ecu();
+			modifiedEcu.name = ecu.getNamme();
+
+			// ecu.url =
+			// "http://myserver.com/doip-simulation/platform/X2024/gateway/GW/ecu/EMS";
+			String currentEcuUrl = currentGatewayUrl + "/ecu/" + ecu.getNamme();
+			modifiedEcu.url = currentEcuUrl;
+
+			List<LookupEntry> configuredlookupEntries = new ArrayList<>();
+
+//			for (doip.library.util.LookupEntry curentLookupEntry : ecu.getConfiguredLookupTable().getLookupEntries()) {
+//
+//				LookupEntry modifiedlookupEntry = createJsonLookupEntry(curentLookupEntry);
+//
+//				configuredlookupEntries.add(modifiedlookupEntry);
+//			}
+
+			List<LookupEntry> runtimelookupEntries = new ArrayList<>();
+
+//			for (doip.library.util.LookupEntry curentLookupEntry : ecu.getRuntimeLookupTable().getLookupEntries()) {
+//
+//				LookupEntry modifiedlookupEntry = createJsonLookupEntry(curentLookupEntry);
+//
+//				runtimelookupEntries.add(modifiedlookupEntry);
+//			}
+
+			modifiedEcu.configuredLookupTable = configuredlookupEntries;
+			modifiedEcu.runtimeLookupTable = runtimelookupEntries;
+
+			modifiedEcus.add(modifiedEcu);
+		}
+
+		gateway.ecus = modifiedEcus;
+
+		return gateway;
+	}
+
+	private LookupEntry createJsonLookupEntry(doip.library.util.LookupEntry curentLookupEntry) {
+		LookupEntry modifiedlookupEntry = new LookupEntry();
+		modifiedlookupEntry.regex = curentLookupEntry.getRegex();
+		modifiedlookupEntry.result = curentLookupEntry.getResult();
+
+		List<Modifier> modifiers = new ArrayList<>();
+		for (doip.library.util.LookupEntry currentModifier : curentLookupEntry.getModifiers()) {
+			Modifier modifier = new Modifier();
+			modifier.regex = currentModifier.getRegex();
+			modifier.result = currentModifier.getResult();
+			modifiers.add(modifier);
+		}
+		modifiedlookupEntry.modifiers = modifiers;
+		return modifiedlookupEntry;
 	}
 
 }
