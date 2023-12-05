@@ -17,6 +17,8 @@ import doip.simulation.http.helpers.HttpServerHelper;
 import doip.simulation.http.lib.Gateway;
 import doip.simulation.http.lib.Modifier;
 import doip.simulation.http.lib.Platform;
+import doip.simulation.http.lib.Action;
+import doip.simulation.http.lib.ActionRequest;
 import doip.simulation.http.lib.Ecu;
 import doip.simulation.http.lib.LookupEntry;
 
@@ -105,11 +107,37 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 
 				} else {
 
-					// Deserialize the JSON string into a Platform object
-					Platform receivedPlatform = HttpServerHelper.deserializeJsonToObject(requestString, Platform.class);
+					// Deserialize the JSON string into a ActionRequest object
+					ActionRequest receivedAction = HttpServerHelper.deserializeJsonToObject(requestString,
+							ActionRequest.class);
 
-					if (receivedPlatform != null) {
+					if (receivedAction != null) {
 						// Process the received platform information as needed
+						logger.info("Received action: {}", receivedAction.getAction().toString());
+
+						// Retrieve the platform based on the specified platform name
+						doip.simulation.api.Platform platform = getPlatformByName(platformParam);
+
+						if (platform == null) {
+							// Log an error if the specified platform is not found
+							logger.error("Action cannot be executed because the specified platform name {} does not exist", platformParam);
+						} else {
+							Action action = receivedAction.getAction();
+							switch (action) {
+							case start:
+								logger.info("Starting the process for platform: {}", platformParam);
+								platform.start();
+								break;
+							case stop:
+								logger.info("Stopping the process for platform: {}", platformParam);
+								platform.stop();
+								break;
+							default:
+								logger.error("Unknown action: " + action.toString());
+								break;
+							}
+
+						}
 
 						// Build the JSON response
 						String jsonResponse = buildPlatformJsonResponse(platformParam);
@@ -212,11 +240,11 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 				// return "{}"; // Return an empty JSON object or handle it as needed!
 			}
 
-			//TODO:
+			// TODO:
 			Platform platformInfo = createPlatformSampleJson(platform);
-			
+
 			// Process the retrieved platform and create a real JSON object Platform
-			//Platform platformInfo = processPlatform(platform);
+			// Platform platformInfo = processPlatform(platform);
 
 			// Convert the object to JSON
 			return buildJsonResponse(platformInfo);
@@ -238,12 +266,12 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 				logger.error("The specified gateway name {} does not exist", gatewayName);
 				// return "{}"; // Return an empty JSON object or handle it as needed
 			}
-			
-			//TODO:
+
+			// TODO:
 			Gateway gatewayInfo = createGatewaySampleJson(gateway, platformName);
-			
+
 			// Process the retrieved gateway and create a real JSON object Gateway
-			//Gateway gatewayInfo = processGateway(gateway, platformName);
+			// Gateway gatewayInfo = processGateway(gateway, platformName);
 
 			// Convert the object to JSON
 			return buildJsonResponse(gatewayInfo);
@@ -288,7 +316,6 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 		return platform;
 	}
 
-	
 	private Gateway createGatewaySampleJson(doip.simulation.api.Gateway gatewayCurrent, String platformName) {
 
 		// Get the server name from the DoipHttpServer
@@ -338,5 +365,5 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 
 		return gateway;
 	}
-	
+
 }
