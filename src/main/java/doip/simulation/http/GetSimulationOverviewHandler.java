@@ -190,53 +190,5 @@ public class GetSimulationOverviewHandler extends SimulationConnector implements
 
 		return serverInfo;
 	}
-
-	private ServerInfo createOverviewJson(List<doip.simulation.api.Platform> platforms, String status) {
-		// Get the server name from the DoipHttpServer
-        String serverName = doipHttpServer.getServerName();
-		// Build a JSON response based on the specified 'status'
-		ServerInfo serverInfo = new ServerInfo();
-
-		if (platforms != null) {
-			// Process each platform
-			List<Platform> modifiedPlatforms = new ArrayList<Platform>();
-			for (doip.simulation.api.Platform platform : platforms) {
-				Platform modifiedPlatform = new Platform();
-				modifiedPlatform.name = platform.getName();
-				modifiedPlatform.status = platform.getState().toString();
-
-				String currentPlatformUrl = serverName + DOIP_SIMULATION_PATH + "platform/" + platform.getName();
-				// Update platform URL using the current server name
-				modifiedPlatform.url = currentPlatformUrl;
-
-				// Process each gateway in the platform
-				List<Gateway> modifiedGateways = new ArrayList<>();
-				for (doip.simulation.api.Gateway gateway : platform.getGateways()) {
-					Gateway modifiedGateway = new Gateway();
-					modifiedGateway.name = gateway.getName();
-					modifiedGateway.status = gateway.getState().toString();
-
-					String currentGatewayUrl = currentPlatformUrl + "/gateway/" + gateway.getName();
-					// Update gateway URL using the current server name
-					modifiedGateway.url = currentGatewayUrl;
-					
-					// Add modified gateway to the list
-					modifiedGateways.add(modifiedGateway);
-				}
-
-				// Set modified gateways to the modified platform
-				modifiedPlatform.gateways = modifiedGateways;
-
-				// Add modified platform to the list
-				modifiedPlatforms.add(modifiedPlatform);
-			}
-
-			// Set modified platforms to the serverInfo
-			serverInfo.platforms = modifiedPlatforms;
-		}
-
-		return serverInfo;
-	}
-
 	
 }

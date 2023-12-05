@@ -40,9 +40,9 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 
 	/**
 	 * Handle method for processing incoming HTTP requests
-	 * /doip-simulation/platform/{platformId} (GET)
-	 * /doip-simulation/platform/{platformId} (POST)
-	 * /doip-simulation/platform/{platformId}/gateway/{gatewayId} (GET)
+	 * /doip-simulation/platform/{platformName} (GET)
+	 * /doip-simulation/platform/{platformName} (POST)
+	 * /doip-simulation/platform/{platformName}/gateway/{gatewayName} (GET)
 	 */
 	@Override
 	public void handle(HttpExchange exchange) throws IOException {
@@ -339,117 +339,4 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 		return gateway;
 	}
 	
-	private Platform createPlatformJson(doip.simulation.api.Platform platformCurrent) {
-		// Get the server name from the DoipHttpServer
-		String serverName = doipHttpServer.getServerName();
-
-		Platform modifiedPlatform = new Platform();
-		modifiedPlatform.name = platformCurrent.getName();
-		modifiedPlatform.status = platformCurrent.getState().toString();
-
-		String currentPlatformUrl = serverName + PLATFORM_PATH + "/" + platformCurrent.getName();
-		// Update platform URL using the current server name
-		modifiedPlatform.url = currentPlatformUrl;
-
-		// Process each gateway in the platform
-		List<Gateway> modifiedGateways = new ArrayList<>();
-		for (doip.simulation.api.Gateway gateway : platformCurrent.getGateways()) {
-			Gateway modifiedGateway = new Gateway();
-			modifiedGateway.name = gateway.getName();
-			modifiedGateway.status = gateway.getState().toString();
-
-			// Add error information for the gateway (if applicable)
-			// modifiedGateway.error = gateway.getState()
-
-			String currentGatewayUrl = currentPlatformUrl + "/gateway/" + gateway.getName();
-			// Update gateway URL using the current server name
-			modifiedGateway.url = currentGatewayUrl;
-
-			// Add modified gateway to the list
-			modifiedGateways.add(modifiedGateway);
-		}
-
-		// Set modified gateways to the modified platform
-		modifiedPlatform.gateways = modifiedGateways;
-
-		return modifiedPlatform;
-	}
-
-
-	private Gateway createGatewayJson(doip.simulation.api.Gateway gatewayCurrent, String platformName) {
-
-		// Get the server name from the DoipHttpServer
-		String serverName = doipHttpServer.getServerName();
-
-		// Create an instance of your classes and populate them with data
-		Gateway gateway = new Gateway();
-		gateway.name = gatewayCurrent.getName();
-
-		// gateway.url =
-		// "http://myserver.com/doip-simulation/platform/X2024/gateway/GW";
-		String currentPlatformUrl = serverName + PLATFORM_PATH + "/" + platformName;
-		String currentGatewayUrl = currentPlatformUrl + "/gateway/" + gatewayCurrent.getName();
-		;
-		gateway.url = currentGatewayUrl;
-
-		gateway.status = gatewayCurrent.getState().toString();
-		// TODO:
-		// gateway.error = "Can't bind to port 13400 because it is already used by another gateway";
-		
-		List<Ecu> modifiedEcus = new ArrayList<>();
-		for (doip.simulation.api.Ecu ecu : gatewayCurrent.getEcus()) {
-
-			Ecu modifiedEcu = new Ecu();
-			modifiedEcu.name = ecu.getNamme();
-
-			// ecu.url =
-			// "http://myserver.com/doip-simulation/platform/X2024/gateway/GW/ecu/EMS";
-			String currentEcuUrl = currentGatewayUrl + "/ecu/" + ecu.getNamme();
-			modifiedEcu.url = currentEcuUrl;
-
-			List<LookupEntry> configuredlookupEntries = new ArrayList<>();
-
-//			for (doip.library.util.LookupEntry curentLookupEntry : ecu.getConfiguredLookupTable().getLookupEntries()) {
-//
-//				LookupEntry modifiedlookupEntry = createJsonLookupEntry(curentLookupEntry);
-//
-//				configuredlookupEntries.add(modifiedlookupEntry);
-//			}
-
-			List<LookupEntry> runtimelookupEntries = new ArrayList<>();
-
-//			for (doip.library.util.LookupEntry curentLookupEntry : ecu.getRuntimeLookupTable().getLookupEntries()) {
-//
-//				LookupEntry modifiedlookupEntry = createJsonLookupEntry(curentLookupEntry);
-//
-//				runtimelookupEntries.add(modifiedlookupEntry);
-//			}
-
-			modifiedEcu.configuredLookupTable = configuredlookupEntries;
-			modifiedEcu.runtimeLookupTable = runtimelookupEntries;
-
-			modifiedEcus.add(modifiedEcu);
-		}
-
-		gateway.ecus = modifiedEcus;
-
-		return gateway;
-	}
-
-	private LookupEntry createJsonLookupEntry(doip.library.util.LookupEntry curentLookupEntry) {
-		LookupEntry modifiedlookupEntry = new LookupEntry();
-		modifiedlookupEntry.regex = curentLookupEntry.getRegex();
-		modifiedlookupEntry.result = curentLookupEntry.getResult();
-
-		List<Modifier> modifiers = new ArrayList<>();
-		for (doip.library.util.LookupEntry currentModifier : curentLookupEntry.getModifiers()) {
-			Modifier modifier = new Modifier();
-			modifier.regex = currentModifier.getRegex();
-			modifier.result = currentModifier.getResult();
-			modifiers.add(modifier);
-		}
-		modifiedlookupEntry.modifiers = modifiers;
-		return modifiedlookupEntry;
-	}
-
 }
