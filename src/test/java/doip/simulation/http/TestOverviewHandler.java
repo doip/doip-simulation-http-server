@@ -132,7 +132,8 @@ class TestOverviewHandler {
 			URISyntaxException, IOException, InterruptedException, HttpInvalidRequestBodyType {
 		logger.info("-------------------------- testPostPlatformOverviewHandler ------------------------------------");
 
-		String jsonPostString = "{\"name\":\"X2024\",\"url\":\"http://myserver.com/doip-simulation/platform/X2024\",\"status\":\"RUNNING\",\"gateways\":[{\"name\":\"string\",\"url\":\"http://myserver.com/doip-simulation/platform/X2024/gateway/GW\",\"status\":\"RUNNING\",\"error\":\"Can't bind to port 13400\"}]}";
+		//String jsonPostString = "{\"name\":\"X2024\",\"url\":\"http://myserver.com/doip-simulation/platform/X2024\",\"status\":\"RUNNING\",\"gateways\":[{\"name\":\"string\",\"url\":\"http://myserver.com/doip-simulation/platform/X2024/gateway/GW\",\"status\":\"RUNNING\",\"error\":\"Can't bind to port 13400\"}]}";
+		String jsonPostString = "{\"action\": \"start\"}";
 
 		HttpClient clientForPost = new HttpClient("http://localhost:" + PORT);
 		clientForPost.addHeader("Content-Type", "application/json");
@@ -209,8 +210,8 @@ class TestOverviewHandler {
 			URISyntaxException, IOException, InterruptedException, HttpInvalidRequestBodyType {
 		logger.info("-------------------------- testPostPlatformWrongRequestJson ------------------------------------");
 
-		String jsonPostString = "{\"urlurl\":\"http://myserver.com/doip-simulation/platform/X2024\",\"status\":\"RUNNING\",\"gateways\":[{\"name\":\"string\",\"url\":\"http://myserver.com/doip-simulation/platform/X2024/gateway/GW\",\"status\":\"RUNNING\",\"error\":\"Can't bind to port 13400\"}]}";
-
+		//String jsonPostString = "{\"urlurl\":\"http://myserver.com/doip-simulation/platform/X2024\",\"status\":\"RUNNING\",\"gateways\":[{\"name\":\"string\",\"url\":\"http://myserver.com/doip-simulation/platform/X2024/gateway/GW\",\"status\":\"RUNNING\",\"error\":\"Can't bind to port 13400\"}]}";
+		String jsonPostString = "{\"action\": \"Unknown\"}";
 		HttpClient clientForPost = new HttpClient("http://localhost:" + PORT);
 		clientForPost.addHeader("Content-Type", "application/json");
 		//"/doip-simulation/platform/X2024"
