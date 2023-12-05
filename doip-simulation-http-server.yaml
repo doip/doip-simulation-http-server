@@ -10,15 +10,17 @@ servers:
 paths:
   /:
     get:
-      summary: Get overview about the DoIP simulation server
+      summary: Get overview about the DoIP simulation server.
+        It corresponds to class doip.simulation.api.SimulationManager.
       parameters:
-        - name: status
+        - name: state
           in: query
-          description: Will filter the platforms and gateways by the given status.
+          description: Will filter the platforms and gateways by the given state.
             For example if status is "RUNNING" then only platforms and gateways with
-            state "RUNNING" will be displayed
+            state "RUNNING" will be displayed. This parameter is optional.
+            If it is not set, then all platforms and gateways will be listed.
           schema:
-            $ref: '#/components/schemas/ServiceStatus'
+            $ref: '#/components/schemas/ServiceState'
       responses:
         '200':
           description: Successful operation
@@ -26,11 +28,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ServerInfo'
-  /platform/{platformId}:
+  /platform/{platformName}:
     get:
-      summary: Get information of a specific platform
+      summary: Get information of a specific platform. It corresponds to
+        class doip.simulation.api.Platform.
       parameters:
-        - $ref: '#/components/parameters/platformId'
+        - $ref: '#/components/parameters/platformName'
       responses:
         '200':
           description: Successful operation
@@ -39,10 +42,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Platform'
     post:
-      summary: Update or run an action for the platform given by the platformId
+      summary: Update or run an action for the platform given by the platformName
         The structure of the body of the request needs to be defined.
       parameters:
-        - $ref: '#/components/parameters/platformId'
+        - $ref: '#/components/parameters/platformName'
+      requestBody:
+        $ref: '#/components/requestBodies/PlatformUpdate'
       responses:
         '200':
           description: Successful operation
@@ -50,12 +55,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Platform'
-  /platform/{platformId}/gateway/{gatewayId}:
+  /platform/{platformName}/gateway/{gatewayName}:
     get:
-      summary: Get information about a specific gateway
+      summary: Get information about a specific gateway. It corresponds
+        to class doip.simulation.api.Gateway
       parameters:
-        - $ref: '#/components/parameters/platformId'
-        - $ref: '#/components/parameters/gatewayId'
+        - $ref: '#/components/parameters/platformName'
+        - $ref: '#/components/parameters/gatewayName'
       responses:
         '200':
           description: Successful operation
@@ -63,28 +69,53 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GatewayDetails'
+  /platform/{platformName}/gateway/{gatewayName}/ecu/{ecuName}:
+    get:
+      summary: Get information about a specific ECU.
+      parameters:
+        - $ref: '#/components/parameters/platformName'
+        - $ref: '#/components/parameters/gatewayName'
+        - $ref: '#/components/parameters/ecuName'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ecu'
 components:
   parameters:
-    platformId:
-      name: platformId
+    platformName:
+      name: platformName
+      description: Relates to function Platform.getName()
       in: path
       required: true
       schema:
         type: string
-    gatewayId:
-      name: gatewayId
+    gatewayName:
+      name: gatewayName
+      description: Relates to function Gateway.getName()
+      in: path
+      required: true
+      schema:
+        type: string
+    ecuName:
+      name: ecuName
+      description: Relates to function Ecu.getName()
       in: path
       required: true
       schema:
         type: string
   schemas:
-    ServiceStatus:
+    ServiceState:
+      description: Relates to class doip.simulation.api.ServiceState.
       type: string
       enum:
         - RUNNING
         - STOPPED
         - ERROR
     Platform:
+      description: Relates to class doip.simulation.api.Platform.
       type: object
       properties:
         name:
@@ -95,23 +126,34 @@ components:
           format: url
           example: "http://myserver.com/doip-simulation/platform/X2024"
         status:
-          $ref: '#/components/schemas/ServiceStatus'
+          $ref: '#/components/schemas/ServiceState'
         gateways:
           type: array
           description: List of all DoIP gateways within this platform
           items:
             $ref: '#/components/schemas/Gateway'
+    PlatformUpdate:
+      type: object
+      properties:
+        action:
+          type: string
+          enum:
+            - start
+            - stop
+          example: "start"
     Gateway:
+      description: Relates to class doip.simulation.api.Gateway.
       type: object
       properties:
         name:
+          description: Name of the gateway. It relates to function Gateway.getName().
           type: string
         url:
           type: string
           format: url
           example: "http://myserver.com/doip-simulation/platform/X2024/gateway/GW"
         status:
-            $ref: '#/components/schemas/ServiceStatus'
+            $ref: '#/components/schemas/ServiceState'
         error:
           type: string
           description: 
@@ -123,6 +165,7 @@ components:
         - url
         - status
     GatewayDetails:
+      description: Relates to class doip.simulation.api.Gateway.
       allOf:
         - $ref: '#/components/schemas/Gateway'
         - type: object
@@ -133,6 +176,7 @@ components:
               items:
                 $ref: '#/components/schemas/Ecu'
     Ecu:
+      description: Relates to class doip.simulation.api.Ecu.
       type: object
       properties:
         name:
@@ -147,33 +191,47 @@ components:
         runtimeLookupTable:
           $ref: '#/components/schemas/LookupTable'
     LookupTable:
+      description: Relates to class doip.simulation.api.LookupTable.
       type: object
       properties:
         lookupEntries:
+          description: List of lookup entries within this lookup table. Relates to function LookupTable.getLookupEntries().
           type: array
-          description: List of lookup entries within this lookup table
           items:
             $ref: '#/components/schemas/LookupEntry'
     LookupEntry:
+      description: Corresponds to class doip.simulation.api.LookupEntry
       type: object
       properties:
         regex:
+          description: Relates to function LookupEntry.getRegex().
           type: string
           example: "10 03"
         result:
+          description: Relates to function LookupEntry.getResult().
           type: string
           example: "50 03 00 32 01 F4"
         modifiers:
+          description: Relates to function LookupEntry.getModifiers().
           type: array
           items: 
             $ref: '#/components/schemas/LookupEntry'
           example: [{regex: "22 F1 86", result: "62 F1 86 03"}]
     ServerInfo:
+      description: Relates to class doip.simulation.api.SimulationManager.
+        The SimulationManager can be seen as the "root" object for
+        the DoIP simulation.
       type: object
-      description: Information about the simulation server
       properties:
         platforms:
           type: array
           description: List of all available vehicle platforms
           items:
             $ref: '#/components/schemas/Platform'
+  requestBodies:
+    PlatformUpdate:
+      description: Used by POST method for url "/platform/{platformName}"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PlatformUpdate"
