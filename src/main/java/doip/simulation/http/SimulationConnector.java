@@ -282,21 +282,21 @@ public class SimulationConnector {
 
 			List<doip.simulation.http.lib.LookupEntry> configuredlookupEntries = new ArrayList<>();
 
-//			for (doip.library.util.LookupEntry curentLookupEntry : ecu.getConfiguredLookupTable().getLookupEntries()) {
-//
-//				LookupEntry modifiedlookupEntry = createJsonLookupEntry(curentLookupEntry);
-//
-//				configuredlookupEntries.add(modifiedlookupEntry);
-//			}
+			for (doip.library.util.LookupEntry curentLookupEntry : ecu.getConfiguredLookupTable().getLookupEntries()) {
+
+				LookupEntry modifiedlookupEntry = createJsonLookupEntry(curentLookupEntry);
+
+				configuredlookupEntries.add(modifiedlookupEntry);
+			}
 
 			List<doip.simulation.http.lib.LookupEntry> runtimelookupEntries = new ArrayList<>();
 
-//			for (doip.library.util.LookupEntry curentLookupEntry : ecu.getRuntimeLookupTable().getLookupEntries()) {
-//
-//				LookupEntry modifiedlookupEntry = createJsonLookupEntry(curentLookupEntry);
-//
-//				runtimelookupEntries.add(modifiedlookupEntry);
-//			}
+			for (doip.library.util.LookupEntry curentLookupEntry : ecu.getRuntimeLookupTable().getLookupEntries()) {
+
+				LookupEntry modifiedlookupEntry = createJsonLookupEntry(curentLookupEntry);
+
+				runtimelookupEntries.add(modifiedlookupEntry);
+			}
 
 			modifiedEcu.configuredLookupTable = configuredlookupEntries;
 			modifiedEcu.runtimeLookupTable = runtimelookupEntries;
