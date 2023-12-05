@@ -125,15 +125,15 @@ public class GetSimulationOverviewHandler extends SimulationConnector implements
 			if (platforms == null) {
 				// Log an error if platform overview retrieval fails
 				logger.error("Failed to retrieve platform overview. Check logs for details.");
-				// return "{}"; // Return an empty JSON object or handle it as needed
+				return "{}"; // Return an empty JSON object or handle it as needed
 			}
 			
 			//TODO:
 			// Create ServerInfo for platforms
-			ServerInfo serverInfo = createSampleJson(platforms, status);
+			//ServerInfo serverInfo = createSampleJson(platforms, status);
 			
 			// Create a real JSON object Platform
-			//ServerInfo serverInfo = processOverview(platforms, status);
+			ServerInfo serverInfo = processOverview(platforms, status);
 
 			// Process the retrieved platforms if needed
 //			for (doip.simulation.api.Platform platform : platforms) {

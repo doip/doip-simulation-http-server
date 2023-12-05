@@ -100,11 +100,11 @@ public class DoipHttpServer {
 	private String buildServerName(int port) {
         try {
             InetAddress localhost = InetAddress.getLocalHost();
-            //return "http://" + localhost.getHostAddress() + ":" + port;
+            return "http://" + localhost.getHostAddress() + ":" + port;
             // getHostName
             //return "http://" + localhost.getHostName() + ":" + port;
             //return "http://" + localhost.getCanonicalHostName() + ":" + port;
-            return "http://" + "localhost" + ":" + port;
+            //return "http://" + "localhost" + ":" + port;
         } catch (UnknownHostException e) {
             // Handle the case where the local host address is not available
            

@@ -122,20 +122,7 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 							// Log an error if the specified platform is not found
 							logger.error("Action cannot be executed because the specified platform name {} does not exist", platformParam);
 						} else {
-							Action action = receivedAction.getAction();
-							switch (action) {
-							case start:
-								logger.info("Starting the process for platform: {}", platformParam);
-								platform.start();
-								break;
-							case stop:
-								logger.info("Stopping the process for platform: {}", platformParam);
-								platform.stop();
-								break;
-							default:
-								logger.error("Unknown action: " + action.toString());
-								break;
-							}
+							performAction(platform, receivedAction.getAction());
 
 						}
 
@@ -164,6 +151,23 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 			exchange.sendResponseHeaders(500, -1); // Internal Server Error
 		}
 	}
+
+	private void performAction(doip.simulation.api.Platform platform, Action action) {
+	    switch (action) {
+	        case start:
+	            logger.info("Starting the process for platform: {}", platform.getName());
+	            platform.start();
+	            break;
+	        case stop:
+	            logger.info("Stopping the process for platform: {}", platform.getName());
+	            platform.stop();
+	            break;
+	        default:
+	            logger.error("Unknown action: " + action.toString());
+	            break;
+	    }
+	}
+
 
 	private void handleGetGatewayRequest(HttpExchange exchange) throws IOException {
 		try {
@@ -237,14 +241,14 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 			if (platform == null) {
 				// Log an error if the specified platform is not found
 				logger.error("The specified platform name {} does not exist", platformName);
-				// return "{}"; // Return an empty JSON object or handle it as needed!
+				return "{}"; // Return an empty JSON object or handle it as needed!
 			}
 
 			// TODO:
-			Platform platformInfo = createPlatformSampleJson(platform);
+			//Platform platformInfo = createPlatformSampleJson(platform);
 
 			// Process the retrieved platform and create a real JSON object Platform
-			// Platform platformInfo = processPlatform(platform);
+			Platform platformInfo = processPlatform(platform);
 
 			// Convert the object to JSON
 			return buildJsonResponse(platformInfo);
@@ -264,14 +268,14 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 			if (gateway == null) {
 				// Log an error if the specified gateway is not found
 				logger.error("The specified gateway name {} does not exist", gatewayName);
-				// return "{}"; // Return an empty JSON object or handle it as needed
+				return "{}"; // Return an empty JSON object or handle it as needed
 			}
 
 			// TODO:
-			Gateway gatewayInfo = createGatewaySampleJson(gateway, platformName);
+			//Gateway gatewayInfo = createGatewaySampleJson(gateway, platformName);
 
 			// Process the retrieved gateway and create a real JSON object Gateway
-			// Gateway gatewayInfo = processGateway(gateway, platformName);
+			Gateway gatewayInfo = processGateway(gateway, platformName);
 
 			// Convert the object to JSON
 			return buildJsonResponse(gatewayInfo);
