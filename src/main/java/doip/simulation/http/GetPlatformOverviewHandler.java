@@ -14,6 +14,7 @@ import com.sun.net.httpserver.HttpHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpExchange;
 
+import doip.library.exception.DoipException;
 import doip.simulation.http.helpers.HttpServerHelper;
 import doip.simulation.http.lib.Gateway;
 import doip.simulation.http.lib.Modifier;
@@ -165,7 +166,12 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 		switch (action) {
 		case start:
 			logger.info("Starting the process for platform: {}", platform.getName());
-			platform.start();
+			try {
+				platform.start();
+			} catch (DoipException e) {
+				logger.error("Failed to start the platform");
+				logger.catching(e);
+			}
 			break;
 		case stop:
 			logger.info("Stopping the process for platform: {}", platform.getName());
