@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,7 +37,7 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 
 	// Constructor to receive the DoipHttpServer instance
 	public GetPlatformOverviewHandler(DoipHttpServer doipHttpServer) {
-		super(doipHttpServer.getSimulationManager(), doipHttpServer.getServerName());
+		super(doipHttpServer);
 		this.doipHttpServer = doipHttpServer;
 	}
 
@@ -48,6 +49,12 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 	 */
 	@Override
 	public void handle(HttpExchange exchange) throws IOException {
+
+		String hostWithPort = HttpServerHelper.getHostWithPort(exchange);
+		if (hostWithPort != null) {
+			doipHttpServer.setServerNameFromRequestHeader("http://" + hostWithPort);
+		}
+
 		String requestPath = exchange.getRequestURI().getPath();
 		if ("GET".equals(exchange.getRequestMethod()) && requestPath.contains(GATEWAY_PATH)) {
 			handleGetGatewayRequest(exchange);
@@ -120,7 +127,9 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 
 						if (platform == null) {
 							// Log an error if the specified platform is not found
-							logger.error("Action cannot be executed because the specified platform name {} does not exist", platformParam);
+							logger.error(
+									"Action cannot be executed because the specified platform name {} does not exist",
+									platformParam);
 						} else {
 							performAction(platform, receivedAction.getAction());
 
@@ -153,21 +162,20 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 	}
 
 	private void performAction(doip.simulation.api.Platform platform, Action action) {
-	    switch (action) {
-	        case start:
-	            logger.info("Starting the process for platform: {}", platform.getName());
-	            platform.start();
-	            break;
-	        case stop:
-	            logger.info("Stopping the process for platform: {}", platform.getName());
-	            platform.stop();
-	            break;
-	        default:
-	            logger.error("Unknown action: " + action.toString());
-	            break;
-	    }
+		switch (action) {
+		case start:
+			logger.info("Starting the process for platform: {}", platform.getName());
+			platform.start();
+			break;
+		case stop:
+			logger.info("Stopping the process for platform: {}", platform.getName());
+			platform.stop();
+			break;
+		default:
+			logger.error("Unknown action: " + action.toString());
+			break;
+		}
 	}
-
 
 	private void handleGetGatewayRequest(HttpExchange exchange) throws IOException {
 		try {
@@ -241,15 +249,19 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 			if (platform == null) {
 				// Log an error if the specified platform is not found
 				logger.error("The specified platform name {} does not exist", platformName);
-				return "{}"; // Return an empty JSON object or handle it as needed!
+				if (doipHttpServer.createMockResponse == false) {
+					return "{}"; // Return an empty JSON object or handle it as needed
+				}
 			}
-
-			// TODO:
-			//Platform platformInfo = createPlatformSampleJson(platform);
-
-			// Process the retrieved platform and create a real JSON object Platform
-			Platform platformInfo = processPlatform(platform);
-
+			
+			Platform platformInfo;
+			if (doipHttpServer.createMockResponse) {
+				// TODO:
+				platformInfo = createPlatformSampleJson(platform);
+			} else {
+				// Process the retrieved platform and create a real JSON object Platform
+				platformInfo = processPlatform(platform);
+			}
 			// Convert the object to JSON
 			return buildJsonResponse(platformInfo);
 		} catch (Exception e) {
@@ -268,14 +280,19 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 			if (gateway == null) {
 				// Log an error if the specified gateway is not found
 				logger.error("The specified gateway name {} does not exist", gatewayName);
-				return "{}"; // Return an empty JSON object or handle it as needed
+				if (doipHttpServer.createMockResponse == false) {
+					return "{}"; // Return an empty JSON object or handle it as needed
+				}
 			}
 
-			// TODO:
-			//Gateway gatewayInfo = createGatewaySampleJson(gateway, platformName);
-
-			// Process the retrieved gateway and create a real JSON object Gateway
-			Gateway gatewayInfo = processGateway(gateway, platformName);
+			Gateway gatewayInfo;
+			if (doipHttpServer.createMockResponse) {
+				// TODO:
+				gatewayInfo = createGatewaySampleJson(gateway, platformName);
+			} else {
+				// Process the retrieved gateway and create a real JSON object Gateway
+				gatewayInfo = processGateway(gateway, platformName);
+			}
 
 			// Convert the object to JSON
 			return buildJsonResponse(gatewayInfo);
@@ -288,7 +305,8 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 
 	private Platform createPlatformSampleJson(doip.simulation.api.Platform platformCurrent) {
 		// Get the server name from the DoipHttpServer
-		String serverName = doipHttpServer.getServerName();
+		// String serverName = doipHttpServer.getServerName();
+		String serverName = doipHttpServer.getServerNameFromRequestHeader();
 
 		// Create a Platform
 		Platform platform = new Platform();
@@ -323,7 +341,8 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 	private Gateway createGatewaySampleJson(doip.simulation.api.Gateway gatewayCurrent, String platformName) {
 
 		// Get the server name from the DoipHttpServer
-		String serverName = doipHttpServer.getServerName();
+		// String serverName = doipHttpServer.getServerName();
+		String serverName = doipHttpServer.getServerNameFromRequestHeader();
 
 		// Create an instance of your classes and populate them with data
 		Gateway gateway = new Gateway();

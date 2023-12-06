@@ -21,14 +21,14 @@ public class SimulationConnector {
 	private static final Logger logger = LogManager.getLogger(SimulationConnector.class);
 
 	protected SimulationManager simulationManager;
-	private String hostName;
+	private final DoipHttpServer doipHttpServer;
 	private final ObjectMapper objectMapper = new ObjectMapper();
 	public static final String PLATFORM_PATH = "/doip-simulation/platform";
 	public static final String DOIP_SIMULATION_PATH = "/doip-simulation/";
 
-	public SimulationConnector(SimulationManager simulationManager, String doipHostName) {
-		this.simulationManager = simulationManager;
-		this.hostName = doipHostName;
+	public SimulationConnector(DoipHttpServer doipHttpServer) {
+		this.simulationManager = doipHttpServer.getSimulationManager();
+		this.doipHttpServer = doipHttpServer;
 	}
 
 	/**
@@ -211,7 +211,8 @@ public class SimulationConnector {
 		// doip.simulation.http.lib.Platform object
 	
 		// Get the server name from the DoipHttpServer
-		String serverName = this.hostName;
+		//String serverName = doipHttpServer.getServerName();
+		String serverName = doipHttpServer.getServerNameFromRequestHeader();
 
 		doip.simulation.http.lib.Platform modifiedPlatform = new doip.simulation.http.lib.Platform();
 		modifiedPlatform.name = platform.getName();
@@ -252,7 +253,8 @@ public class SimulationConnector {
 		// doip.simulation.http.lib.Gateway object
 		
 		// Get the server name from the DoipHttpServer
-		String serverName = this.hostName;
+		//String serverName = doipHttpServer.getServerName();
+		String serverName = doipHttpServer.getServerNameFromRequestHeader();
 
 		// Create an instance of your classes and populate them with data
 		doip.simulation.http.lib.Gateway gateway = new doip.simulation.http.lib.Gateway();
@@ -328,7 +330,9 @@ public class SimulationConnector {
 	
 	protected ServerInfo processOverview(List<doip.simulation.api.Platform> platforms, String status) {
 		// Get the server name from the DoipHttpServer
-        String serverName = this.hostName;;
+		//String serverName = doipHttpServer.getServerName();
+		String serverName = doipHttpServer.getServerNameFromRequestHeader();
+		
 		// Build a JSON response based on the specified 'status'
 		ServerInfo serverInfo = new ServerInfo();
 

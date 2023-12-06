@@ -38,7 +38,7 @@ public class GetSimulationOverviewHandler extends SimulationConnector implements
 
 	// Constructor to receive the DoipHttpServer instance
 	public GetSimulationOverviewHandler(DoipHttpServer doipHttpServer) {
-		super(doipHttpServer.getSimulationManager(), doipHttpServer.getServerName());
+		super(doipHttpServer);
 		this.doipHttpServer = doipHttpServer;
 	}
 
@@ -48,6 +48,11 @@ public class GetSimulationOverviewHandler extends SimulationConnector implements
 	 */
 	@Override
 	public void handle(HttpExchange exchange) throws IOException {
+
+		String hostWithPort = HttpServerHelper.getHostWithPort(exchange);
+		if (hostWithPort != null) {
+			doipHttpServer.setServerNameFromRequestHeader("http://" + hostWithPort);
+		}
 
 		if ("GET".equals(exchange.getRequestMethod())) {
 			handleGetRequest(exchange);
@@ -63,7 +68,7 @@ public class GetSimulationOverviewHandler extends SimulationConnector implements
 			// Get the query from the URI
 			URI uri = exchange.getRequestURI();
 			String query = uri.getQuery();
-			
+
 			logger.info("Path component of this URI :{} ", exchange.getRequestURI().getPath());
 
 			logger.info("Returns the decoded query component of this URI: {}", query);
@@ -125,16 +130,19 @@ public class GetSimulationOverviewHandler extends SimulationConnector implements
 			if (platforms == null) {
 				// Log an error if platform overview retrieval fails
 				logger.error("Failed to retrieve platform overview. Check logs for details.");
-				return "{}"; // Return an empty JSON object or handle it as needed
+				if (doipHttpServer.createMockResponse == false) {
+					return "{}"; // Return an empty JSON object or handle it as needed
+				}
 			}
-			
-			//TODO:
-			// Create ServerInfo for platforms
-			//ServerInfo serverInfo = createSampleJson(platforms, status);
-			
-			// Create a real JSON object Platform
-			ServerInfo serverInfo = processOverview(platforms, status);
-
+			ServerInfo serverInfo;
+			if (doipHttpServer.createMockResponse) {
+				// TODO:
+				// Create ServerInfo for platforms
+				serverInfo = createSampleJson(platforms, status);
+			} else {
+				// Create a real JSON object Platform
+				serverInfo = processOverview(platforms, status);
+			}
 			// Process the retrieved platforms if needed
 //			for (doip.simulation.api.Platform platform : platforms) {
 //				// Do something with each platform if needed
@@ -152,29 +160,32 @@ public class GetSimulationOverviewHandler extends SimulationConnector implements
 	// Method to build a sample JSON response
 	private ServerInfo createSampleJson(List<doip.simulation.api.Platform> platforms, String status) {
 		// Get the server name from the DoipHttpServer
-        String serverName = doipHttpServer.getServerName();
+		// String serverName = doipHttpServer.getServerName();
+		String serverName = doipHttpServer.getServerNameFromRequestHeader();
+
 		// Build a JSON response based on the specified 'status'
 		ServerInfo serverInfo = new ServerInfo();
 
 		// Create a Platform
 		Platform platform = new Platform();
 		platform.name = "X2024";
-		
-		//platform.url = "http://myserver.com/doip-simulation/platform/X2024";
-		String currentPlatformUrl = serverName + DOIP_SIMULATION_PATH + "platform/" + platform.name ;
+
+		// platform.url = "http://myserver.com/doip-simulation/platform/X2024";
+		String currentPlatformUrl = serverName + DOIP_SIMULATION_PATH + "platform/" + platform.name;
 		// Update platform URL using the current server name
 		platform.url = currentPlatformUrl;
-		
+
 		platform.status = status;
 
 		// Create a Gateway
 		Gateway gateway = new Gateway();
 		gateway.name = "GW";
-		
-		//gateway.url = "http://myserver.com/doip-simulation/platform/X2024/gateway/GW";
-		String currentGatewayUrl = currentPlatformUrl + "/gateway/" + gateway.name ;
+
+		// gateway.url =
+		// "http://myserver.com/doip-simulation/platform/X2024/gateway/GW";
+		String currentGatewayUrl = currentPlatformUrl + "/gateway/" + gateway.name;
 		gateway.url = currentGatewayUrl;
-		
+
 		gateway.status = status;
 
 		// Add error information for the gateway (if applicable)
@@ -190,5 +201,5 @@ public class GetSimulationOverviewHandler extends SimulationConnector implements
 
 		return serverInfo;
 	}
-	
+
 }
