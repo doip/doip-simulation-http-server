@@ -38,7 +38,7 @@ class TestOverviewHandler {
 
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
-		// SimulationManagerMock mockSimulationManager = new SimulationManagerMock();
+		// SimulationManager mockSimulationManager = new  MockSimulationManager();
 		// Create a mock instance of SimulationManager
 		SimulationManager mockSimulationManager = Mockito.mock(SimulationManager.class);
 

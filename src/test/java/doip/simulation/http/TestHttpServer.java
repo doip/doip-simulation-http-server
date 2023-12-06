@@ -44,7 +44,7 @@ class TestHttpServer {
 //		CustomGateway gateway = new CustomGateway(config);		
 //		server = new DoipHttpServer(gateway);
 
-		// SimulationManagerMock mockSimulationManager = new SimulationManagerMock();
+		// SimulationManager mockSimulationManager = new  MockSimulationManager();
 		// Create a mock instance of SimulationManager
 		SimulationManager mockSimulationManager = Mockito.mock(SimulationManager.class);
 
