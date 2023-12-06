@@ -29,19 +29,37 @@ public class DoipHttpServer {
 	private static final int DEFAULT_PORT = 8080;
 	private HttpServer server;
 	private String serverName;
-    private int port;
-    
-    // Add getter methods for serverName and port
-    public String getServerName() {
-        return serverName;
-    }
+	private int port;
+	
+	public boolean createMockResponse = false;
 
-    public int getPort() {
-        return port;
-    }
+	// Add getter methods for serverName and port
+	public String getServerName() {
+		return serverName;
+	}
+	
+	private String serverNameFromRequestHeader;
+	
+	public String getServerNameFromRequestHeader() {
+		if (serverNameFromRequestHeader == null)
+		{
+			return serverName;
+		}
+		return serverNameFromRequestHeader;
+	}
+	
+	public void setServerNameFromRequestHeader(String serverNameParam) {
+		if (serverNameParam != null) {
+			this.serverNameFromRequestHeader = serverNameParam;
+		}
+	}
+
+	public int getPort() {
+		return port;
+	}
 
 	private SimulationManager simulationManager = null;
-	
+
 	public SimulationManager getSimulationManager() {
 		return simulationManager;
 	}
@@ -88,31 +106,31 @@ public class DoipHttpServer {
 		server = HttpServer.create(new InetSocketAddress(port), 0);
 
 		handlers = new ArrayList<ContextHandler>();
-		
-		 this.port = port;
-	     this.serverName = buildServerName(port);
+
+		this.port = port;
+		this.serverName = buildServerName(port);
 
 		// TODO: Possibly create default mapping contexts here if needed
-		//createTestMappingContexts();
+		// createTestMappingContexts();
 
 	}
-	
+
 	private String buildServerName(int port) {
-        try {
-            InetAddress localhost = InetAddress.getLocalHost();
-            return "http://" + localhost.getHostAddress() + ":" + port;
-            // getHostName
-            //return "http://" + localhost.getHostName() + ":" + port;
-            //return "http://" + localhost.getCanonicalHostName() + ":" + port;
-            //return "http://" + "localhost" + ":" + port;
-        } catch (UnknownHostException e) {
-            // Handle the case where the local host address is not available
-           
-        	logger.warn("Local host address is not available");
-            //return null; // Or return a default server name
-            return "http://localhost:" + port;
-        }
-    }
+		try {
+			InetAddress localhost = InetAddress.getLocalHost();
+			return "http://" + localhost.getHostAddress() + ":" + port;
+			// getHostName
+			// return "http://" + localhost.getHostName() + ":" + port;
+			// return "http://" + localhost.getCanonicalHostName() + ":" + port;
+			// return "http://" + "localhost" + ":" + port;
+		} catch (UnknownHostException e) {
+			// Handle the case where the local host address is not available
+
+			logger.warn("Local host address is not available");
+			// return null; // Or return a default server name
+			return "http://localhost:" + port;
+		}
+	}
 
 	/**
 	 * Creates default mapping contexts for POST and GET requests.
@@ -270,7 +288,7 @@ public class DoipHttpServer {
 			logger.info("Context: {}, Handler: {}", contextHandler.getContext(), contextHandler.getHandler());
 		}
 	}
-
+	
 	class PostHandler implements HttpHandler {
 		@Override
 		public void handle(HttpExchange exchange) throws IOException {

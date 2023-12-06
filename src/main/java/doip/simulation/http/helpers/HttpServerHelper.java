@@ -341,6 +341,39 @@ public class HttpServerHelper {
             return null;
         }
     }
+    
+    /**
+     * Retrieves the host with port information from the "Host" header in the given HttpExchange.
+     *
+     * @param exchange The HttpExchange object representing the HTTP request and response.
+     * @return A string representing the host with port information, or null if the "Host" header is not present.
+     */
+    public static String getHostWithPort(HttpExchange exchange) {
+    	logger.info("Local address: {}", exchange.getLocalAddress().toString());
+        Headers headers = exchange.getRequestHeaders();
+        return getHostWithPortFromHeaders(headers);
+    }
+
+    /**
+     * Retrieves the host with port information from the "Host" header in the given Headers object.
+     *
+     * @param headers The Headers object containing HTTP headers, typically obtained from an HttpExchange.
+     * @return A string representing the host with port information, or null if the "Host" header is not present.
+     */
+    public static String getHostWithPortFromHeaders(Headers headers) {
+        List<String> hostHeader = headers.get("Host");
+
+        if (hostHeader != null && !hostHeader.isEmpty()) {
+            // Return the entire host string with port (if present)
+        	logger.info("Host with Port: " + hostHeader.get(0));
+            return hostHeader.get(0);
+        } else {
+            // Handle the case where the "Host" header is not present in the headers
+        	logger.info("Host header not found in the request");
+            return null;
+        }
+    }
+
 
 
 }
