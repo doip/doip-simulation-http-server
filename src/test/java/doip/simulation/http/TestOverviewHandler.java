@@ -33,12 +33,12 @@ class TestOverviewHandler {
 
 	private static final int PORT = 8080;
 
-	//private static final String PLATFORM_PATH = "/doip-simulation/platform";
-	//private static final String DOIP_SIMULATION_PATH = "/doip-simulation/";
+	// private static final String PLATFORM_PATH = "/doip-simulation/platform";
+	// private static final String DOIP_SIMULATION_PATH = "/doip-simulation/";
 
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
-		// SimulationManager mockSimulationManager = new  MockSimulationManager();
+		//SimulationManager mockSimulationManager = new MockSimulationManager();
 		// Create a mock instance of SimulationManager
 		SimulationManager mockSimulationManager = Mockito.mock(SimulationManager.class);
 
@@ -46,8 +46,12 @@ class TestOverviewHandler {
 
 		customController = new CustomMappingController(server);
 
-		customController.addExternalHandler(SimulationConnector.DOIP_SIMULATION_PATH, new GetSimulationOverviewHandler(server));
-		customController.addExternalHandler(SimulationConnector.PLATFORM_PATH, new GetPlatformOverviewHandler(server));
+//		customController.addExternalHandler(SimulationConnector.DOIP_SIMULATION_PATH, new GetSimulationOverviewHandler(server));
+//		customController.addExternalHandler(SimulationConnector.PLATFORM_PATH, new GetPlatformOverviewHandler(server));
+		customController.addExternalHandler(SimulationConnector.DOIP_SIMULATION_PATH, new GetSimulationOverviewHandler(
+				server, new SimulationConnectorTest(server.getSimulationManager(), server.getServerName())));
+		customController.addExternalHandler(SimulationConnector.PLATFORM_PATH, new GetPlatformOverviewHandler(server,
+				new SimulationConnectorTest(server.getSimulationManager(), server.getServerName())));
 
 		customController.startHttpServer();
 
@@ -67,21 +71,21 @@ class TestOverviewHandler {
 			IOException, InterruptedException {
 		logger.info("-------------------------- testGetOverviewHandler ------------------------------------");
 
-		//"/doip-simulation/?status=RUNNING"
-		HttpResponse<String> response = clientForLocalHost.GET(SimulationConnector.DOIP_SIMULATION_PATH + "?status=RUNNING", String.class);
+		// "/doip-simulation/?status=RUNNING"
+		HttpResponse<String> response = clientForLocalHost
+				.GET(SimulationConnector.DOIP_SIMULATION_PATH + "?status=RUNNING", String.class);
 		int statusCode = response.statusCode();
 		assertEquals(200, statusCode, "The HTTP status code is not 200");
 
 		String responseBody = response.body();
 		assertNotNull(responseBody, "The response body from server is null");
-		
-		//it must work without query parameters
+
+		// it must work without query parameters
 		response = clientForLocalHost.GET(SimulationConnector.DOIP_SIMULATION_PATH, String.class);
 
 		assertEquals(200, response.statusCode(), "The HTTP status code is not 200");
 
 		assertNotNull(response.body(), "The response body from server is null");
-				
 
 		// TODO Add more assertions if needed
 
@@ -92,9 +96,10 @@ class TestOverviewHandler {
 	void testGetPlatformOverviewHandler() throws HttpStatusCodeException, HttpInvalidResponseBodyType,
 			URISyntaxException, IOException, InterruptedException {
 		logger.info("-------------------------- testGetPlatformOverviewHandler ------------------------------------");
-		
-		//"/doip-simulation/platform/X2024"
-		HttpResponse<String> response = clientForLocalHost.GET(SimulationConnector.PLATFORM_PATH + "/X2024", String.class); 
+
+		// "/doip-simulation/platform/X2024"
+		HttpResponse<String> response = clientForLocalHost.GET(SimulationConnector.PLATFORM_PATH + "/X2024",
+				String.class);
 
 		int statusCode = response.statusCode();
 		assertEquals(200, statusCode, "The HTTP status code is not 200");
@@ -112,7 +117,7 @@ class TestOverviewHandler {
 			URISyntaxException, IOException, InterruptedException {
 		logger.info("-------------------------- testGetGatewayOverviewHandler ------------------------------------");
 
-		//"/doip-simulation/platform/X2024/gateway/GW"
+		// "/doip-simulation/platform/X2024/gateway/GW"
 		HttpResponse<String> response = clientForLocalHost.GET(SimulationConnector.PLATFORM_PATH + "/X2024/gateway/GW",
 				String.class);
 
@@ -132,12 +137,14 @@ class TestOverviewHandler {
 			URISyntaxException, IOException, InterruptedException, HttpInvalidRequestBodyType {
 		logger.info("-------------------------- testPostPlatformOverviewHandler ------------------------------------");
 
-		//String jsonPostString = "{\"name\":\"X2024\",\"url\":\"http://myserver.com/doip-simulation/platform/X2024\",\"status\":\"RUNNING\",\"gateways\":[{\"name\":\"string\",\"url\":\"http://myserver.com/doip-simulation/platform/X2024/gateway/GW\",\"status\":\"RUNNING\",\"error\":\"Can't bind to port 13400\"}]}";
+		// String jsonPostString =
+		// "{\"name\":\"X2024\",\"url\":\"http://myserver.com/doip-simulation/platform/X2024\",\"status\":\"RUNNING\",\"gateways\":[{\"name\":\"string\",\"url\":\"http://myserver.com/doip-simulation/platform/X2024/gateway/GW\",\"status\":\"RUNNING\",\"error\":\"Can't
+		// bind to port 13400\"}]}";
 		String jsonPostString = "{\"action\": \"start\"}";
 
 		HttpClient clientForPost = new HttpClient("http://localhost:" + PORT);
 		clientForPost.addHeader("Content-Type", "application/json");
-		//"/doip-simulation/platform/X2024"
+		// "/doip-simulation/platform/X2024"
 		HttpResponse<String> response = clientForPost.POST(SimulationConnector.PLATFORM_PATH + "/X2024", jsonPostString,
 				String.class);
 
@@ -151,7 +158,7 @@ class TestOverviewHandler {
 
 		logger.info("Custom POST test completed.");
 	}
-	
+
 	@Test
 	void testPostPlatformEmptyRequestJson() throws HttpStatusCodeException, HttpInvalidResponseBodyType,
 			URISyntaxException, IOException, InterruptedException, HttpInvalidRequestBodyType {
@@ -160,8 +167,8 @@ class TestOverviewHandler {
 		String jsonPostString = "";
 		HttpClient clientForPost = new HttpClient("http://localhost:" + PORT);
 		clientForPost.addHeader("Content-Type", "application/json");
-		
-		//"/doip-simulation/platform/X2024"
+
+		// "/doip-simulation/platform/X2024"
 		HttpResponse<String> response = clientForPost.POST(SimulationConnector.PLATFORM_PATH + "/X2024", jsonPostString,
 				String.class);
 
@@ -189,7 +196,7 @@ class TestOverviewHandler {
 		int statusCode = 0;
 		HttpResponse<String> response = null;
 		try {
-			//"/doip-simulation/platform/X2024"
+			// "/doip-simulation/platform/X2024"
 			response = clientForPost.POST(SimulationConnector.PLATFORM_PATH + "/X2024", postMessage, String.class);
 
 		} catch (HttpStatusCodeException e) {
@@ -199,23 +206,26 @@ class TestOverviewHandler {
 		}
 		assertEquals(400, statusCode, "The status code does not match the value 400");
 
-		//logger.info("response {}", response);
+		// logger.info("response {}", response);
 		assertNull(response, "The response from server is not null");
 
 		logger.info("Custom POST test completed.");
 	}
-	
+
 	@Test
 	void testPostPlatformWrongRequestJson() throws HttpStatusCodeException, HttpInvalidResponseBodyType,
 			URISyntaxException, IOException, InterruptedException, HttpInvalidRequestBodyType {
 		logger.info("-------------------------- testPostPlatformWrongRequestJson ------------------------------------");
 
-		//String jsonPostString = "{\"urlurl\":\"http://myserver.com/doip-simulation/platform/X2024\",\"status\":\"RUNNING\",\"gateways\":[{\"name\":\"string\",\"url\":\"http://myserver.com/doip-simulation/platform/X2024/gateway/GW\",\"status\":\"RUNNING\",\"error\":\"Can't bind to port 13400\"}]}";
+		// String jsonPostString =
+		// "{\"urlurl\":\"http://myserver.com/doip-simulation/platform/X2024\",\"status\":\"RUNNING\",\"gateways\":[{\"name\":\"string\",\"url\":\"http://myserver.com/doip-simulation/platform/X2024/gateway/GW\",\"status\":\"RUNNING\",\"error\":\"Can't
+		// bind to port 13400\"}]}";
 		String jsonPostString = "{\"action\": \"Unknown\"}";
 		HttpClient clientForPost = new HttpClient("http://localhost:" + PORT);
 		clientForPost.addHeader("Content-Type", "application/json");
-		//"/doip-simulation/platform/X2024"
-		HttpStatusCodeException e = assertThrows(HttpStatusCodeException.class, () -> clientForPost.POST(SimulationConnector.PLATFORM_PATH + "/X2024", jsonPostString, String.class));
+		// "/doip-simulation/platform/X2024"
+		HttpStatusCodeException e = assertThrows(HttpStatusCodeException.class,
+				() -> clientForPost.POST(SimulationConnector.PLATFORM_PATH + "/X2024", jsonPostString, String.class));
 		int statusCode = e.getResponse().statusCode();
 		String statusText = HttpUtils.getStatusText(statusCode);
 		logger.info("Status code = {} ({})", statusCode, statusText);
