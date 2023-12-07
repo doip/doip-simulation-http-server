@@ -8,8 +8,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import doip.simulation.api.Platform;
+import doip.library.exception.DoipException;
 import doip.simulation.api.Gateway;
 import doip.simulation.api.SimulationManager;
+import doip.simulation.http.lib.Action;
 import doip.simulation.http.lib.LookupEntry;
 import doip.simulation.http.lib.Modifier;
 import doip.simulation.http.lib.ServerInfo;
@@ -392,6 +394,27 @@ public class SimulationConnector {
 		}
 
 		return serverInfo;
+	}
+	
+	public void performAction(doip.simulation.api.Platform platform, Action action) {
+		switch (action) {
+		case start:
+			logger.info("Starting the process for platform: {}", platform.getName());
+			try {
+				platform.start();
+			} catch (DoipException e) {
+				logger.error("Failed to start the platform");
+				logger.catching(e);
+			}
+			break;
+		case stop:
+			logger.info("Stopping the process for platform: {}", platform.getName());
+			platform.stop();
+			break;
+		default:
+			logger.error("Unknown action: " + action.toString());
+			break;
+		}
 	}
 
 

@@ -16,7 +16,6 @@ import doip.simulation.http.helpers.HttpServerHelper;
 import doip.simulation.http.lib.Action;
 import doip.simulation.http.lib.ActionRequest;
 
-
 /**
  * Define a handler for the "/doip-simulation/platform" path
  */
@@ -24,24 +23,23 @@ public class GetPlatformOverviewHandler implements HttpHandler {
 	private static Logger logger = LogManager.getLogger(GetPlatformOverviewHandler.class);
 
 	// Reference to the DoipHttpServer instance
-	private final DoipHttpServer doipHttpServer;
+	// private final DoipHttpServer doipHttpServer;
 
 	private final SimulationConnector simulationConnector;
 
-	private final ObjectMapper objectMapper = new ObjectMapper();
 	private static final String GATEWAY_PATH = "/gateway";
 
 	// Constructor to receive the DoipHttpServer instance
 	public GetPlatformOverviewHandler(DoipHttpServer doipHttpServer) {
 		// super(doipHttpServer.getSimulationManager(), doipHttpServer.getServerName());
-		this(doipHttpServer,  new SimulationConnector(doipHttpServer.getSimulationManager(),doipHttpServer.getServerName()));
-	}
-	
-	public GetPlatformOverviewHandler(DoipHttpServer doipHttpServer, SimulationConnector simulationConnector) {
-		this.simulationConnector = simulationConnector;
-		this.doipHttpServer = doipHttpServer;
+		this(doipHttpServer,
+				new SimulationConnector(doipHttpServer.getSimulationManager(), doipHttpServer.getServerName()));
 	}
 
+	public GetPlatformOverviewHandler(DoipHttpServer doipHttpServer, SimulationConnector simulationConnector) {
+		this.simulationConnector = simulationConnector;
+		// this.doipHttpServer = doipHttpServer;
+	}
 
 	/**
 	 * Handle method for processing incoming HTTP requests
@@ -133,7 +131,7 @@ public class GetPlatformOverviewHandler implements HttpHandler {
 									"Action cannot be executed because the specified platform name {} does not exist",
 									platformParam);
 						} else {
-							performAction(platform, receivedAction.getAction());
+							simulationConnector.performAction(platform, receivedAction.getAction());
 
 						}
 
@@ -162,28 +160,7 @@ public class GetPlatformOverviewHandler implements HttpHandler {
 			exchange.sendResponseHeaders(500, -1); // Internal Server Error
 		}
 	}
-
-	private void performAction(doip.simulation.api.Platform platform, Action action) {
-		switch (action) {
-		case start:
-			logger.info("Starting the process for platform: {}", platform.getName());
-			try {
-				platform.start();
-			} catch (DoipException e) {
-				logger.error("Failed to start the platform");
-				logger.catching(e);
-			}
-			break;
-		case stop:
-			logger.info("Stopping the process for platform: {}", platform.getName());
-			platform.stop();
-			break;
-		default:
-			logger.error("Unknown action: " + action.toString());
-			break;
-		}
-	}
-
+	
 	private void handleGetGatewayRequest(HttpExchange exchange) throws IOException {
 		try {
 			// Get the request URI
