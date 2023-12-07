@@ -43,7 +43,6 @@ public class SimulationConnector {
 		}
 	}
 
-
 	public SimulationConnector(SimulationManager simulationManager, String doipHostName) {
 		this.simulationManager = simulationManager;
 		this.hostName = doipHostName;
@@ -56,7 +55,7 @@ public class SimulationConnector {
 	 * @return A list of platforms.
 	 * @throws IOException If an I/O error occurs during platform retrieval.
 	 */
-	protected List<Platform> getPlatformOverview(String status) throws IOException {
+	public List<Platform> getPlatformOverview(String status) throws IOException {
 		List<Platform> platforms = null;
 		try {
 			// Access simulationManager
@@ -79,7 +78,7 @@ public class SimulationConnector {
 	 * @param platformName The name of the platform.
 	 * @return The platform if found, otherwise null.
 	 */
-	protected Platform getPlatformByName(String platformName) {
+	public Platform getPlatformByName(String platformName) {
 		Platform platform = null;
 		try {
 			// Attempt to retrieve the platform
@@ -104,7 +103,7 @@ public class SimulationConnector {
 	 * @param gatewayName  The name of the gateway.
 	 * @return The gateway if found, otherwise null.
 	 */
-	protected Gateway getGatewayByName(String platformName, String gatewayName) {
+	public Gateway getGatewayByName(String platformName, String gatewayName) {
 		Gateway gateway = null;
 		try {
 			// Check if the platform exists
@@ -134,7 +133,7 @@ public class SimulationConnector {
 	 * @return The JSON response as a string.
 	 * @throws IOException If an I/O error occurs during the process.
 	 */
-	protected String buildOverviewJsonResponse(String status) throws IOException {
+	public String buildOverviewJsonResponse(String status) throws IOException {
 		try {
 			// Initialize ServerInfo to hold platform overview
 			//ServerInfo serverInfo = new ServerInfo();
@@ -168,7 +167,7 @@ public class SimulationConnector {
 	 * @return The JSON response as a string.
 	 * @throws IOException If an I/O error occurs during the process.
 	 */
-	protected String buildPlatformJsonResponse(String platformName) throws IOException {
+	public String buildPlatformJsonResponse(String platformName) throws IOException {
 		try {
 			// Retrieve the platform based on the specified platform name
 			doip.simulation.api.Platform platform = getPlatformByName(platformName);
@@ -200,7 +199,7 @@ public class SimulationConnector {
 	 * @return The JSON response as a string.
 	 * @throws IOException If an I/O error occurs during the process.
 	 */
-	protected String buildGatewayJsonResponse(String platformName, String gatewayName) throws IOException {
+	public String buildGatewayJsonResponse(String platformName, String gatewayName) throws IOException {
 		try {
 			// Retrieve the gateway based on the specified platform and gateway names
 			doip.simulation.api.Gateway gateway = getGatewayByName(platformName, gatewayName);
@@ -224,7 +223,7 @@ public class SimulationConnector {
 	}
 
 	// Additional methods to process Platform and Gateway objects
-	protected doip.simulation.http.lib.Platform processPlatform(doip.simulation.api.Platform platform) {
+	public doip.simulation.http.lib.Platform processPlatform(doip.simulation.api.Platform platform) {
 		// Implement the logic to process the platform and create a
 		// doip.simulation.http.lib.Platform object
 	
@@ -266,7 +265,7 @@ public class SimulationConnector {
 		// return new doip.simulation.http.lib.Platform();
 	}
 
-	protected doip.simulation.http.lib.Gateway processGateway(doip.simulation.api.Gateway gatewayCurrent, String platformName) {
+	public doip.simulation.http.lib.Gateway processGateway(doip.simulation.api.Gateway gatewayCurrent, String platformName) {
 		// Implement the logic to process the gateway and create a
 		// doip.simulation.http.lib.Gateway object
 		
@@ -346,7 +345,7 @@ public class SimulationConnector {
 		return modifiedlookupEntry;
 	}
 	
-	protected ServerInfo processOverview(List<doip.simulation.api.Platform> platforms, String status) {
+	public ServerInfo processOverview(List<doip.simulation.api.Platform> platforms, String status) {
 		// Get the server name from the DoipHttpServer
 		//String serverName = doipHttpServer.getServerName();
 		String serverName = getServerNameFromRequestHeader();

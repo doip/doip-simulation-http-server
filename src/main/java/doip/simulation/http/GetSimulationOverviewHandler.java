@@ -28,17 +28,20 @@ import doip.simulation.http.lib.Platform;
 /**
  * Define a handler for the "/doip-simulation/" path
  */
-public class GetSimulationOverviewHandler extends SimulationConnector implements HttpHandler {
+public class GetSimulationOverviewHandler implements HttpHandler {
 	private static Logger logger = LogManager.getLogger(GetSimulationOverviewHandler.class);
 
 	// Reference to the DoipHttpServer instance
 	private final DoipHttpServer doipHttpServer;
-
+	private final SimulationConnector simulationConnector;
 	private final ObjectMapper objectMapper = new ObjectMapper();
+	
+	private boolean createMockResponse = true;
 
 	// Constructor to receive the DoipHttpServer instance
 	public GetSimulationOverviewHandler(DoipHttpServer doipHttpServer) {
-		super(doipHttpServer.getSimulationManager(), doipHttpServer.getServerName());
+		//super(doipHttpServer.getSimulationManager(), doipHttpServer.getServerName());
+		this.simulationConnector = new SimulationConnector(doipHttpServer.getSimulationManager(), doipHttpServer.getServerName());
 		this.doipHttpServer = doipHttpServer;
 	}
 
@@ -51,7 +54,7 @@ public class GetSimulationOverviewHandler extends SimulationConnector implements
 
 		String hostWithPort = HttpServerHelper.getHostWithPort(exchange);
 		if (hostWithPort != null) {
-			setServerNameFromRequestHeader("http://" + hostWithPort);
+			simulationConnector.setServerNameFromRequestHeader("http://" + hostWithPort);
 		}
 
 		if ("GET".equals(exchange.getRequestMethod())) {
@@ -89,7 +92,7 @@ public class GetSimulationOverviewHandler extends SimulationConnector implements
 			}
 
 			// Build the JSON response based on the status
-			String jsonResponse = buildOverviewJsonResponse(status);
+			String jsonResponse = simulationConnector.buildOverviewJsonResponse(status);
 
 			// Set the response headers and body
 			HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json", 200);
@@ -121,27 +124,26 @@ public class GetSimulationOverviewHandler extends SimulationConnector implements
 		}
 	}
 
-	@Override
-	protected String buildOverviewJsonResponse(String status) throws IOException {
+	
+	private String buildOverviewJsonResponseTest(String status) throws IOException {
 		try {
 			// Retrieve platform overview based on the status
-			List<doip.simulation.api.Platform> platforms = getPlatformOverview(status);
+			List<doip.simulation.api.Platform> platforms = simulationConnector.getPlatformOverview(status);
 
 			if (platforms == null) {
 				// Log an error if platform overview retrieval fails
 				logger.error("Failed to retrieve platform overview. Check logs for details.");
-				if (doipHttpServer.createMockResponse == false) {
+				if (createMockResponse == false) {
 					return "{}"; // Return an empty JSON object or handle it as needed
 				}
 			}
 			ServerInfo serverInfo;
-			if (doipHttpServer.createMockResponse) {
-				// TODO:
+			if (createMockResponse) {
 				// Create ServerInfo for platforms
 				serverInfo = createSampleJson(platforms, status);
 			} else {
 				// Create a real JSON object Platform
-				serverInfo = processOverview(platforms, status);
+				serverInfo = simulationConnector.processOverview(platforms, status);
 			}
 			// Process the retrieved platforms if needed
 //			for (doip.simulation.api.Platform platform : platforms) {
@@ -149,7 +151,7 @@ public class GetSimulationOverviewHandler extends SimulationConnector implements
 //			}
 
 			// Convert the ServerInfo object to JSON
-			return buildJsonResponse(serverInfo);
+			return simulationConnector.buildJsonResponse(serverInfo);
 		} catch (Exception e) {
 			// Log an error and return an empty JSON object in case of an exception
 			logger.error("Error building overview JSON response: {}", e.getMessage(), e);
@@ -161,7 +163,7 @@ public class GetSimulationOverviewHandler extends SimulationConnector implements
 	private ServerInfo createSampleJson(List<doip.simulation.api.Platform> platforms, String status) {
 		// Get the server name from the DoipHttpServer
 		// String serverName = doipHttpServer.getServerName();
-		String serverName = getServerNameFromRequestHeader();
+		String serverName = simulationConnector.getServerNameFromRequestHeader();
 
 		// Build a JSON response based on the specified 'status'
 		ServerInfo serverInfo = new ServerInfo();
@@ -171,7 +173,7 @@ public class GetSimulationOverviewHandler extends SimulationConnector implements
 		platform.name = "X2024";
 
 		// platform.url = "http://myserver.com/doip-simulation/platform/X2024";
-		String currentPlatformUrl = serverName + DOIP_SIMULATION_PATH + "platform/" + platform.name;
+		String currentPlatformUrl = serverName + SimulationConnector.DOIP_SIMULATION_PATH + "platform/" + platform.name;
 		// Update platform URL using the current server name
 		platform.url = currentPlatformUrl;
 
