@@ -38,22 +38,6 @@ public class DoipHttpServer {
 		return serverName;
 	}
 	
-	private String serverNameFromRequestHeader;
-	
-	public String getServerNameFromRequestHeader() {
-		if (serverNameFromRequestHeader == null)
-		{
-			return serverName;
-		}
-		return serverNameFromRequestHeader;
-	}
-	
-	public void setServerNameFromRequestHeader(String serverNameParam) {
-		if (serverNameParam != null) {
-			this.serverNameFromRequestHeader = serverNameParam;
-		}
-	}
-
 	public int getPort() {
 		return port;
 	}
