@@ -8,6 +8,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import doip.simulation.api.SimulationManager;
+import doip.library.exception.DoipException;
 import doip.library.util.LookupTable;
 import doip.simulation.api.Ecu;
 import doip.simulation.api.Gateway;
@@ -134,7 +135,7 @@ class MockGateway implements Gateway {
     }
 
     @Override
-    public void start() throws IOException {
+    public void start() throws DoipException {
         // Implement the start logic for the gateway
     }
 

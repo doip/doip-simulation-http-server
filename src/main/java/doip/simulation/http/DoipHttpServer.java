@@ -31,8 +31,6 @@ public class DoipHttpServer {
 	private String serverName;
 	private int port;
 	
-	public boolean createMockResponse = false;
-
 	// Add getter methods for serverName and port
 	public String getServerName() {
 		return serverName;
