@@ -120,9 +120,9 @@ public class DoipHttpServer {
 	private void createTestMappingContexts() {
 		// Check if the server is running before creating test mapping contexts
 		if (isRunning == false) {
-			List<ContextHandler> defaultHandlers = List.of(new ContextHandler("/posttest", new PostHandler()),
-					new ContextHandler("/gettest", new GetHandler()));
-			createMappingContexts(defaultHandlers);
+//			List<ContextHandler> defaultHandlers = List.of(new ContextHandler("/posttest", new PostHandler()),
+//					new ContextHandler("/gettest", new GetHandler()));
+//			createMappingContexts(defaultHandlers);
 		} else {
 			logger.warn("Server is running. Test mapping contexts not created.");
 		}
@@ -269,53 +269,6 @@ public class DoipHttpServer {
 		for (ContextHandler contextHandler : handlers) {
 			logger.info("Context: {}, Handler: {}", contextHandler.getContext(), contextHandler.getHandler());
 		}
-	}
-	
-	class PostHandler implements HttpHandler {
-		@Override
-		public void handle(HttpExchange exchange) throws IOException {
-			if ("POST".equals(exchange.getRequestMethod())) {
-				// Read the request body as a string
-				// String requestString = DoipHttpServer.readRequestBodyAsString(exchange);
-				String requestString = HttpServerHelper.readRequestBody(exchange, String.class);
-				HttpServerHelper.requestServerLogging(exchange, requestString);
-
-				// Process the request string
-				String response = "Received the following POST request: " + requestString;
-
-				// Set the response headers and body
-				HttpServerHelper.sendResponse(exchange, response, "text/plain", 200);
-				HttpServerHelper.responseServerLogging(exchange, 200, response);
-
-			} else {
-				// Method not allowed
-				logger.error("Method not allowed. Received a {} request.", exchange.getRequestMethod());
-				exchange.sendResponseHeaders(405, -1);
-			}
-			exchange.close();
-		}
-
-	}
-
-	class GetHandler implements HttpHandler {
-		@Override
-		public void handle(HttpExchange exchange) throws IOException {
-			if ("GET".equals(exchange.getRequestMethod())) {
-				// Create the GET response
-				String response = "This is a GET request response.";
-
-				// Set the response headers and body
-				HttpServerHelper.sendResponse(exchange, response, "text/plain", 200);
-				HttpServerHelper.responseServerLogging(exchange, 200, response);
-
-			} else {
-				// Method not allowed
-				logger.error("Method not allowed. Received a {} request.", exchange.getRequestMethod());
-				exchange.sendResponseHeaders(405, -1);
-			}
-			exchange.close();
-		}
-
 	}
 
 }
