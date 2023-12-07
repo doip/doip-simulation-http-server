@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.http.HttpResponse;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,8 +23,11 @@ import com.starcode88.http.HttpUtils;
 import com.starcode88.http.exception.HttpInvalidRequestBodyType;
 import com.starcode88.http.exception.HttpInvalidResponseBodyType;
 import com.starcode88.http.exception.HttpStatusCodeException;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
 
 import doip.simulation.api.SimulationManager;
+import doip.simulation.http.helpers.HttpServerHelper;
 
 class TestHttpServer {
 
@@ -44,11 +48,14 @@ class TestHttpServer {
 //		CustomGateway gateway = new CustomGateway(config);		
 //		server = new DoipHttpServer(gateway);
 
-		// SimulationManager mockSimulationManager = new  MockSimulationManager();
+		// SimulationManager mockSimulationManager = new MockSimulationManager();
 		// Create a mock instance of SimulationManager
 		SimulationManager mockSimulationManager = Mockito.mock(SimulationManager.class);
 
 		server = new DoipHttpServer(PORT, mockSimulationManager);
+		List<ContextHandler> defaultHandlers = List.of(new ContextHandler("/posttest", new PostHandler()),
+				new ContextHandler("/gettest", new GetHandler()));
+		server.createMappingContexts(defaultHandlers);
 
 		server.start();
 		clientForLocalHost = new HttpClient("http://localhost:" + PORT);
@@ -66,10 +73,10 @@ class TestHttpServer {
 	void testDoipPOST() throws HttpStatusCodeException, URISyntaxException, IOException, InterruptedException,
 			HttpInvalidRequestBodyType, HttpInvalidResponseBodyType {
 		logger.info("---------------------------  testDoipPOST -----------------------------------");
-		
+
 		String testtContext = "/posttest";
-		if(!server.contextExists(testtContext)) {
-			
+		if (!server.contextExists(testtContext)) {
+
 			logger.warn("Mapping context '{}' does not exists.", testtContext);
 			return;
 		}
@@ -93,12 +100,12 @@ class TestHttpServer {
 			InterruptedException {
 		logger.info("---------------------------  testDoipGet -----------------------------------");
 		String testtContext = "/gettest";
-		if(!server.contextExists(testtContext)) {
-			
+		if (!server.contextExists(testtContext)) {
+
 			logger.warn("Mapping context '{}' does not exists.", testtContext);
 			return;
 		}
-		
+
 		HttpResponse<String> response = clientForLocalHost.GET(testtContext, String.class);
 
 		int statusCode = response.statusCode();
@@ -108,8 +115,9 @@ class TestHttpServer {
 
 		logger.info("--------------------------------------------------------------");
 	}
+
 	
-/*
+	/*
 	@Test
 	void testCheckWrongHttpMethod() throws HttpStatusCodeException, HttpInvalidResponseBodyType, URISyntaxException,
 			IOException, InterruptedException, HttpInvalidRequestBodyType {
@@ -136,4 +144,56 @@ class TestHttpServer {
 		logger.info("--------------------------------------------------------------");
 	}
 */
+
+}
+
+class PostHandler implements HttpHandler {
+	private static Logger logger = LogManager.getLogger(PostHandler.class);
+
+	@Override
+	public void handle(HttpExchange exchange) throws IOException {
+		if ("POST".equals(exchange.getRequestMethod())) {
+			// Read the request body as a string
+			// String requestString = DoipHttpServer.readRequestBodyAsString(exchange);
+			String requestString = HttpServerHelper.readRequestBody(exchange, String.class);
+			HttpServerHelper.requestServerLogging(exchange, requestString);
+
+			// Process the request string
+			String response = "Received the following POST request: " + requestString;
+
+			// Set the response headers and body
+			HttpServerHelper.sendResponse(exchange, response, "text/plain", 200);
+			HttpServerHelper.responseServerLogging(exchange, 200, response);
+
+		} else {
+			// Method not allowed
+			logger.error("Method not allowed. Received a {} request.", exchange.getRequestMethod());
+			exchange.sendResponseHeaders(405, -1);
+		}
+		exchange.close();
+	}
+
+}
+
+class GetHandler implements HttpHandler {
+	private static Logger logger = LogManager.getLogger(GetHandler.class);
+
+	@Override
+	public void handle(HttpExchange exchange) throws IOException {
+		if ("GET".equals(exchange.getRequestMethod())) {
+			// Create the GET response
+			String response = "This is a GET request response.";
+
+			// Set the response headers and body
+			HttpServerHelper.sendResponse(exchange, response, "text/plain", 200);
+			HttpServerHelper.responseServerLogging(exchange, 200, response);
+
+		} else {
+			// Method not allowed
+			logger.error("Method not allowed. Received a {} request.", exchange.getRequestMethod());
+			exchange.sendResponseHeaders(405, -1);
+		}
+		exchange.close();
+	}
+
 }
