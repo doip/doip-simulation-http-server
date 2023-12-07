@@ -38,7 +38,7 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 
 	// Constructor to receive the DoipHttpServer instance
 	public GetPlatformOverviewHandler(DoipHttpServer doipHttpServer) {
-		super(doipHttpServer);
+		super(doipHttpServer.getSimulationManager(), doipHttpServer.getServerName());
 		this.doipHttpServer = doipHttpServer;
 	}
 
@@ -53,7 +53,7 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 
 		String hostWithPort = HttpServerHelper.getHostWithPort(exchange);
 		if (hostWithPort != null) {
-			doipHttpServer.setServerNameFromRequestHeader("http://" + hostWithPort);
+			setServerNameFromRequestHeader("http://" + hostWithPort);
 		}
 
 		String requestPath = exchange.getRequestURI().getPath();
@@ -312,7 +312,7 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 	private Platform createPlatformSampleJson(doip.simulation.api.Platform platformCurrent) {
 		// Get the server name from the DoipHttpServer
 		// String serverName = doipHttpServer.getServerName();
-		String serverName = doipHttpServer.getServerNameFromRequestHeader();
+		String serverName = getServerNameFromRequestHeader();
 
 		// Create a Platform
 		Platform platform = new Platform();
@@ -348,7 +348,7 @@ public class GetPlatformOverviewHandler extends SimulationConnector implements H
 
 		// Get the server name from the DoipHttpServer
 		// String serverName = doipHttpServer.getServerName();
-		String serverName = doipHttpServer.getServerNameFromRequestHeader();
+		String serverName = getServerNameFromRequestHeader();
 
 		// Create an instance of your classes and populate them with data
 		Gateway gateway = new Gateway();

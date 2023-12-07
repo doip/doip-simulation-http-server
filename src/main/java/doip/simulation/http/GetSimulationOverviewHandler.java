@@ -38,7 +38,7 @@ public class GetSimulationOverviewHandler extends SimulationConnector implements
 
 	// Constructor to receive the DoipHttpServer instance
 	public GetSimulationOverviewHandler(DoipHttpServer doipHttpServer) {
-		super(doipHttpServer);
+		super(doipHttpServer.getSimulationManager(), doipHttpServer.getServerName());
 		this.doipHttpServer = doipHttpServer;
 	}
 
@@ -51,7 +51,7 @@ public class GetSimulationOverviewHandler extends SimulationConnector implements
 
 		String hostWithPort = HttpServerHelper.getHostWithPort(exchange);
 		if (hostWithPort != null) {
-			doipHttpServer.setServerNameFromRequestHeader("http://" + hostWithPort);
+			setServerNameFromRequestHeader("http://" + hostWithPort);
 		}
 
 		if ("GET".equals(exchange.getRequestMethod())) {
@@ -161,7 +161,7 @@ public class GetSimulationOverviewHandler extends SimulationConnector implements
 	private ServerInfo createSampleJson(List<doip.simulation.api.Platform> platforms, String status) {
 		// Get the server name from the DoipHttpServer
 		// String serverName = doipHttpServer.getServerName();
-		String serverName = doipHttpServer.getServerNameFromRequestHeader();
+		String serverName = getServerNameFromRequestHeader();
 
 		// Build a JSON response based on the specified 'status'
 		ServerInfo serverInfo = new ServerInfo();
