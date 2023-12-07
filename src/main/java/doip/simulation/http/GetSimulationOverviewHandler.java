@@ -14,8 +14,6 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-
-
 /**
  * Define a handler for the "/doip-simulation/" path
  */
@@ -23,21 +21,20 @@ public class GetSimulationOverviewHandler implements HttpHandler {
 	private static Logger logger = LogManager.getLogger(GetSimulationOverviewHandler.class);
 
 	// Reference to the DoipHttpServer instance
-	private final DoipHttpServer doipHttpServer;
+	// private final DoipHttpServer doipHttpServer;
 	private final SimulationConnector simulationConnector;
-	
+
 	// Constructor to receive the DoipHttpServer instance
 	public GetSimulationOverviewHandler(DoipHttpServer doipHttpServer) {
 		// super(doipHttpServer.getSimulationManager(), doipHttpServer.getServerName());
-		// super(doipHttpServer.getSimulationManager(), doipHttpServer.getServerName());
-		this(doipHttpServer,  new SimulationConnector(doipHttpServer.getSimulationManager(),doipHttpServer.getServerName()));
-	}
-	
-	public GetSimulationOverviewHandler(DoipHttpServer doipHttpServer, SimulationConnector simulationConnector) {
-		this.simulationConnector = simulationConnector;
-		this.doipHttpServer = doipHttpServer;
+		this(doipHttpServer,
+				new SimulationConnector(doipHttpServer.getSimulationManager(), doipHttpServer.getServerName()));
 	}
 
+	public GetSimulationOverviewHandler(DoipHttpServer doipHttpServer, SimulationConnector simulationConnector) {
+		this.simulationConnector = simulationConnector;
+		// this.doipHttpServer = doipHttpServer;
+	}
 
 	/**
 	 * Handle method for processing incoming HTTP requests
