@@ -9,21 +9,12 @@ import com.sun.net.httpserver.HttpHandler;
 import doip.simulation.api.ServiceState;
 import doip.simulation.http.helpers.HttpServerHelper;
 
-import java.io.OutputStream;
 import java.net.URI;
-import java.util.List;
 import java.util.Map;
-import java.util.ArrayList;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
-import doip.simulation.http.lib.Gateway;
-import doip.simulation.http.lib.ServerInfo;
-import doip.simulation.http.lib.Platform;
 
 /**
  * Define a handler for the "/doip-simulation/" path
@@ -34,16 +25,19 @@ public class GetSimulationOverviewHandler implements HttpHandler {
 	// Reference to the DoipHttpServer instance
 	private final DoipHttpServer doipHttpServer;
 	private final SimulationConnector simulationConnector;
-	private final ObjectMapper objectMapper = new ObjectMapper();
 	
-	private boolean createMockResponse = true;
-
 	// Constructor to receive the DoipHttpServer instance
 	public GetSimulationOverviewHandler(DoipHttpServer doipHttpServer) {
-		//super(doipHttpServer.getSimulationManager(), doipHttpServer.getServerName());
-		this.simulationConnector = new SimulationConnector(doipHttpServer.getSimulationManager(), doipHttpServer.getServerName());
+		// super(doipHttpServer.getSimulationManager(), doipHttpServer.getServerName());
+		// super(doipHttpServer.getSimulationManager(), doipHttpServer.getServerName());
+		this(doipHttpServer,  new SimulationConnector(doipHttpServer.getSimulationManager(),doipHttpServer.getServerName()));
+	}
+	
+	public GetSimulationOverviewHandler(DoipHttpServer doipHttpServer, SimulationConnector simulationConnector) {
+		this.simulationConnector = simulationConnector;
 		this.doipHttpServer = doipHttpServer;
 	}
+
 
 	/**
 	 * Handle method for processing incoming HTTP requests
@@ -122,86 +116,6 @@ public class GetSimulationOverviewHandler implements HttpHandler {
 		} catch (IllegalArgumentException e) {
 			return false; // If an exception is thrown, the status is invalid
 		}
-	}
-
-	
-	private String buildOverviewJsonResponseTest(String status) throws IOException {
-		try {
-			// Retrieve platform overview based on the status
-			List<doip.simulation.api.Platform> platforms = simulationConnector.getPlatformOverview(status);
-
-			if (platforms == null) {
-				// Log an error if platform overview retrieval fails
-				logger.error("Failed to retrieve platform overview. Check logs for details.");
-				if (createMockResponse == false) {
-					return "{}"; // Return an empty JSON object or handle it as needed
-				}
-			}
-			ServerInfo serverInfo;
-			if (createMockResponse) {
-				// Create ServerInfo for platforms
-				serverInfo = createSampleJson(platforms, status);
-			} else {
-				// Create a real JSON object Platform
-				serverInfo = simulationConnector.processOverview(platforms, status);
-			}
-			// Process the retrieved platforms if needed
-//			for (doip.simulation.api.Platform platform : platforms) {
-//				// Do something with each platform if needed
-//			}
-
-			// Convert the ServerInfo object to JSON
-			return simulationConnector.buildJsonResponse(serverInfo);
-		} catch (Exception e) {
-			// Log an error and return an empty JSON object in case of an exception
-			logger.error("Error building overview JSON response: {}", e.getMessage(), e);
-			return "{}";
-		}
-	}
-
-	// Method to build a sample JSON response
-	private ServerInfo createSampleJson(List<doip.simulation.api.Platform> platforms, String status) {
-		// Get the server name from the DoipHttpServer
-		// String serverName = doipHttpServer.getServerName();
-		String serverName = simulationConnector.getServerNameFromRequestHeader();
-
-		// Build a JSON response based on the specified 'status'
-		ServerInfo serverInfo = new ServerInfo();
-
-		// Create a Platform
-		Platform platform = new Platform();
-		platform.name = "X2024";
-
-		// platform.url = "http://myserver.com/doip-simulation/platform/X2024";
-		String currentPlatformUrl = serverName + SimulationConnector.DOIP_SIMULATION_PATH + "platform/" + platform.name;
-		// Update platform URL using the current server name
-		platform.url = currentPlatformUrl;
-
-		platform.status = status;
-
-		// Create a Gateway
-		Gateway gateway = new Gateway();
-		gateway.name = "GW";
-
-		// gateway.url =
-		// "http://myserver.com/doip-simulation/platform/X2024/gateway/GW";
-		String currentGatewayUrl = currentPlatformUrl + "/gateway/" + gateway.name;
-		gateway.url = currentGatewayUrl;
-
-		gateway.status = status;
-
-		// Add error information for the gateway (if applicable)
-		if ("ERROR".equals(status)) {
-			gateway.error = "Can't bind to port 13400 because it is already used by another gateway";
-		}
-
-		// Add the gateway to the platform's gateways list
-		platform.gateways = List.of(gateway);
-
-		// Add the platform to the serverInfo's platforms list
-		serverInfo.platforms = List.of(platform);
-
-		return serverInfo;
 	}
 
 }
