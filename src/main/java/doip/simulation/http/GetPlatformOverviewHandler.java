@@ -119,21 +119,10 @@ public class GetPlatformOverviewHandler implements HttpHandler {
 							ActionRequest.class);
 
 					if (receivedAction != null) {
-						// Process the received platform information as needed
+						// Process the received platform information
 						logger.info("Received action: {}", receivedAction.getAction().toString());
 
-						// Retrieve the platform based on the specified platform name
-						doip.simulation.api.Platform platform = simulationConnector.getPlatformByName(platformParam);
-
-						if (platform == null) {
-							// Log an error if the specified platform is not found
-							logger.error(
-									"Action cannot be executed because the specified platform name {} does not exist",
-									platformParam);
-						} else {
-							simulationConnector.performAction(platform, receivedAction.getAction());
-
-						}
+						simulationConnector.handlePlatformAction(platformParam, receivedAction);
 
 						// Build the JSON response
 						String jsonResponse = simulationConnector.buildPlatformJsonResponse(platformParam);
@@ -160,6 +149,8 @@ public class GetPlatformOverviewHandler implements HttpHandler {
 			exchange.sendResponseHeaders(500, -1); // Internal Server Error
 		}
 	}
+
+	
 	
 	private void handleGetGatewayRequest(HttpExchange exchange) throws IOException {
 		try {

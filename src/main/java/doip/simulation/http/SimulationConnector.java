@@ -1,6 +1,7 @@
 package doip.simulation.http;
 
 import java.io.IOException;
+
 import java.util.List;
 import java.util.ArrayList;
 
@@ -12,6 +13,7 @@ import doip.library.exception.DoipException;
 import doip.simulation.api.Gateway;
 import doip.simulation.api.SimulationManager;
 import doip.simulation.http.lib.Action;
+import doip.simulation.http.lib.ActionRequest;
 import doip.simulation.http.lib.LookupEntry;
 import doip.simulation.http.lib.Modifier;
 import doip.simulation.http.lib.ServerInfo;
@@ -19,12 +21,19 @@ import doip.simulation.http.lib.ServerInfo;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * The SimulationConnector class provides a connection to the simulation manager and
+ * facilitates various operations related to platforms and gateways.
+ */
 public class SimulationConnector {
 	private static final Logger logger = LogManager.getLogger(SimulationConnector.class);
 
 	protected SimulationManager simulationManager;
 	
-	private final ObjectMapper objectMapper = new ObjectMapper();
+	//private final ObjectMapper objectMapper = new ObjectMapper();
+	private final ObjectMapper objectMapper = new ObjectMapper()
+            .setSerializationInclusion(JsonInclude.Include.NON_NULL);
+	
 	public static final String PLATFORM_PATH = "/doip-simulation/platform";
 	public static final String DOIP_SIMULATION_PATH = "/doip-simulation/";
 	private String hostName;
@@ -51,12 +60,12 @@ public class SimulationConnector {
 	}
 
 	/**
-	 * Retrieve an overview of platforms.
-	 *
-	 * @param status The status parameter.
-	 * @return A list of platforms.
-	 * @throws IOException If an I/O error occurs during platform retrieval.
-	 */
+     * Retrieve an overview of platforms based on the specified status.
+     *
+     * @param status The status parameter.
+     * @return A list of platforms.
+     * @throws Exception If an I/O error occurs during platform retrieval.
+     */
 	public List<Platform> getPlatformOverview(String status) throws IOException {
 		List<Platform> platforms = null;
 		try {
@@ -133,7 +142,7 @@ public class SimulationConnector {
 	 *
 	 * @param status The status parameter.
 	 * @return The JSON response as a string.
-	 * @throws IOException If an I/O error occurs during the process.
+	 * @throws Exception If an I/O error occurs during the process.
 	 */
 	public String buildOverviewJsonResponse(String status) throws IOException {
 		try {
@@ -154,10 +163,13 @@ public class SimulationConnector {
 
 			// Convert the ServerInfo object to JSON
 			return buildJsonResponse(serverInfo);
-		} catch (Exception e) {
+		} catch (Exception  e) {
 			// Log an error and return an empty JSON object in case of an exception
-			logger.error("Error building overview JSON response: {}", e.getMessage(), e);
-			return "{}";
+			//logger.error("Error building overview JSON response: {}", e.getMessage(), e);
+			//return "{}";
+			String errorMessage = "Error building overview JSON response: " + e.getMessage();
+	        logger.error(errorMessage, e);
+	        return buildJsonErrorResponse(errorMessage);
 		}
 	}
 
@@ -167,7 +179,7 @@ public class SimulationConnector {
 	 *
 	 * @param platformName The name of the platform.
 	 * @return The JSON response as a string.
-	 * @throws IOException If an I/O error occurs during the process.
+	 * @throws Exception If an I/O error occurs during the process.
 	 */
 	public String buildPlatformJsonResponse(String platformName) throws IOException {
 		try {
@@ -187,20 +199,22 @@ public class SimulationConnector {
 			return buildJsonResponse(platformInfo);
 		} catch (Exception e) {
 			// Log an error and return an empty JSON object in case of an exception
-			logger.error("Error building platform JSON response: {}", e.getMessage(), e);
-			return "{}";
+			//logger.error("Error building platform JSON response: {}", e.getMessage(), e);
+			//return "{}";
+			String errorMessage = "Error building overview JSON response: " + e.getMessage();
+	        logger.error(errorMessage, e);
+	        return buildJsonErrorResponse(errorMessage);
 		}
 	}
 
 	/**
-	 * Build a JSON response for a specific gateway based on the specified platform
-	 * and gateway names.
-	 *
-	 * @param platformName The name of the platform.
-	 * @param gatewayName  The name of the gateway.
-	 * @return The JSON response as a string.
-	 * @throws IOException If an I/O error occurs during the process.
-	 */
+     * Build a JSON response for a specific gateway based on the specified platform and gateway names.
+     *
+     * @param platformName The name of the platform.
+     * @param gatewayName  The name of the gateway.
+     * @return The JSON response as a string.
+     * @throws Exception If an I/O error occurs during the process.
+     */
 	public String buildGatewayJsonResponse(String platformName, String gatewayName) throws IOException {
 		try {
 			// Retrieve the gateway based on the specified platform and gateway names
@@ -219,12 +233,20 @@ public class SimulationConnector {
 			return buildJsonResponse(gatewayInfo);
 		} catch (Exception e) {
 			// Log an error and return an empty JSON object in case of an exception
-			logger.error("Error building gateway JSON response: {}", e.getMessage(), e);
-			return "{}";
+			//logger.error("Error building gateway JSON response: {}", e.getMessage(), e);
+			//return "{}";
+			String errorMessage = "Error building overview JSON response: " + e.getMessage();
+	        logger.error(errorMessage, e);
+	        return buildJsonErrorResponse(errorMessage);
 		}
 	}
 
-	// Additional methods to process Platform and Gateway objects
+	/**
+     * Process a platform object and create a corresponding JSON object.
+     *
+     * @param platform The platform object to process.
+     * @return The JSON representation of the platform.
+     */
 	public doip.simulation.http.lib.Platform processPlatform(doip.simulation.api.Platform platform) {
 		// Implement the logic to process the platform and create a
 		// doip.simulation.http.lib.Platform object
@@ -266,6 +288,14 @@ public class SimulationConnector {
 
 		// return new doip.simulation.http.lib.Platform();
 	}
+	
+	 /**
+     * Process a gateway object and create a corresponding JSON object.
+     *
+     * @param gatewayCurrent The gateway object to process.
+     * @param platformName   The name of the platform to which the gateway belongs.
+     * @return The JSON representation of the gateway.
+     */
 
 	public doip.simulation.http.lib.Gateway processGateway(doip.simulation.api.Gateway gatewayCurrent, String platformName) {
 		// Implement the logic to process the gateway and create a
@@ -347,6 +377,14 @@ public class SimulationConnector {
 		return modifiedlookupEntry;
 	}
 	
+	/**
+	 * Process a list of platform objects and create a corresponding ServerInfo object
+	 * that represents an overview of platforms based on the specified status.
+	 *
+	 * @param platforms The list of platform objects to process.
+	 * @param status    The status parameter for filtering platforms.
+	 * @return A ServerInfo object containing an overview of platforms and their gateways.
+	 */
 	public ServerInfo processOverview(List<doip.simulation.api.Platform> platforms, String status) {
 		// Get the server name from the DoipHttpServer
 		//String serverName = doipHttpServer.getServerName();
@@ -396,7 +434,28 @@ public class SimulationConnector {
 		return serverInfo;
 	}
 	
-	public void performAction(doip.simulation.api.Platform platform, Action action) {
+	/**
+     * Handle a platform action based on the received action request.
+     *
+     * @param platformParam   The name of the platform.
+     * @param receivedAction  The action request received.
+     */
+	public void handlePlatformAction(String platformParam, ActionRequest receivedAction) {
+		// Retrieve the platform based on the specified platform name
+		doip.simulation.api.Platform platform = getPlatformByName(platformParam);
+
+		if (platform == null) {
+			// Log an error if the specified platform is not found
+			logger.error(
+					"Action cannot be executed because the specified platform name {} does not exist",
+					platformParam);
+		} else {
+			performAction(platform, receivedAction.getAction());
+
+		}
+	}
+	
+	private void performAction(doip.simulation.api.Platform platform, Action action) {
 		switch (action) {
 		case start:
 			logger.info("Starting the process for platform: {}", platform.getName());
@@ -417,9 +476,19 @@ public class SimulationConnector {
 		}
 	}
 
-
+	/**
+     * Build a JSON response for the provided information object.
+     *
+     * @param info The information object.
+     * @return The JSON response as a string.
+     * @throws IOException If an I/O error occurs during the process.
+     */
 	public String buildJsonResponse(Object info) throws IOException {
 		return objectMapper.writeValueAsString(info);
+	}
+	
+	private String buildJsonErrorResponse(String errorMessage) {
+	    return "{\"error\": \"" + errorMessage + "\"}";
 	}
 
 }
