@@ -27,11 +27,10 @@ public class GetSimulationOverviewHandler implements HttpHandler {
 	// Constructor to receive the DoipHttpServer instance
 	public GetSimulationOverviewHandler(DoipHttpServer doipHttpServer) {
 		// super(doipHttpServer.getSimulationManager(), doipHttpServer.getServerName());
-		this(doipHttpServer,
-				new SimulationConnector(doipHttpServer.getSimulationManager(), doipHttpServer.getServerName()));
+		this(new SimulationConnector(doipHttpServer.getSimulationManager(), doipHttpServer.getServerName()));
 	}
 
-	public GetSimulationOverviewHandler(DoipHttpServer doipHttpServer, SimulationConnector simulationConnector) {
+	public GetSimulationOverviewHandler(SimulationConnector simulationConnector) {
 		this.simulationConnector = simulationConnector;
 		// this.doipHttpServer = doipHttpServer;
 	}
@@ -53,7 +52,7 @@ public class GetSimulationOverviewHandler implements HttpHandler {
 		} else {
 			// Respond with 405 Method Not Allowed for non-GET requests
 			logger.error("Method not allowed. Received a {} request.", exchange.getRequestMethod());
-			exchange.sendResponseHeaders(405, -1);
+            exchange.sendResponseHeaders(DoipHttpServer.HTTP_METHOD_NOT_ALLOWED, -1);
 		}
 	}
 
@@ -81,29 +80,28 @@ public class GetSimulationOverviewHandler implements HttpHandler {
 					return;
 				}
 			}
-
 			// Build the JSON response based on the status
 			String jsonResponse = simulationConnector.buildOverviewJsonResponse(status);
 
 			// Set the response headers and body
 			HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json", 200);
-			HttpServerHelper.responseServerLogging(exchange, 200, jsonResponse);
+			HttpServerHelper.responseServerLogging(exchange, DoipHttpServer.HTTP_OK, jsonResponse);
 
 		} catch (IllegalArgumentException e) {
 			// Handle invalid status
 			logger.error("Invalid status provided: {}", e.getMessage());
-			exchange.sendResponseHeaders(400, -1); // Bad Request
+			exchange.sendResponseHeaders(DoipHttpServer.HTTP_BAD_REQUEST, -1); // Bad Request
 		} catch (IOException e) {
 			// Handle I/O errors
 			logger.error("I/O error processing request: {}", e.getMessage());
-			exchange.sendResponseHeaders(500, -1); // Internal Server Error
+			exchange.sendResponseHeaders(DoipHttpServer.HTTP_INTERNAL_SERVER_ERROR, -1); // Internal Server Error
 		} catch (Exception e) {
 			// Catch unexpected exceptions
 			logger.error("Unexpected error processing request: {}", e.getMessage(), e);
-			exchange.sendResponseHeaders(500, -1); // Internal Server Error
+			exchange.sendResponseHeaders(DoipHttpServer.HTTP_INTERNAL_SERVER_ERROR, -1); // Internal Server Error
 		}
 	}
-
+	
 	private boolean isValidStatus(String status) {
 		// Validate the 'status' parameter against the allowed values
 		try {
