@@ -294,11 +294,11 @@ public class SimulationConnector {
 		for (doip.simulation.api.Ecu ecu : gatewayCurrent.getEcus()) {
 
 			doip.simulation.http.lib.Ecu modifiedEcu = new doip.simulation.http.lib.Ecu();
-			modifiedEcu.name = ecu.getNamme();
+			modifiedEcu.name = ecu.getName();
 
 			// ecu.url =
 			// "http://myserver.com/doip-simulation/platform/X2024/gateway/GW/ecu/EMS";
-			String currentEcuUrl = currentGatewayUrl + "/ecu/" + ecu.getNamme();
+			String currentEcuUrl = currentGatewayUrl + "/ecu/" + ecu.getName();
 			modifiedEcu.url = currentEcuUrl;
 
 			List<doip.simulation.http.lib.LookupEntry> configuredlookupEntries = new ArrayList<>();
