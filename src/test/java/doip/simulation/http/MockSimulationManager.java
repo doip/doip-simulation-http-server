@@ -37,13 +37,13 @@ public class MockSimulationManager implements SimulationManager {
         // Implement the start logic for a specific platform
     }
 
-    @Override
-    public void start(String platform, String host) {
-        // Implement the start logic for a specific platform with a given host
-    }
+//    @Override
+//    public void start(String platform, String host) {
+//        // Implement the start logic for a specific platform with a given host
+//    }
 
     @Override
-    public void stop() {
+    public void stop(String platform) {
         // Implement the stop logic
     }
 
@@ -159,7 +159,7 @@ class MockGateway implements Gateway {
     public Ecu getEcuByName(String name) {
         // Implement the logic to retrieve an ECU by name
         return ecus.stream()
-                .filter(e -> e.getNamme().equals(name))
+                .filter(e -> e.getName().equals(name))
                 .findFirst()
                 .orElse(null);
     }
@@ -180,7 +180,7 @@ class MockEcu implements Ecu {
     }
 
 	@Override
-	public String getNamme() {
+	public String getName() {
 		// TODO Auto-generated method stub
 		return null;
 	}
