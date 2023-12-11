@@ -402,33 +402,35 @@ public class SimulationConnector {
 			List<doip.simulation.http.lib.Platform> modifiedPlatforms = new ArrayList<doip.simulation.http.lib.Platform>();
 			for (doip.simulation.api.Platform platform : platforms) {
 				doip.simulation.http.lib.Platform modifiedPlatform = new doip.simulation.http.lib.Platform();
-				modifiedPlatform.name = platform.getName();
-				modifiedPlatform.status = platform.getState().toString();
+				if (filterPlatform(platform, status)) {
+					modifiedPlatform.name = platform.getName();
+					modifiedPlatform.status = platform.getState().toString();
 
-				String currentPlatformUrl = serverName + DOIP_SIMULATION_PATH + "platform/" + platform.getName();
-				// Update platform URL using the current server name
-				modifiedPlatform.url = currentPlatformUrl;
+					String currentPlatformUrl = serverName + DOIP_SIMULATION_PATH + "platform/" + platform.getName();
+					// Update platform URL using the current server name
+					modifiedPlatform.url = currentPlatformUrl;
 
-				// Process each gateway in the platform
-				List<doip.simulation.http.lib.Gateway> modifiedGateways = new ArrayList<>();
-				for (doip.simulation.api.Gateway gateway : platform.getGateways()) {
-					doip.simulation.http.lib.Gateway modifiedGateway = new doip.simulation.http.lib.Gateway();
-					modifiedGateway.name = gateway.getName();
-					modifiedGateway.status = gateway.getState().toString();
+					// Process each gateway in the platform
+					List<doip.simulation.http.lib.Gateway> modifiedGateways = new ArrayList<>();
+					for (doip.simulation.api.Gateway gateway : platform.getGateways()) {
+						doip.simulation.http.lib.Gateway modifiedGateway = new doip.simulation.http.lib.Gateway();
+						modifiedGateway.name = gateway.getName();
+						modifiedGateway.status = gateway.getState().toString();
 
-					String currentGatewayUrl = currentPlatformUrl + "/gateway/" + gateway.getName();
-					// Update gateway URL using the current server name
-					modifiedGateway.url = currentGatewayUrl;
+						String currentGatewayUrl = currentPlatformUrl + "/gateway/" + gateway.getName();
+						// Update gateway URL using the current server name
+						modifiedGateway.url = currentGatewayUrl;
 
-					// Add modified gateway to the list
-					modifiedGateways.add(modifiedGateway);
+						// Add modified gateway to the list
+						modifiedGateways.add(modifiedGateway);
+					}
+
+					// Set modified gateways to the modified platform
+					modifiedPlatform.gateways = modifiedGateways;
+
+					// Add modified platform to the list
+					modifiedPlatforms.add(modifiedPlatform);
 				}
-
-				// Set modified gateways to the modified platform
-				modifiedPlatform.gateways = modifiedGateways;
-
-				// Add modified platform to the list
-				modifiedPlatforms.add(modifiedPlatform);
 			}
 
 			// Set modified platforms to the serverInfo
@@ -436,6 +438,14 @@ public class SimulationConnector {
 		}
 
 		return serverInfo;
+	}
+
+	private static boolean filterPlatform(doip.simulation.api.Platform platform, String status) {
+		if (status == null || status.isEmpty()) {
+			return true; // Include all platforms if status is empty
+		} else {
+			return platform.getState().toString().equals(status);
+		}
 	}
 
 	/**
