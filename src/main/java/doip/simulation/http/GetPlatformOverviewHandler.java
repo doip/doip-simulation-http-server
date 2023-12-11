@@ -1,6 +1,7 @@
 package doip.simulation.http;
 
 import java.io.IOException;
+import java.net.URI;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -48,6 +49,9 @@ public class GetPlatformOverviewHandler implements HttpHandler {
 	 */
 	@Override
 	public void handle(HttpExchange exchange) throws IOException {
+		
+		URI uri = exchange.getRequestURI();
+		logger.info("Full URI: {}", uri.toString());
 
 		String hostWithPort = HttpServerHelper.getHostWithPort(exchange);
 		if (hostWithPort != null) {
@@ -108,8 +112,8 @@ public class GetPlatformOverviewHandler implements HttpHandler {
 					String jsonResponse = simulationConnector.buildPlatformJsonResponse(platformParam);
 
 					// Set the response headers and body
-					HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json", 200);
-					HttpServerHelper.responseServerLogging(exchange, 200, jsonResponse);
+					HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json", DoipHttpServer.HTTP_OK);
+					HttpServerHelper.responseServerLogging(exchange, DoipHttpServer.HTTP_OK, jsonResponse);
 
 				} else {
 
@@ -127,7 +131,7 @@ public class GetPlatformOverviewHandler implements HttpHandler {
 						String jsonResponse = simulationConnector.buildPlatformJsonResponse(platformParam);
 
 						// Set the response headers and body
-						HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json", 200);
+						HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json", DoipHttpServer.HTTP_OK);
 						HttpServerHelper.responseServerLogging(exchange, DoipHttpServer.HTTP_OK, jsonResponse);
 					} else {
 						// Invalid JSON structure Platform deserialization failed.
@@ -153,6 +157,8 @@ public class GetPlatformOverviewHandler implements HttpHandler {
 		try {
 			// Get the request URI
 			String requestUri = exchange.getRequestURI().toString();
+			
+			logger.info("Path component of this URI :{} ", exchange.getRequestURI().getPath());
 
 			// Extract platform and gateway from the path
 			String platformParam = HttpServerHelper.getPathParam(requestUri, "platform");
@@ -168,7 +174,7 @@ public class GetPlatformOverviewHandler implements HttpHandler {
 				String jsonResponse = simulationConnector.buildGatewayJsonResponse(platformParam, gatewayParam);
 
 				// Set the response headers and body
-				HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json", 200);
+				HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json", DoipHttpServer.HTTP_OK);
 				HttpServerHelper.responseServerLogging(exchange, DoipHttpServer.HTTP_OK, jsonResponse);
 			} else {
 				// Invalid URL parameters
@@ -187,6 +193,8 @@ public class GetPlatformOverviewHandler implements HttpHandler {
 		try {
 			// Extract platform parameter from the path
 			String requestPath = exchange.getRequestURI().getPath();
+			logger.info("Path component of this URI :{} ", exchange.getRequestURI().getPath());
+			
 			String platformParam = HttpServerHelper.getPathParam(requestPath, "platform");
 			if (platformParam != null) {
 
@@ -197,7 +205,7 @@ public class GetPlatformOverviewHandler implements HttpHandler {
 				String jsonResponse = simulationConnector.buildPlatformJsonResponse(platformParam);
 
 				// Set the response headers and body
-				HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json", 200);
+				HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json", DoipHttpServer.HTTP_OK);
 				HttpServerHelper.responseServerLogging(exchange, DoipHttpServer.HTTP_OK, jsonResponse);
 			} else {
 				// Invalid URL parameters
