@@ -50,6 +50,12 @@ jar {
 test {
 	useJUnitPlatform()
 	systemProperty 'log4j.configurationFile', 'src/test/resources/log4j2.xml'
+	reports {
+		junitXml {
+			outputPerTestCase = true // defaults to false
+			//mergeReruns = true // defaults to false
+		}
+    }
 }
 
 
