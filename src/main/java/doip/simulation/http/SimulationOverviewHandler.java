@@ -17,14 +17,14 @@ import org.apache.logging.log4j.Logger;
 /**
  * Define a handler for the "/doip-simulation/" path
  */
-public class GetSimulationOverviewHandler implements HttpHandler {
-	private static Logger logger = LogManager.getLogger(GetSimulationOverviewHandler.class);
+public class SimulationOverviewHandler implements HttpHandler {
+	private static Logger logger = LogManager.getLogger(SimulationOverviewHandler.class);
 
 	// Reference to the DoipHttpServer instance
 	// private final DoipHttpServer doipHttpServer;
 	private final SimulationConnector simulationConnector;
 
-	public GetSimulationOverviewHandler(SimulationConnector simulationConnector) {
+	public SimulationOverviewHandler(SimulationConnector simulationConnector) {
 		this.simulationConnector = simulationConnector;
 		// this.doipHttpServer = doipHttpServer;
 	}
