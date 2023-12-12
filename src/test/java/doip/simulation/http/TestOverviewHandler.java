@@ -45,9 +45,15 @@ class TestOverviewHandler {
 		server = new DoipHttpServer(PORT, mockSimulationManager);
 
 		customController = new CustomMappingController(server);
-
-		customController.addExternalHandler(SimulationConnector.DOIP_SIMULATION_PATH, new SimulationOverviewHandler(server));
-		customController.addExternalHandler(SimulationConnector.PLATFORM_PATH, new PlatformOverviewHandler(server));
+		
+//		SimulationConnector connector = new SimulationConnector(server.getSimulationManager(), server.getServerName());
+//		customController.addExternalHandler(SimulationConnector.DOIP_SIMULATION_PATH, new SimulationOverviewHandler(connector));
+//		customController.addExternalHandler(SimulationConnector.PLATFORM_PATH, new PlatformOverviewHandler(connector));
+		
+		
+		SimulationConnector connectorTest = new SimulationConnectorTest(server.getSimulationManager(), server.getServerName());
+		customController.addExternalHandler(SimulationConnector.DOIP_SIMULATION_PATH, new SimulationOverviewHandler(connectorTest));
+		customController.addExternalHandler(SimulationConnector.PLATFORM_PATH, new PlatformOverviewHandler(connectorTest));
 
 		customController.startHttpServer();
 
