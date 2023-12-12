@@ -20,8 +20,8 @@ import doip.simulation.http.lib.ActionRequest;
 /**
  * Define a handler for the "/doip-simulation/platform" path
  */
-public class GetPlatformOverviewHandler implements HttpHandler {
-	private static Logger logger = LogManager.getLogger(GetPlatformOverviewHandler.class);
+public class PlatformOverviewHandler implements HttpHandler {
+	private static Logger logger = LogManager.getLogger(PlatformOverviewHandler.class);
 
 	// Reference to the DoipHttpServer instance
 	// private final DoipHttpServer doipHttpServer;
@@ -30,7 +30,7 @@ public class GetPlatformOverviewHandler implements HttpHandler {
 
 	private static final String GATEWAY_PATH = "/gateway";
 
-	public GetPlatformOverviewHandler(SimulationConnector simulationConnector) {
+	public PlatformOverviewHandler(SimulationConnector simulationConnector) {
 		this.simulationConnector = simulationConnector;
 		// this.doipHttpServer = doipHttpServer;
 	}
