@@ -14,7 +14,7 @@ import doip.simulation.api.Ecu;
 import doip.simulation.api.Gateway;
 import doip.simulation.api.Platform;
 import doip.simulation.api.ServiceState;
-/*
+
 public class MockSimulationManager implements SimulationManager {
 	
 	private static Logger logger = LogManager.getLogger(MockSimulationManager.class);
@@ -206,4 +206,4 @@ class MockEcu implements Ecu {
     // Implement the ECU methods
     // ...
 }
-*/
+

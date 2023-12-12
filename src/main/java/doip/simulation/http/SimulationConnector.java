@@ -334,23 +334,25 @@ public class SimulationConnector {
 			modifiedEcu.url = currentEcuUrl;
 
 			List<doip.simulation.http.lib.LookupEntry> configuredlookupEntries = new ArrayList<>();
+			if (ecu.getConfiguredLookupTable() != null && ecu.getConfiguredLookupTable().getLookupEntries() != null) {
+				for (doip.library.util.LookupEntry curentLookupEntry : ecu.getConfiguredLookupTable()
+						.getLookupEntries()) {
 
-			for (doip.library.util.LookupEntry curentLookupEntry : ecu.getConfiguredLookupTable().getLookupEntries()) {
+					LookupEntry modifiedlookupEntry = createJsonLookupEntry(curentLookupEntry);
 
-				LookupEntry modifiedlookupEntry = createJsonLookupEntry(curentLookupEntry);
-
-				configuredlookupEntries.add(modifiedlookupEntry);
+					configuredlookupEntries.add(modifiedlookupEntry);
+				}
 			}
 
 			List<doip.simulation.http.lib.LookupEntry> runtimelookupEntries = new ArrayList<>();
+			if (ecu.getRuntimeLookupTable() != null && ecu.getRuntimeLookupTable().getLookupEntries() != null) {
+				for (doip.library.util.LookupEntry curentLookupEntry : ecu.getRuntimeLookupTable().getLookupEntries()) {
 
-			for (doip.library.util.LookupEntry curentLookupEntry : ecu.getRuntimeLookupTable().getLookupEntries()) {
+					LookupEntry modifiedlookupEntry = createJsonLookupEntry(curentLookupEntry);
 
-				LookupEntry modifiedlookupEntry = createJsonLookupEntry(curentLookupEntry);
-
-				runtimelookupEntries.add(modifiedlookupEntry);
+					runtimelookupEntries.add(modifiedlookupEntry);
+				}
 			}
-
 			modifiedEcu.configuredLookupTable = configuredlookupEntries;
 			modifiedEcu.runtimeLookupTable = runtimelookupEntries;
 
@@ -468,7 +470,7 @@ public class SimulationConnector {
 		}
 	}
 
-	private void performAction(doip.simulation.api.Platform platform, Action action) {
+	public void performAction(doip.simulation.api.Platform platform, Action action) {
 		switch (action) {
 		case start:
 			logger.info("Starting the process for platform: {}", platform.getName());
