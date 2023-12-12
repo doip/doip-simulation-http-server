@@ -19,8 +19,9 @@ public class SimulationConnectorTest extends SimulationConnector {
 	private static final Logger logger = LogManager.getLogger(SimulationConnectorTest.class);
 	private boolean createMockResponse = true;
 
-	public SimulationConnectorTest(DoipHttpServer doipHttpServer) {
-		super(doipHttpServer.getSimulationManager(), doipHttpServer.getServerName());
+	public SimulationConnectorTest(SimulationManager simulationManager, String alternativeHostName) {
+		//super(doipHttpServer.getSimulationManager(), doipHttpServer.getServerName());
+		super(simulationManager, alternativeHostName);
 	}
 
 	@Override
