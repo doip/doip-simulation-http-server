@@ -53,9 +53,9 @@ public class SimulationConnector {
 		}
 	}
 
-	public SimulationConnector(SimulationManager simulationManager, String doipHostName) {
+	public SimulationConnector(SimulationManager simulationManager, String alternativeHostName) {
 		this.simulationManager = simulationManager;
-		this.hostName = doipHostName;
+		this.hostName = alternativeHostName;
 	}
 
 	/**

@@ -24,12 +24,6 @@ public class GetSimulationOverviewHandler implements HttpHandler {
 	// private final DoipHttpServer doipHttpServer;
 	private final SimulationConnector simulationConnector;
 
-	// Constructor to receive the DoipHttpServer instance
-	public GetSimulationOverviewHandler(DoipHttpServer doipHttpServer) {
-		// super(doipHttpServer.getSimulationManager(), doipHttpServer.getServerName());
-		this(new SimulationConnector(doipHttpServer.getSimulationManager(), doipHttpServer.getServerName()));
-	}
-
 	public GetSimulationOverviewHandler(SimulationConnector simulationConnector) {
 		this.simulationConnector = simulationConnector;
 		// this.doipHttpServer = doipHttpServer;

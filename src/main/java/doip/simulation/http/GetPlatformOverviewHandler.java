@@ -30,12 +30,6 @@ public class GetPlatformOverviewHandler implements HttpHandler {
 
 	private static final String GATEWAY_PATH = "/gateway";
 
-	// Constructor to receive the DoipHttpServer instance
-	public GetPlatformOverviewHandler(DoipHttpServer doipHttpServer) {
-		// super(doipHttpServer.getSimulationManager(), doipHttpServer.getServerName());
-		this(new SimulationConnector(doipHttpServer.getSimulationManager(), doipHttpServer.getServerName()));
-	}
-
 	public GetPlatformOverviewHandler(SimulationConnector simulationConnector) {
 		this.simulationConnector = simulationConnector;
 		// this.doipHttpServer = doipHttpServer;

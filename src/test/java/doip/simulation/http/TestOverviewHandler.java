@@ -46,12 +46,8 @@ class TestOverviewHandler {
 
 		customController = new CustomMappingController(server);
 
-//		customController.addExternalHandler(SimulationConnector.DOIP_SIMULATION_PATH, new GetSimulationOverviewHandler(server));
-//		customController.addExternalHandler(SimulationConnector.PLATFORM_PATH, new GetPlatformOverviewHandler(server));
-		customController.addExternalHandler(SimulationConnector.DOIP_SIMULATION_PATH, new GetSimulationOverviewHandler(
-				 new SimulationConnectorTest(server)));
-		customController.addExternalHandler(SimulationConnector.PLATFORM_PATH, new GetPlatformOverviewHandler(
-				new SimulationConnectorTest(server)));
+		customController.addExternalHandler(SimulationConnector.DOIP_SIMULATION_PATH, new GetSimulationOverviewHandler(server));
+		customController.addExternalHandler(SimulationConnector.PLATFORM_PATH, new GetPlatformOverviewHandler(server));
 
 		customController.startHttpServer();
 
