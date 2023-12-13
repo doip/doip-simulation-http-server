@@ -118,13 +118,56 @@ class TestSimulationConnector {
 			connector.handlePlatformAction(platformName, actionRequest);
 		} catch (Exception e) {
 			// throw logger.throwing(e);
-			logger.error("Unexpected IOException: " + e.getMessage(), e);
-			fail("Unexpected IOException: " + e.getMessage());
+			logger.error("Unexpected Exception: " + e.getMessage(), e);
+			fail("Unexpected Exception: " + e.getMessage());
 		}
 
 		// Verify that the performAction method is called with the correct arguments
 		// verify(connector,times(1)).performAction(mockPlatform, Action.start); // or
 		// Action.stop
+
+		actionRequest.setAction(Action.stop);
+		try {
+			// Call the method being tested
+			connector.handlePlatformAction(platformName, actionRequest);
+		} catch (Exception e) {
+			// throw logger.throwing(e);
+			logger.error("Unexpected Exception: " + e.getMessage(), e);
+			fail("Unexpected Exception: " + e.getMessage());
+		}
+	}
+
+	@Test
+	public void testHandlePlatformActionWithUnknownPlatform() {
+		// Simulate the case where the platform is not found
+		// Calls the method being tested and assert the expected behavior
+		logger.info(
+				"-------------------------- testHandlePlatformActionWithUnknownPlatform ------------------------------------");
+		// Create an action request
+		ActionRequest actionRequest = new ActionRequest();
+		actionRequest.setAction(Action.start); // or Action.stop
+		try {
+			// Call the method being tested
+			connector.handlePlatformAction("UnknownName", actionRequest);
+		} catch (Exception e) {
+			// throw logger.throwing(e);
+			logger.error("Unexpected Exception: " + e.getMessage(), e);
+			fail("Unexpected Exception: " + e.getMessage());
+		}
+	}
+
+	@Test
+	public void testPerformAction() {
+		logger.info("-------------------------- testPerformAction ------------------------------------");
+		
+		doip.simulation.api.Platform testPlatfotm = mock(doip.simulation.api.Platform.class);
+		try {
+			// Call the method being tested
+			connector.performAction(testPlatfotm, Action.start);
+		} catch (Exception e) {
+			logger.error("Unexpected Exception: " + e.getMessage(), e);
+			fail("Unexpected Exception: " + e.getMessage());
+		}
 	}
 
 }
