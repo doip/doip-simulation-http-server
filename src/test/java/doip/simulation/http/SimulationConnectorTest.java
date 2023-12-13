@@ -70,14 +70,14 @@ public class SimulationConnectorTest extends SimulationConnector {
 
 		// Create a Platform
 		Platform platform = new Platform();
-		platform.name = "X2024";
+		platform.setName("X2024");
 
 		// platform.url = "http://myserver.com/doip-simulation/platform/X2024";
-		String currentPlatformUrl = serverName + SimulationConnector.DOIP_SIMULATION_PATH + "platform/" + platform.name;
+		String currentPlatformUrl = serverName + SimulationConnector.DOIP_SIMULATION_PATH + "platform/" + platform.getName();
 		// Update platform URL using the current server name
-		platform.url = currentPlatformUrl;
+		platform.setUrl(currentPlatformUrl);
 
-		platform.status = status;
+		platform.setStatus(status);
 
 		// Create a Gateway
 		Gateway gateway = new Gateway();
@@ -96,7 +96,7 @@ public class SimulationConnectorTest extends SimulationConnector {
 		}
 
 		// Add the gateway to the platform's gateways list
-		platform.gateways = List.of(gateway);
+		platform.setGateways(List.of(gateway));
 
 		// Add the platform to the serverInfo's platforms list
 		serverInfo.platforms = List.of(platform);
@@ -172,13 +172,13 @@ public class SimulationConnectorTest extends SimulationConnector {
 
 		// Create a Platform
 		Platform platform = new Platform();
-		platform.name = "X2024";
+		platform.setName("X2024");
 		// platform.url = "http://myserver.com/doip-simulation/platform/X2024";
-		String currentPlatformUrl = serverName + SimulationConnector.PLATFORM_PATH + "/" + platform.name;
+		String currentPlatformUrl = serverName + SimulationConnector.PLATFORM_PATH + "/" + platform.getName();
 		// Update platform URL using the current server name
-		platform.url = currentPlatformUrl;
+		platform.setUrl(currentPlatformUrl);
 
-		platform.status = "RUNNING";
+		platform.setStatus("RUNNING");
 
 		// Create a Gateway
 		Gateway gateway = new Gateway();
@@ -195,7 +195,7 @@ public class SimulationConnectorTest extends SimulationConnector {
 		gateway.error = "Can't bind to port 13400 because it is already used by another gateway";
 
 		// Add the gateway to the platform's gateways list
-		platform.gateways = List.of(gateway);
+		platform.setGateways(List.of(gateway));
 
 		return platform;
 	}
