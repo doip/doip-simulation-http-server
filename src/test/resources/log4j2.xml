@@ -21,9 +21,6 @@
 		<File name="assert" fileName="assert.log" append="false">
 			<PatternLayout pattern="${customlayout}" />
 		</File>
-		<File name="html" fileName="report.html" append="false">
-			<HTMLLayout charset="UTF-8" title="Log4j 2 Demo" datePattern="HH:mm:ss.SSS"/>
-		</File>
 	</Appenders>
 	<Loggers>
 		<Root level="TRACE">
