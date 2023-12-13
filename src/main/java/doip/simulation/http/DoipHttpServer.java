@@ -25,22 +25,17 @@ import com.sun.net.httpserver.HttpServer;
 public class DoipHttpServer {
 
 	private static Logger logger = LogManager.getLogger(DoipHttpServer.class);
-	
-	public static final int HTTP_BAD_REQUEST = 400;
-    public static final int HTTP_INTERNAL_SERVER_ERROR = 500;
-    public static final int HTTP_OK = 200;
-    public static final int HTTP_METHOD_NOT_ALLOWED = 405;
 
 	private static final int DEFAULT_PORT = 8080;
 	private HttpServer server;
 	private String serverName;
 	private int port;
-	
+
 	// Add getter methods for serverName and port
 	public String getServerName() {
 		return serverName;
 	}
-	
+
 	public int getPort() {
 		return port;
 	}
@@ -122,6 +117,7 @@ public class DoipHttpServer {
 	/**
 	 * Creates default mapping contexts for POST and GET requests.
 	 */
+	@SuppressWarnings("unused")
 	private void createTestMappingContexts() {
 		// Check if the server is running before creating test mapping contexts
 		if (isRunning == false) {
@@ -277,4 +273,3 @@ public class DoipHttpServer {
 	}
 
 }
-

@@ -1,6 +1,7 @@
 package doip.simulation.http;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.URI;
 
 import org.apache.logging.log4j.LogManager;
@@ -62,7 +63,7 @@ public class PlatformOverviewHandler implements HttpHandler {
 		} else {
 			// Respond with 405 Method Not Allowed for non-GET requests
 			logger.error("Method not allowed. Received a {} request.", exchange.getRequestMethod());
-			exchange.sendResponseHeaders(DoipHttpServer.HTTP_METHOD_NOT_ALLOWED, -1);
+			exchange.sendResponseHeaders(HttpURLConnection.HTTP_BAD_METHOD, -1);
 		}
 	}
 
@@ -106,8 +107,8 @@ public class PlatformOverviewHandler implements HttpHandler {
 					String jsonResponse = simulationConnector.buildPlatformJsonResponse(platformParam);
 
 					// Set the response headers and body
-					HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json", DoipHttpServer.HTTP_OK);
-					HttpServerHelper.responseServerLogging(exchange, DoipHttpServer.HTTP_OK, jsonResponse);
+					HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json", HttpURLConnection.HTTP_OK);
+					HttpServerHelper.responseServerLogging(exchange, HttpURLConnection.HTTP_OK, jsonResponse);
 
 				} else {
 
@@ -125,25 +126,25 @@ public class PlatformOverviewHandler implements HttpHandler {
 						String jsonResponse = simulationConnector.buildPlatformJsonResponse(platformParam);
 
 						// Set the response headers and body
-						HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json", DoipHttpServer.HTTP_OK);
-						HttpServerHelper.responseServerLogging(exchange, DoipHttpServer.HTTP_OK, jsonResponse);
+						HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json", HttpURLConnection.HTTP_OK);
+						HttpServerHelper.responseServerLogging(exchange, HttpURLConnection.HTTP_OK, jsonResponse);
 					} else {
 						// Invalid JSON structure Platform deserialization failed.
 						logger.error("Received JSON structure is invalid.");
-						exchange.sendResponseHeaders(DoipHttpServer.HTTP_BAD_REQUEST, -1); // Bad Request
+						exchange.sendResponseHeaders(HttpURLConnection.HTTP_BAD_REQUEST, -1); // Bad Request
 					}
 				}
 
 			} else {
 				// Invalid URL parameters. Platform parameter is missing or invalid.
 				logger.error("Invalid URL parameters for POST request.");
-				exchange.sendResponseHeaders(DoipHttpServer.HTTP_BAD_REQUEST, -1); // Bad Request
+				exchange.sendResponseHeaders(HttpURLConnection.HTTP_BAD_REQUEST, -1); // Bad Request
 			}
 
 		} catch (Exception e) {
 			// Handle exceptions and send an appropriate response
 			logger.error("Error processing request: {}", e.getMessage(), e);
-			exchange.sendResponseHeaders(DoipHttpServer.HTTP_INTERNAL_SERVER_ERROR, -1); // Internal Server Error
+			exchange.sendResponseHeaders(HttpURLConnection.HTTP_INTERNAL_ERROR, -1); // Internal Server Error
 		}
 	}
 
@@ -168,17 +169,17 @@ public class PlatformOverviewHandler implements HttpHandler {
 				String jsonResponse = simulationConnector.buildGatewayJsonResponse(platformParam, gatewayParam);
 
 				// Set the response headers and body
-				HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json", DoipHttpServer.HTTP_OK);
-				HttpServerHelper.responseServerLogging(exchange, DoipHttpServer.HTTP_OK, jsonResponse);
+				HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json", HttpURLConnection.HTTP_OK);
+				HttpServerHelper.responseServerLogging(exchange, HttpURLConnection.HTTP_OK, jsonResponse);
 			} else {
 				// Invalid URL parameters
 				logger.error("Invalid URL parameters for POST request.");
-				exchange.sendResponseHeaders(DoipHttpServer.HTTP_BAD_REQUEST, -1); // Bad Request
+				exchange.sendResponseHeaders(HttpURLConnection.HTTP_BAD_REQUEST, -1); // Bad Request
 			}
 		} catch (Exception e) {
 			// Handle exceptions and send an appropriate response
 			logger.error("Error processing request: {}", e.getMessage(), e);
-			exchange.sendResponseHeaders(DoipHttpServer.HTTP_INTERNAL_SERVER_ERROR, -1); // Internal Server Error
+			exchange.sendResponseHeaders(HttpURLConnection.HTTP_INTERNAL_ERROR, -1); // Internal Server Error
 		}
 
 	}
@@ -199,18 +200,18 @@ public class PlatformOverviewHandler implements HttpHandler {
 				String jsonResponse = simulationConnector.buildPlatformJsonResponse(platformParam);
 
 				// Set the response headers and body
-				HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json", DoipHttpServer.HTTP_OK);
-				HttpServerHelper.responseServerLogging(exchange, DoipHttpServer.HTTP_OK, jsonResponse);
+				HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json", HttpURLConnection.HTTP_OK);
+				HttpServerHelper.responseServerLogging(exchange, HttpURLConnection.HTTP_OK, jsonResponse);
 			} else {
 				// Invalid URL parameters
 				logger.error("Invalid URL parameters for POST request.");
-				exchange.sendResponseHeaders(DoipHttpServer.HTTP_BAD_REQUEST, -1); // Bad Request
+				exchange.sendResponseHeaders(HttpURLConnection.HTTP_BAD_REQUEST, -1); // Bad Request
 			}
 
 		} catch (Exception e) {
 			// Handle exceptions and send an appropriate response
 			logger.error("Error processing request: {}", e.getMessage(), e);
-			exchange.sendResponseHeaders(DoipHttpServer.HTTP_INTERNAL_SERVER_ERROR, -1); // Internal Server Error
+			exchange.sendResponseHeaders(HttpURLConnection.HTTP_INTERNAL_ERROR, -1); // Internal Server Error
 		}
 	}
 
