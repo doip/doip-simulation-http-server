@@ -256,12 +256,12 @@ public class SimulationConnector {
 		String serverName = getServerNameFromRequestHeader();
 
 		doip.simulation.http.lib.Platform modifiedPlatform = new doip.simulation.http.lib.Platform();
-		modifiedPlatform.name = platform.getName();
-		modifiedPlatform.status = platform.getState().toString();
+		modifiedPlatform.setName(platform.getName());
+		modifiedPlatform.setStatus(platform.getState().toString());
 
 		String currentPlatformUrl = serverName + PLATFORM_PATH + "/" + platform.getName();
 		// Update platform URL using the current server name
-		modifiedPlatform.url = currentPlatformUrl;
+		modifiedPlatform.setUrl(currentPlatformUrl);
 
 		// Process each gateway in the platform
 		List<doip.simulation.http.lib.Gateway> modifiedGateways = new ArrayList<>();
@@ -282,7 +282,7 @@ public class SimulationConnector {
 		}
 
 		// Set modified gateways to the modified platform
-		modifiedPlatform.gateways = modifiedGateways;
+		modifiedPlatform.setGateways(modifiedGateways);
 
 		return modifiedPlatform;// Get the server name from the DoipHttpServer
 
@@ -405,12 +405,12 @@ public class SimulationConnector {
 			for (doip.simulation.api.Platform platform : platforms) {
 				doip.simulation.http.lib.Platform modifiedPlatform = new doip.simulation.http.lib.Platform();
 				if (filterPlatform(platform, status)) {
-					modifiedPlatform.name = platform.getName();
-					modifiedPlatform.status = platform.getState().toString();
+					modifiedPlatform.setName(platform.getName());
+					modifiedPlatform.setStatus(platform.getState().toString());
 
 					String currentPlatformUrl = serverName + DOIP_SIMULATION_PATH + "platform/" + platform.getName();
 					// Update platform URL using the current server name
-					modifiedPlatform.url = currentPlatformUrl;
+					modifiedPlatform.setUrl(currentPlatformUrl);
 
 					// Process each gateway in the platform
 					List<doip.simulation.http.lib.Gateway> modifiedGateways = new ArrayList<>();
@@ -428,7 +428,7 @@ public class SimulationConnector {
 					}
 
 					// Set modified gateways to the modified platform
-					modifiedPlatform.gateways = modifiedGateways;
+					modifiedPlatform.setGateways(modifiedGateways);
 
 					// Add modified platform to the list
 					modifiedPlatforms.add(modifiedPlatform);
