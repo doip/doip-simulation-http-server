@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpExchange;
 
 import doip.library.exception.DoipException;
+import doip.simulation.api.ServiceState;
 import doip.simulation.http.helpers.HttpServerHelper;
 
 import doip.simulation.http.lib.Action;
@@ -40,11 +41,12 @@ public class PlatformOverviewHandler implements HttpHandler {
 	 * Handle method for processing incoming HTTP requests
 	 * /doip-simulation/platform/{platformName} (GET)
 	 * /doip-simulation/platform/{platformName} (POST)
+	 * /doip-simulation/platform/{platformName}/?action=start (GET)
 	 * /doip-simulation/platform/{platformName}/gateway/{gatewayName} (GET)
 	 */
 	@Override
 	public void handle(HttpExchange exchange) throws IOException {
-		
+
 		URI uri = exchange.getRequestURI();
 		logger.info("Full URI: {}", uri.toString());
 
@@ -54,16 +56,74 @@ public class PlatformOverviewHandler implements HttpHandler {
 		}
 
 		String requestPath = exchange.getRequestURI().getPath();
-		if ("GET".equals(exchange.getRequestMethod()) && requestPath.contains(GATEWAY_PATH)) {
-			handleGetGatewayRequest(exchange);
-		} else if ("GET".equals(exchange.getRequestMethod())) {
-			handleGetPlatformRequest(exchange);
-		} else if ("POST".equals(exchange.getRequestMethod())) {
-			handlePostPlatformRequest(exchange);
-		} else {
-			// Respond with 405 Method Not Allowed for non-GET requests
-			logger.error("Method not allowed. Received a {} request.", exchange.getRequestMethod());
-			exchange.sendResponseHeaders(HttpURLConnection.HTTP_BAD_METHOD, -1);
+	    String requestMethod = exchange.getRequestMethod();
+
+	    if ("GET".equals(requestMethod) && requestPath.contains(GATEWAY_PATH)) {
+	        handleGetGatewayRequest(exchange);
+	    } else if ("GET".equals(requestMethod)) {
+	        if (isStartActionRequest(exchange)) {
+	            handleStartActionRequest(exchange);
+	        } else {
+	            handleGetPlatformRequest(exchange);
+	        }
+	    } else if ("POST".equals(requestMethod)) {
+	        handlePostPlatformRequest(exchange);
+	    } else {
+	        // Respond with 405 Method Not Allowed for non-GET requests
+	        logger.error("Method not allowed. Received a {} request.", requestMethod);
+	        exchange.sendResponseHeaders(HttpURLConnection.HTTP_BAD_METHOD, -1);
+	    }
+	}
+
+	// Method to handle the special case for starting an action
+	private void handleStartActionRequest(HttpExchange exchange) throws IOException {
+		try {
+			// Extract platform parameter from the path
+			String requestPath = exchange.getRequestURI().getPath();
+
+			logger.info("Path component of this URI :{} ", requestPath);
+
+			String platformParam = HttpServerHelper.getPathParam(requestPath, "platform");
+			if (platformParam != null) {
+
+				String requestInfo = String.format("This is a POST request for platform: %s", platformParam);
+				logger.info(requestInfo);
+
+				// Deserialize the JSON string into a ActionRequest object
+				String actionParam = HttpServerHelper.getQueryParam(exchange, "action");
+				if (actionParam == null || !isValidAction(actionParam)) {
+					// If 'status' is not empty and not a valid status, return Bad Request
+					logger.error("Invalid status provided: {}", actionParam);
+					exchange.sendResponseHeaders(HttpURLConnection.HTTP_BAD_REQUEST, -1); // Bad Request
+					return;
+				}
+
+				Action currentAction = Action.valueOf(actionParam);
+				ActionRequest receivedAction = new ActionRequest();
+				receivedAction.setAction(currentAction);
+
+				// Process the received platform information
+				logger.info("Received action: {}", receivedAction.getAction().toString());
+
+				simulationConnector.handlePlatformAction(platformParam, receivedAction);
+
+				// Build the JSON response
+				String jsonResponse = simulationConnector.buildPlatformJsonResponse(platformParam);
+
+				// Set the response headers and body
+				HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json", HttpURLConnection.HTTP_OK);
+				HttpServerHelper.responseServerLogging(exchange, HttpURLConnection.HTTP_OK, jsonResponse);
+
+			} else {
+				// Invalid URL parameters. Platform parameter is missing or invalid.
+				logger.error("Invalid URL parameters for POST request.");
+				exchange.sendResponseHeaders(HttpURLConnection.HTTP_BAD_REQUEST, -1); // Bad Request
+			}
+
+		} catch (Exception e) {
+			// Handle exceptions and send an appropriate response
+			logger.error("Error processing request: {}", e.getMessage(), e);
+			exchange.sendResponseHeaders(HttpURLConnection.HTTP_INTERNAL_ERROR, -1); // Internal Server Error
 		}
 	}
 
@@ -107,7 +167,8 @@ public class PlatformOverviewHandler implements HttpHandler {
 					String jsonResponse = simulationConnector.buildPlatformJsonResponse(platformParam);
 
 					// Set the response headers and body
-					HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json", HttpURLConnection.HTTP_OK);
+					HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json",
+							HttpURLConnection.HTTP_OK);
 					HttpServerHelper.responseServerLogging(exchange, HttpURLConnection.HTTP_OK, jsonResponse);
 
 				} else {
@@ -126,7 +187,8 @@ public class PlatformOverviewHandler implements HttpHandler {
 						String jsonResponse = simulationConnector.buildPlatformJsonResponse(platformParam);
 
 						// Set the response headers and body
-						HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json", HttpURLConnection.HTTP_OK);
+						HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json",
+								HttpURLConnection.HTTP_OK);
 						HttpServerHelper.responseServerLogging(exchange, HttpURLConnection.HTTP_OK, jsonResponse);
 					} else {
 						// Invalid JSON structure Platform deserialization failed.
@@ -152,7 +214,7 @@ public class PlatformOverviewHandler implements HttpHandler {
 		try {
 			// Get the request URI
 			String requestUri = exchange.getRequestURI().toString();
-			
+
 			logger.info("Path component of this URI :{} ", exchange.getRequestURI().getPath());
 
 			// Extract platform and gateway from the path
@@ -189,7 +251,7 @@ public class PlatformOverviewHandler implements HttpHandler {
 			// Extract platform parameter from the path
 			String requestPath = exchange.getRequestURI().getPath();
 			logger.info("Path component of this URI :{} ", exchange.getRequestURI().getPath());
-			
+
 			String platformParam = HttpServerHelper.getPathParam(requestPath, "platform");
 			if (platformParam != null) {
 
@@ -212,6 +274,31 @@ public class PlatformOverviewHandler implements HttpHandler {
 			// Handle exceptions and send an appropriate response
 			logger.error("Error processing request: {}", e.getMessage(), e);
 			exchange.sendResponseHeaders(HttpURLConnection.HTTP_INTERNAL_ERROR, -1); // Internal Server Error
+		}
+	}
+
+	// Helper method to check if it's a special case for starting an action
+	private boolean isStartActionRequest(HttpExchange exchange) {
+		String requestPath = exchange.getRequestURI().getPath();
+		String platformParam = HttpServerHelper.getPathParam(requestPath, "platform");
+		String actionParam = HttpServerHelper.getQueryParam(exchange, "action");
+
+		boolean isValidRequest = actionParam != null && isValidAction(actionParam) && platformParam != null;
+
+	    if (!isValidRequest) {
+	        logger.error("Invalid action request. Platform: {}, Action: {}", platformParam, actionParam);
+	    }
+
+	    return isValidRequest;
+	}
+
+	private boolean isValidAction(String action) {
+		// Validate the 'action' parameter against the allowed values
+		try {
+			Action currentAction = Action.valueOf(action);
+			return true; // If no exception is thrown, the status is valid
+		} catch (IllegalArgumentException e) {
+			return false; // If an exception is thrown, the status is invalid
 		}
 	}
 
