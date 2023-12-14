@@ -203,30 +203,7 @@ class TestSimulationConnector {
 	public void testHandlePlatformAction() {
 		logger.info("-------------------------- testHandlePlatformAction ------------------------------------");
 		// Create an action request
-		ActionRequest actionRequest = new ActionRequest();
-		actionRequest.setAction(Action.start); // or Action.stop
-		try {
-			// Call the method being tested
-			connector.handlePlatformAction(platformName, actionRequest);
-		} catch (Exception e) {
-			// throw logger.throwing(e);
-			logger.error("Unexpected Exception: " + e.getMessage(), e);
-			fail("Unexpected Exception: " + e.getMessage());
-		}
-
-		// Verify that the performAction method is called with the correct arguments
-		// verify(connector,times(1)).performAction(mockPlatform, Action.start); // or
-		// Action.stop
-
-		actionRequest.setAction(Action.stop);
-		try {
-			// Call the method being tested
-			connector.handlePlatformAction(platformName, actionRequest);
-		} catch (Exception e) {
-			// throw logger.throwing(e);
-			logger.error("Unexpected Exception: " + e.getMessage(), e);
-			fail("Unexpected Exception: " + e.getMessage());
-		}
+		performStartStopAction(connector);
 	}
 
 	@Test
@@ -257,6 +234,40 @@ class TestSimulationConnector {
 			// Call the method being tested
 			connector.performAction(testPlatfotm, Action.start);
 		} catch (Exception e) {
+			logger.error("Unexpected Exception: " + e.getMessage(), e);
+			fail("Unexpected Exception: " + e.getMessage());
+		}
+	}
+	
+	@Test
+	public void testHandlePlatformActionWithStub() {
+		logger.info("-------------------------- testHandlePlatformActionWithStub ------------------------------------");
+		// Create an action request
+		performStartStopAction(connectorMockito);
+	}
+
+	private void performStartStopAction(SimulationConnector currentConnector) {
+		ActionRequest actionRequest = new ActionRequest();
+		actionRequest.setAction(Action.start); // or Action.stop
+		try {
+			// Call the method being tested
+			currentConnector.handlePlatformAction(platformName, actionRequest);
+		} catch (Exception e) {
+			// throw logger.throwing(e);
+			logger.error("Unexpected Exception: " + e.getMessage(), e);
+			fail("Unexpected Exception: " + e.getMessage());
+		}
+
+		// Verify that the performAction method is called with the correct arguments
+		// verify(connector,times(1)).performAction(mockPlatform, Action.start); // or
+		// Action.stop
+
+		actionRequest.setAction(Action.stop);
+		try {
+			// Call the method being tested
+			currentConnector.handlePlatformAction(platformName, actionRequest);
+		} catch (Exception e) {
+			// throw logger.throwing(e);
 			logger.error("Unexpected Exception: " + e.getMessage(), e);
 			fail("Unexpected Exception: " + e.getMessage());
 		}
