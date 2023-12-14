@@ -21,7 +21,7 @@ public class MockSimulationManager implements SimulationManager {
 
     private List<Platform> platforms;
 
-    public MockSimulationManager() {
+    public MockSimulationManager() throws IOException {
         this.platforms = new ArrayList<>();
         // Initialize with some mock platforms
         Platform platform1 = new MockPlatform("X2024");
@@ -68,7 +68,7 @@ class MockPlatform implements Platform {
     private String name;
     private List<Gateway> gateways;
 
-    public MockPlatform(String name) {
+    public MockPlatform(String name) throws IOException {
         this.name = name;
         this.gateways = new ArrayList<>();
         // Initialize with some mock gateways
@@ -122,7 +122,7 @@ class MockGateway implements Gateway {
     private String name;
     private List<Ecu> ecus;
 
-    public MockGateway(String name) {
+    public MockGateway(String name) throws IOException {
         this.name = name;
         this.ecus = new ArrayList<>();
         // Initialize with some mock ECUs
@@ -174,15 +174,19 @@ class MockGateway implements Gateway {
 class MockEcu implements Ecu {
 
     private String name;
+    private LookupTable configuredLookupTable = new LookupTable();
+    private LookupTable runTimeLookupTable = new LookupTable();
 
-    public MockEcu(String name) {
+    public MockEcu(String name) throws IOException {
         this.name = name;
+        this.configuredLookupTable.addLookupEntriesFromFile("src/test/resources/standard.uds");
+        this.runTimeLookupTable.addLookupEntriesFromFile("src/test/resources/standard.uds");
     }
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+	
+		return name;
 	}
 
 	@Override
@@ -193,14 +197,14 @@ class MockEcu implements Ecu {
 
 	@Override
 	public LookupTable getConfiguredLookupTable() {
-		// TODO Auto-generated method stub
-		return null;
+		//return null;
+		return configuredLookupTable;
 	}
 
 	@Override
 	public LookupTable getRuntimeLookupTable() {
-		// TODO Auto-generated method stub
-		return null;
+		//return null;
+		return runTimeLookupTable;
 	}
 
     // Implement the ECU methods
