@@ -9,6 +9,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
@@ -277,6 +278,25 @@ public class HttpServerHelper {
 
         // Return the parsed query parameters
         return queryParams;
+    }
+    
+    /**
+     * Get a specific query parameter from the request URI.
+     * 
+     * @param exchange The HttpExchange object.
+     * @param paramName The name of the query parameter.
+     * @return The value of the specified query parameter or null if not found.
+     */
+    public static String getQueryParam(HttpExchange exchange, String paramName) {
+        URI uri = exchange.getRequestURI();
+        String query = uri.getQuery();
+
+        if (query != null && !query.trim().isEmpty()) {
+            Map<String, String> queryParams = parseQueryParameters(query);
+            return queryParams.get(paramName);
+        }
+
+        return null;
     }
     
     /**
