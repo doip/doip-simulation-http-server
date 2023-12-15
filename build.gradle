@@ -20,6 +20,7 @@ dependencies {
 	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.4'
 
 	implementation 'com.github.doip:doip-simulation-api:2.0.0'
+	implementation 'com.github.doip:doip-simulation:2.0.0'
 	implementation 'com.github.starcode88:starcode88-jhttp:2.0.0'
 	implementation 'com.github.starcode88:starcode88-jutils:1.0.0'
 	implementation 'com.github.doip:doip-simulation-http-lib:1.0.0'

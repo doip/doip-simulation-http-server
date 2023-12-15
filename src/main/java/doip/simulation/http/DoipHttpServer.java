@@ -101,31 +101,9 @@ public class DoipHttpServer {
 		try {
 			InetAddress localhost = InetAddress.getLocalHost();
 			return "http://" + localhost.getHostAddress() + ":" + port;
-			// getHostName
-			// return "http://" + localhost.getHostName() + ":" + port;
-			// return "http://" + localhost.getCanonicalHostName() + ":" + port;
-			// return "http://" + "localhost" + ":" + port;
 		} catch (UnknownHostException e) {
-			// Handle the case where the local host address is not available
-
 			logger.warn("Local host address is not available");
-			// return null; // Or return a default server name
 			return "http://localhost:" + port;
-		}
-	}
-
-	/**
-	 * Creates default mapping contexts for POST and GET requests.
-	 */
-	@SuppressWarnings("unused")
-	private void createTestMappingContexts() {
-		// Check if the server is running before creating test mapping contexts
-		if (isRunning == false) {
-//			List<ContextHandler> defaultHandlers = List.of(new ContextHandler("/posttest", new PostHandler()),
-//					new ContextHandler("/gettest", new GetHandler()));
-//			createMappingContexts(defaultHandlers);
-		} else {
-			logger.warn("Server is running. Test mapping contexts not created.");
 		}
 	}
 
