@@ -39,7 +39,7 @@ public class PlatformOverviewHandler implements HttpHandler {
 	 * Handle method for processing incoming HTTP requests
 	 * /doip-simulation/platform/{platformName} (GET)
 	 * /doip-simulation/platform/{platformName} (POST)
-	 * /doip-simulation/platform/{platformName}/?action=start (GET)
+	 * /doip-simulation/platform/{platformName}?action=start (GET)
 	 * /doip-simulation/platform/{platformName}/gateway/{gatewayName} (GET)
 	 */
 	@Override

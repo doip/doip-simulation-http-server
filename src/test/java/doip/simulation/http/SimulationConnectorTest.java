@@ -20,7 +20,7 @@ public class SimulationConnectorTest extends SimulationConnector {
 	private boolean createMockResponse = true;
 
 	public SimulationConnectorTest(SimulationManager simulationManager, String alternativeHostName) {
-		//super(doipHttpServer.getSimulationManager(), doipHttpServer.getServerName());
+		// super(doipHttpServer.getSimulationManager(), doipHttpServer.getServerName());
 		super(simulationManager, alternativeHostName);
 	}
 
@@ -73,7 +73,7 @@ public class SimulationConnectorTest extends SimulationConnector {
 		platform.setName("X2024");
 
 		// platform.url = "http://myserver.com/doip-simulation/platform/X2024";
-		String currentPlatformUrl = serverName + SimulationConnector.DOIP_SIMULATION_PATH + "platform/" + platform.getName();
+		String currentPlatformUrl = serverName + SimulationConnector.PLATFORM_PATH + "/" + platform.getName();
 		// Update platform URL using the current server name
 		platform.setUrl(currentPlatformUrl);
 

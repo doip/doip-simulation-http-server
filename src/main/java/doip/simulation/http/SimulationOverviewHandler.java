@@ -34,7 +34,7 @@ public class SimulationOverviewHandler implements HttpHandler {
 
 	/**
 	 * Handle method for processing incoming HTTP requests
-	 * /doip-simulation/?status=RUNNING' /doip-simulation/
+	 * /doip-simulation?status=RUNNING' /doip-simulation/
 	 */
 	@Override
 	public void handle(HttpExchange exchange) throws IOException {
