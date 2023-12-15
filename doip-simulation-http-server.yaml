@@ -6,9 +6,9 @@ info:
   termsOfService: http://swagger.io/terms/
   version: 1.0.0
 servers:
-  - url: http://myserver.com/doip-simulation
+  - url: http://localhost:8080
 paths:
-  /:
+  /doip-simulation:
     get:
       summary: Get overview about the DoIP simulation server.
         It corresponds to class doip.simulation.api.SimulationManager.
@@ -28,7 +28,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ServerInfo'
-  /platform/{platformName}:
+  /doip-simulation/platform/{platformName}:
     get:
       summary: Get information of a specific platform. It corresponds to
         class doip.simulation.api.Platform.
@@ -55,7 +55,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Platform'
-  /platform/{platformName}/gateway/{gatewayName}:
+  /doip-simulation/platform/{platformName}/gateway/{gatewayName}:
     get:
       summary: Get information about a specific gateway. It corresponds
         to class doip.simulation.api.Gateway
@@ -69,7 +69,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GatewayDetails'
-  /platform/{platformName}/gateway/{gatewayName}/ecu/{ecuName}:
+  /doip-simulation/platform/{platformName}/gateway/{gatewayName}/ecu/{ecuName}:
     get:
       summary: Get information about a specific ECU.
       parameters:
