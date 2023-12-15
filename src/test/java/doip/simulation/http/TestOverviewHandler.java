@@ -73,7 +73,7 @@ class TestOverviewHandler {
 			IOException, InterruptedException {
 		logger.info("-------------------------- testGetOverviewHandler ------------------------------------");
 
-		// "/doip-simulation/?status=RUNNING"
+		// "/doip-simulation?status=RUNNING"
 		HttpResponse<String> response = clientForLocalHost
 				.GET(SimulationConnector.DOIP_SIMULATION_PATH + "?status=RUNNING", String.class);
 		int statusCode = response.statusCode();
@@ -241,7 +241,7 @@ class TestOverviewHandler {
 			URISyntaxException, IOException, InterruptedException, HttpInvalidRequestBodyType {
 		logger.info("-------------------------- testGetActionPlatformRequestJson ------------------------------------");
 
-		HttpResponse<String> response = clientForLocalHost.GET(SimulationConnector.PLATFORM_PATH + "/X2024/?action=start",
+		HttpResponse<String> response = clientForLocalHost.GET(SimulationConnector.PLATFORM_PATH + "/X2024?action=start",
 				String.class);
 
 		int statusCode = response.statusCode();
@@ -259,7 +259,7 @@ class TestOverviewHandler {
 		logger.info("-------------------------- testGetWrongActionPlatformRequestJson ------------------------------------");
 
 		HttpStatusCodeException e = assertThrows(HttpStatusCodeException.class,
-				() -> clientForLocalHost.GET(SimulationConnector.PLATFORM_PATH + "/X2024/?action=???",String.class));
+				() -> clientForLocalHost.GET(SimulationConnector.PLATFORM_PATH + "/X2024?action=???",String.class));
 		int statusCode = e.getResponse().statusCode();
 		String statusText = HttpUtils.getStatusText(statusCode);
 		logger.info("Status code = {} ({})", statusCode, statusText);

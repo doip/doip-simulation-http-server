@@ -36,7 +36,7 @@ public class SimulationConnector {
 			.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
 	public static final String PLATFORM_PATH = "/doip-simulation/platform";
-	public static final String DOIP_SIMULATION_PATH = "/doip-simulation/";
+	public static final String DOIP_SIMULATION_PATH = "/doip-simulation";
 	private String hostName;
 
 	private String serverNameFromRequestHeader;
@@ -409,7 +409,7 @@ public class SimulationConnector {
 					modifiedPlatform.setName(platform.getName());
 					modifiedPlatform.setStatus(platform.getState().toString());
 
-					String currentPlatformUrl = serverName + DOIP_SIMULATION_PATH + "platform/" + platform.getName();
+					String currentPlatformUrl = serverName + PLATFORM_PATH + "/" + platform.getName();
 					// Update platform URL using the current server name
 					modifiedPlatform.setUrl(currentPlatformUrl);
 
