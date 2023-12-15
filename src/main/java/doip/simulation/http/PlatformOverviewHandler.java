@@ -281,7 +281,7 @@ public class PlatformOverviewHandler implements HttpHandler {
 		String platformParam = HttpServerHelper.getPathParam(requestPath, "platform");
 		String actionParam = HttpServerHelper.getQueryParam(exchange, "action");
 
-		boolean isValidRequest = actionParam != null && isValidAction(actionParam) && platformParam != null;
+		boolean isValidRequest = actionParam != null && platformParam != null; //&& isValidAction(actionParam) 
 
 	    if (!isValidRequest) {
 	        logger.error("Invalid action request. Platform: {}, Action: {}", platformParam, actionParam);

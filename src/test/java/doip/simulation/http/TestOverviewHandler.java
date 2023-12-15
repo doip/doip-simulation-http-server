@@ -241,11 +241,7 @@ class TestOverviewHandler {
 			URISyntaxException, IOException, InterruptedException, HttpInvalidRequestBodyType {
 		logger.info("-------------------------- testGetActionPlatformRequestJson ------------------------------------");
 
-		HttpClient clientForPost = new HttpClient("http://localhost:" + PORT);
-		clientForPost.addHeader("Content-Type", "application/json");
-
-		// "/doip-simulation/platform/X2024"
-		HttpResponse<String> response = clientForPost.GET(SimulationConnector.PLATFORM_PATH + "/X2024/?action=start",
+		HttpResponse<String> response = clientForLocalHost.GET(SimulationConnector.PLATFORM_PATH + "/X2024/?action=start",
 				String.class);
 
 		int statusCode = response.statusCode();
@@ -253,8 +249,23 @@ class TestOverviewHandler {
 
 		String responseBody = response.body();
 		assertNotNull(responseBody, "The response body from server is null");
+	
+		logger.info("Custom POST test completed.");
+	}
+	
+	@Test
+	void testGetWrongActionPlatformRequestJson() throws HttpStatusCodeException, HttpInvalidResponseBodyType,
+			URISyntaxException, IOException, InterruptedException, HttpInvalidRequestBodyType {
+		logger.info("-------------------------- testGetWrongActionPlatformRequestJson ------------------------------------");
 
-		// TODO Add more assertions if needed
+		HttpStatusCodeException e = assertThrows(HttpStatusCodeException.class,
+				() -> clientForLocalHost.GET(SimulationConnector.PLATFORM_PATH + "/X2024/?action=???",String.class));
+		int statusCode = e.getResponse().statusCode();
+		String statusText = HttpUtils.getStatusText(statusCode);
+		logger.info("Status code = {} ({})", statusCode, statusText);
+		assertEquals(400, e.getResponse().statusCode(), "The status code does not match the value 400");
+
+		logger.info("Custom POST test completed.");
 
 		logger.info("Custom POST test completed.");
 	}
