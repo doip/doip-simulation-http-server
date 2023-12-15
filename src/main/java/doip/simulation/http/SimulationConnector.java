@@ -9,6 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import doip.simulation.api.Platform;
+import doip.simulation.api.ServiceState;
 import doip.library.exception.DoipException;
 import doip.simulation.api.Gateway;
 import doip.simulation.api.SimulationManager;

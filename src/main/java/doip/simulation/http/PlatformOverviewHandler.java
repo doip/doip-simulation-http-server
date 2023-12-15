@@ -25,16 +25,14 @@ import doip.simulation.http.lib.ActionRequest;
 public class PlatformOverviewHandler implements HttpHandler {
 	private static Logger logger = LogManager.getLogger(PlatformOverviewHandler.class);
 
-	// Reference to the DoipHttpServer instance
-	// private final DoipHttpServer doipHttpServer;
-
 	private final SimulationConnector simulationConnector;
+
+	public final static String RESOURCE_PATH = "/doip-simulation/platform";
 
 	private static final String GATEWAY_PATH = "/gateway";
 
 	public PlatformOverviewHandler(SimulationConnector simulationConnector) {
 		this.simulationConnector = simulationConnector;
-		// this.doipHttpServer = doipHttpServer;
 	}
 
 	/**

@@ -25,6 +25,8 @@ public class SimulationOverviewHandler implements HttpHandler {
 	// private final DoipHttpServer doipHttpServer;
 	private final SimulationConnector simulationConnector;
 
+	public static final String RESOURCE_PATH = "/doip-simulation/";
+
 	public SimulationOverviewHandler(SimulationConnector simulationConnector) {
 		this.simulationConnector = simulationConnector;
 		// this.doipHttpServer = doipHttpServer;
