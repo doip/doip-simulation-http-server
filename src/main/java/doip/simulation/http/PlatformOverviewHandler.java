@@ -292,6 +292,10 @@ public class PlatformOverviewHandler implements HttpHandler {
 
 	private boolean isValidAction(String action) {
 		// Validate the 'action' parameter against the allowed values
+		/*
+		 * TODO: @Nataliya: Using exceptions to validate correctness
+		 * is expensive. Building exceptions by JVM takes a lot of time.
+		 */
 		try {
 			Action currentAction = Action.valueOf(action);
 			return true; // If no exception is thrown, the status is valid
@@ -299,5 +303,4 @@ public class PlatformOverviewHandler implements HttpHandler {
 			return false; // If an exception is thrown, the status is invalid
 		}
 	}
-
 }
