@@ -1,0 +1,15 @@
+{
+    "modelVersion": 1,
+    "testcases": [
+        {
+            "id": "ID",
+            "description": "Description",
+            "testSteps" : [
+                {
+                    "action": "Action",
+                    "expectedResult": "Expected Result"
+                }    
+            ]
+        }
+    ]
+}
