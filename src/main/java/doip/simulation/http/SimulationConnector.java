@@ -463,22 +463,49 @@ public class SimulationConnector {
 	 *
 	 * @param platformParam  The name of the platform.
 	 * @param receivedAction The action request received.
+	 * @throws IOException 
 	 */
-	public void handlePlatformAction(String platformParam, ActionRequest receivedAction) {
-		// Retrieve the platform based on the specified platform name
-		doip.simulation.api.Platform platform = getPlatformByName(platformParam);
+	public SimulationResponse handlePlatformAction(String platformParam, ActionRequest receivedAction) throws IOException {
+	    // Retrieve the platform based on the specified platform name
+	    doip.simulation.api.Platform platform = getPlatformByName(platformParam);
 
-		if (platform == null) {
-			// Log an error if the specified platform is not found
-			logger.error("Action cannot be executed because the specified platform name {} does not exist",
-					platformParam);
-		} else {
-			performAction(platform, receivedAction.getAction());
-
-		}
+	    if (platform == null) {
+	        // Log an error if the specified platform is not found
+	        logger.error("Action cannot be executed because the specified platform name {} does not exist",
+	                platformParam);
+	        String errorMessage = String.format("The specified platform name %s does not exist", platformParam);
+	        return new SimulationResponse(HttpURLConnection.HTTP_NOT_FOUND, buildJsonErrorResponse(errorMessage));
+	    } else {
+	        return performAction(platform, receivedAction.getAction());
+	    }
 	}
 
-	public void performAction(doip.simulation.api.Platform platform, Action action) {
+	public SimulationResponse performAction(doip.simulation.api.Platform platform, Action action) throws IOException {
+	    try {
+	    	 switch (action) {
+	            case start:
+	                logger.info("Starting the process for platform: {}", platform.getName());
+	                platform.start();
+	                return new SimulationResponse(HttpURLConnection.HTTP_OK, buildJsonResponse("Platform started successfully"));
+
+	            case stop:
+	                logger.info("Stopping the process for platform: {}", platform.getName());
+	                platform.stop();
+	                return new SimulationResponse(HttpURLConnection.HTTP_OK, buildJsonResponse("Platform stopped successfully"));
+
+	            default:
+	                String errorMessage = "Unknown action: " + action.toString();
+	                logger.error(errorMessage);
+	                return new SimulationResponse(HttpURLConnection.HTTP_BAD_REQUEST, buildJsonErrorResponse(errorMessage));
+	        }
+	    } catch (DoipException e) {
+	        String errorMessage = "Failed to perform action on platform: " + e.getMessage();
+	        logger.error(errorMessage);
+	        return new SimulationResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, buildJsonErrorResponse(errorMessage));
+	    }
+	}
+
+	public void performAction_old(doip.simulation.api.Platform platform, Action action) {
 		switch (action) {
 		case start:
 			logger.info("Starting the process for platform: {}", platform.getName());
