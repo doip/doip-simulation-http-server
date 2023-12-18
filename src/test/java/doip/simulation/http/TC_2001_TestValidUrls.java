@@ -93,7 +93,8 @@ public class TC_2001_TestValidUrls {
 			HttpResponse<String> response = client.GET(url, String.class);
 			assertNotNull(response);
 			String jsonString = response.body();
-			logger.info("HTTP body\n" + JsonUtils.prettyPrint(jsonString));
+			//????? logger.info("HTTP body\n" + JsonUtils.prettyPrint(jsonString));
+			logger.info("HTTP body\n" + jsonString);
 		} catch (HttpStatusCodeException | HttpInvalidResponseBodyType | URISyntaxException | IOException
 				| InterruptedException e) {
 			throw logger.throwing(new TestExecutionError(e));

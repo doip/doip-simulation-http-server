@@ -54,23 +54,23 @@ public class PlatformOverviewHandler implements HttpHandler {
 		}
 
 		String requestPath = exchange.getRequestURI().getPath();
-	    String requestMethod = exchange.getRequestMethod();
+		String requestMethod = exchange.getRequestMethod();
 
-	    if ("GET".equals(requestMethod) && requestPath.contains(GATEWAY_PATH)) {
-	        handleGetGatewayRequest(exchange);
-	    } else if ("GET".equals(requestMethod)) {
-	        if (isStartActionRequest(exchange)) {
-	            handleStartActionRequest(exchange);
-	        } else {
-	            handleGetPlatformRequest(exchange);
-	        }
-	    } else if ("POST".equals(requestMethod)) {
-	        handlePostPlatformRequest(exchange);
-	    } else {
-	        // Respond with 405 Method Not Allowed for non-GET requests
-	        logger.error("Method not allowed. Received a {} request.", requestMethod);
-	        exchange.sendResponseHeaders(HttpURLConnection.HTTP_BAD_METHOD, -1);
-	    }
+		if ("GET".equals(requestMethod) && requestPath.contains(GATEWAY_PATH)) {
+			handleGetGatewayRequest(exchange);
+		} else if ("GET".equals(requestMethod)) {
+			if (isStartActionRequest(exchange)) {
+				handleStartActionRequest(exchange);
+			} else {
+				handleGetPlatformRequest(exchange);
+			}
+		} else if ("POST".equals(requestMethod)) {
+			handlePostPlatformRequest(exchange);
+		} else {
+			// Respond with 405 Method Not Allowed for non-GET requests
+			logger.error("Method not allowed. Received a {} request.", requestMethod);
+			exchange.sendResponseHeaders(HttpURLConnection.HTTP_BAD_METHOD, -1);
+		}
 	}
 
 	// Method to handle the special case for starting an action
@@ -106,11 +106,16 @@ public class PlatformOverviewHandler implements HttpHandler {
 				simulationConnector.handlePlatformAction(platformParam, receivedAction);
 
 				// Build the JSON response
-				String jsonResponse = simulationConnector.buildPlatformJsonResponse(platformParam);
+				SimulationResponse simulationResponse = simulationConnector.buildPlatformJsonResponse(platformParam);
 
 				// Set the response headers and body
-				HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json", HttpURLConnection.HTTP_OK);
-				HttpServerHelper.responseServerLogging(exchange, HttpURLConnection.HTTP_OK, jsonResponse);
+				HttpServerHelper.sendResponse(exchange, simulationResponse.getJsonResponse(), "application/json",
+						simulationResponse.getStatusCode());
+				HttpServerHelper.responseServerLogging(exchange, simulationResponse.getStatusCode(),
+						simulationResponse.getJsonResponse());
+
+//				HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json", HttpURLConnection.HTTP_OK);
+//				HttpServerHelper.responseServerLogging(exchange, HttpURLConnection.HTTP_OK, jsonResponse);
 
 			} else {
 				// Invalid URL parameters. Platform parameter is missing or invalid.
@@ -162,13 +167,14 @@ public class PlatformOverviewHandler implements HttpHandler {
 
 					// If an empty request JSON is allowed
 					// Build the JSON response
-					String jsonResponse = simulationConnector.buildPlatformJsonResponse(platformParam);
+					SimulationResponse simulationResponse = simulationConnector
+							.buildPlatformJsonResponse(platformParam);
 
 					// Set the response headers and body
-					HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json",
-							HttpURLConnection.HTTP_OK);
-					HttpServerHelper.responseServerLogging(exchange, HttpURLConnection.HTTP_OK, jsonResponse);
-
+					HttpServerHelper.sendResponse(exchange, simulationResponse.getJsonResponse(), "application/json",
+							simulationResponse.getStatusCode());
+					HttpServerHelper.responseServerLogging(exchange, simulationResponse.getStatusCode(),
+							simulationResponse.getJsonResponse());
 				} else {
 
 					// Deserialize the JSON string into a ActionRequest object
@@ -182,12 +188,15 @@ public class PlatformOverviewHandler implements HttpHandler {
 						simulationConnector.handlePlatformAction(platformParam, receivedAction);
 
 						// Build the JSON response
-						String jsonResponse = simulationConnector.buildPlatformJsonResponse(platformParam);
+						SimulationResponse simulationResponse = simulationConnector
+								.buildPlatformJsonResponse(platformParam);
 
 						// Set the response headers and body
-						HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json",
-								HttpURLConnection.HTTP_OK);
-						HttpServerHelper.responseServerLogging(exchange, HttpURLConnection.HTTP_OK, jsonResponse);
+						HttpServerHelper.sendResponse(exchange, simulationResponse.getJsonResponse(),
+								"application/json", simulationResponse.getStatusCode());
+						HttpServerHelper.responseServerLogging(exchange, simulationResponse.getStatusCode(),
+								simulationResponse.getJsonResponse());
+
 					} else {
 						// Invalid JSON structure Platform deserialization failed.
 						logger.error("Received JSON structure is invalid.");
@@ -226,11 +235,15 @@ public class PlatformOverviewHandler implements HttpHandler {
 				logger.info(requestInfo);
 
 				// Build the JSON response
-				String jsonResponse = simulationConnector.buildGatewayJsonResponse(platformParam, gatewayParam);
+				SimulationResponse simulationResponse = simulationConnector.buildGatewayJsonResponse(platformParam,
+						gatewayParam);
 
 				// Set the response headers and body
-				HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json", HttpURLConnection.HTTP_OK);
-				HttpServerHelper.responseServerLogging(exchange, HttpURLConnection.HTTP_OK, jsonResponse);
+				HttpServerHelper.sendResponse(exchange, simulationResponse.getJsonResponse(), "application/json",
+						simulationResponse.getStatusCode());
+				HttpServerHelper.responseServerLogging(exchange, simulationResponse.getStatusCode(),
+						simulationResponse.getJsonResponse());
+
 			} else {
 				// Invalid URL parameters
 				logger.error("Invalid URL parameters for POST request.");
@@ -257,11 +270,13 @@ public class PlatformOverviewHandler implements HttpHandler {
 				logger.info(requestInfo);
 
 				// Build the JSON response
-				String jsonResponse = simulationConnector.buildPlatformJsonResponse(platformParam);
+				SimulationResponse simulationResponse = simulationConnector.buildPlatformJsonResponse(platformParam);
 
 				// Set the response headers and body
-				HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json", HttpURLConnection.HTTP_OK);
-				HttpServerHelper.responseServerLogging(exchange, HttpURLConnection.HTTP_OK, jsonResponse);
+				HttpServerHelper.sendResponse(exchange, simulationResponse.getJsonResponse(), "application/json",
+						simulationResponse.getStatusCode());
+				HttpServerHelper.responseServerLogging(exchange, simulationResponse.getStatusCode(),
+						simulationResponse.getJsonResponse());
 			} else {
 				// Invalid URL parameters
 				logger.error("Invalid URL parameters for POST request.");
@@ -281,20 +296,20 @@ public class PlatformOverviewHandler implements HttpHandler {
 		String platformParam = HttpServerHelper.getPathParam(requestPath, "platform");
 		String actionParam = HttpServerHelper.getQueryParam(exchange, "action");
 
-		boolean isValidRequest = actionParam != null && platformParam != null; //&& isValidAction(actionParam) 
+		boolean isValidRequest = actionParam != null && platformParam != null; // && isValidAction(actionParam)
 
-	    if (!isValidRequest) {
-	        logger.error("Invalid action request. Platform: {}, Action: {}", platformParam, actionParam);
-	    }
+		if (!isValidRequest) {
+			logger.error("Invalid action request. Platform: {}, Action: {}", platformParam, actionParam);
+		}
 
-	    return isValidRequest;
+		return isValidRequest;
 	}
 
 	private boolean isValidAction(String action) {
 		// Validate the 'action' parameter against the allowed values
 		/*
-		 * TODO: @Nataliya: Using exceptions to validate correctness
-		 * is expensive. Building exceptions by JVM takes a lot of time.
+		 * TODO: @Nataliya: Using exceptions to validate correctness is expensive.
+		 * Building exceptions by JVM takes a lot of time.
 		 */
 		try {
 			Action currentAction = Action.valueOf(action);

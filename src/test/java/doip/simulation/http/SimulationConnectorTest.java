@@ -1,6 +1,7 @@
 package doip.simulation.http;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,16 +26,20 @@ public class SimulationConnectorTest extends SimulationConnector {
 	}
 
 	@Override
-	public String buildOverviewJsonResponse(String status) throws IOException {
+	public SimulationResponse buildOverviewJsonResponse(String status) throws IOException {
 		try {
 			// Retrieve platform overview based on the status
 			List<doip.simulation.api.Platform> platforms = getPlatformOverview(status);
 
 			if (platforms == null) {
-				// Log an error if platform overview retrieval fails
-				logger.error("Failed to retrieve platform overview. Check logs for details.");
+				// Log an error if platform overview retrieval fails. Check logs for details.
+				logger.error("Failed to retrieve platform overview.");
+				String errorMessage = "Failed to retrieve platform overview";
+				logger.error(errorMessage);
 				if (createMockResponse == false) {
-					return "{}"; // Return an empty JSON object or handle it as needed
+					return new SimulationResponse(HttpURLConnection.HTTP_NOT_FOUND,
+							buildJsonErrorResponse(errorMessage)); // "{}" Return an empty JSON object or handle it as
+																	// needed
 				}
 			}
 			ServerInfo serverInfo;
@@ -51,11 +56,12 @@ public class SimulationConnectorTest extends SimulationConnector {
 //			}
 
 			// Convert the ServerInfo object to JSON
-			return buildJsonResponse(serverInfo);
+			return new SimulationResponse(HttpURLConnection.HTTP_OK, buildJsonResponse(serverInfo));
 		} catch (Exception e) {
 			// Log an error and return an empty JSON object in case of an exception
-			logger.error("Error building overview JSON response: {}", e.getMessage(), e);
-			return "{}";
+			String errorMessage = "Error building overview JSON response: " + e.getMessage();
+			logger.error(errorMessage, e);
+			return new SimulationResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, buildJsonErrorResponse(errorMessage));
 		}
 	}
 
@@ -105,16 +111,17 @@ public class SimulationConnectorTest extends SimulationConnector {
 	}
 
 	@Override
-	public String buildPlatformJsonResponse(String platformName) throws IOException {
+	public SimulationResponse buildPlatformJsonResponse(String platformName) throws IOException {
 		try {
 			// Retrieve the platform based on the specified platform name
 			doip.simulation.api.Platform platform = getPlatformByName(platformName);
 
 			if (platform == null) {
 				// Log an error if the specified platform is not found
-				logger.error("The specified platform name {} does not exist", platformName);
+				String errorMessage = String.format("The specified platform name {} does not exist", platformName);
+				logger.error(errorMessage);
 				if (createMockResponse == false) {
-					return "{}"; // Return an empty JSON object or handle it as needed
+					return new SimulationResponse(HttpURLConnection.HTTP_NOT_FOUND,buildJsonErrorResponse(errorMessage)); //"{}"; // Return an empty JSON object or handle it as needed
 				}
 			}
 
@@ -126,25 +133,30 @@ public class SimulationConnectorTest extends SimulationConnector {
 				platformInfo = processPlatform(platform);
 			}
 			// Convert the object to JSON
-			return buildJsonResponse(platformInfo);
+			String jsonResponse = buildJsonResponse(platformInfo);
+			return new SimulationResponse(HttpURLConnection.HTTP_OK,jsonResponse);
 		} catch (Exception e) {
 			// Log an error and return an empty JSON object in case of an exception
-			logger.error("Error building platform JSON response: {}", e.getMessage(), e);
-			return "{}";
+			//logger.error("Error building platform JSON response: {}", e.getMessage(), e);
+			//return "{}";
+			String errorMessage = "Error building platform JSON response: " + e.getMessage();
+			logger.error(errorMessage, e);
+			return new SimulationResponse(HttpURLConnection.HTTP_INTERNAL_ERROR,buildJsonErrorResponse(errorMessage));
 		}
 	}
 
 	@Override
-	public String buildGatewayJsonResponse(String platformName, String gatewayName) throws IOException {
+	public SimulationResponse buildGatewayJsonResponse(String platformName, String gatewayName) throws IOException {
 		try {
 			// Retrieve the gateway based on the specified platform and gateway names
 			doip.simulation.api.Gateway gateway = getGatewayByName(platformName, gatewayName);
 
 			if (gateway == null) {
 				// Log an error if the specified gateway is not found
-				logger.error("The specified gateway name {} does not exist", gatewayName);
+				String errorMessage = String.format("The specified gateway name {} does not exist",gatewayName);
+				logger.error(errorMessage);
 				if (createMockResponse == false) {
-					return "{}"; // Return an empty JSON object or handle it as needed
+					return new SimulationResponse(HttpURLConnection.HTTP_NOT_FOUND,buildJsonErrorResponse(errorMessage)); //"{}" Return an empty JSON object or handle it as needed
 				}
 			}
 
@@ -157,11 +169,15 @@ public class SimulationConnectorTest extends SimulationConnector {
 			}
 
 			// Convert the object to JSON
-			return buildJsonResponse(gatewayInfo);
+			String jsonResponse = buildJsonResponse(gatewayInfo);
+			return new SimulationResponse(HttpURLConnection.HTTP_OK,jsonResponse);
 		} catch (Exception e) {
 			// Log an error and return an empty JSON object in case of an exception
-			logger.error("Error building gateway JSON response: {}", e.getMessage(), e);
-			return "{}";
+			//logger.error("Error building gateway JSON response: {}", e.getMessage(), e);
+			//return "{}";
+			String errorMessage = "Error building gateway JSON response: " + e.getMessage();
+			logger.error(errorMessage, e);
+			return new SimulationResponse(HttpURLConnection.HTTP_INTERNAL_ERROR,buildJsonErrorResponse(errorMessage));
 		}
 	}
 
