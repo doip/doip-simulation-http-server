@@ -103,16 +103,21 @@ public class PlatformOverviewHandler implements HttpHandler {
 				// Process the received platform information
 				logger.info("Received action: {}", receivedAction.getAction().toString());
 
-				simulationConnector.handlePlatformAction(platformParam, receivedAction);
+				SimulationResponse simulationResponse = simulationConnector.handlePlatformAction(platformParam,
+						receivedAction);
 
-				// Build the JSON response
-				SimulationResponse simulationResponse = simulationConnector.buildPlatformJsonResponse(platformParam);
+				// Build the JSON response based on the outcome of handlePlatformAction
+				String jsonResponse;
+				if (simulationResponse.getStatusCode() != HttpURLConnection.HTTP_OK) {
+					jsonResponse = simulationResponse.getJsonResponse();
+				} else {
+					jsonResponse = simulationConnector.buildPlatformJsonResponse(platformParam).getJsonResponse();
+				}
 
 				// Set the response headers and body
-				HttpServerHelper.sendResponse(exchange, simulationResponse.getJsonResponse(), "application/json",
+				HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json",
 						simulationResponse.getStatusCode());
-				HttpServerHelper.responseServerLogging(exchange, simulationResponse.getStatusCode(),
-						simulationResponse.getJsonResponse());
+				HttpServerHelper.responseServerLogging(exchange, simulationResponse.getStatusCode(), jsonResponse);
 
 //				HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json", HttpURLConnection.HTTP_OK);
 //				HttpServerHelper.responseServerLogging(exchange, HttpURLConnection.HTTP_OK, jsonResponse);
@@ -185,17 +190,23 @@ public class PlatformOverviewHandler implements HttpHandler {
 						// Process the received platform information
 						logger.info("Received action: {}", receivedAction.getAction().toString());
 
-						simulationConnector.handlePlatformAction(platformParam, receivedAction);
+						SimulationResponse simulationResponse = simulationConnector.handlePlatformAction(platformParam,
+								receivedAction);
 
-						// Build the JSON response
-						SimulationResponse simulationResponse = simulationConnector
-								.buildPlatformJsonResponse(platformParam);
+						// Build the JSON response based on the outcome of handlePlatformAction
+						String jsonResponse;
+						if (simulationResponse.getStatusCode() != HttpURLConnection.HTTP_OK) {
+							jsonResponse = simulationResponse.getJsonResponse();
+						} else {
+							jsonResponse = simulationConnector.buildPlatformJsonResponse(platformParam)
+									.getJsonResponse();
+						}
 
 						// Set the response headers and body
-						HttpServerHelper.sendResponse(exchange, simulationResponse.getJsonResponse(),
-								"application/json", simulationResponse.getStatusCode());
+						HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json",
+								simulationResponse.getStatusCode());
 						HttpServerHelper.responseServerLogging(exchange, simulationResponse.getStatusCode(),
-								simulationResponse.getJsonResponse());
+								jsonResponse);
 
 					} else {
 						// Invalid JSON structure Platform deserialization failed.
