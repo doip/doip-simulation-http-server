@@ -1,7 +1,7 @@
 package doip.simulation.http;
 
 import java.io.IOException;
-
+import java.net.HttpURLConnection;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -141,10 +141,10 @@ public class SimulationConnector {
 	 * status.
 	 *
 	 * @param status The status parameter.
-	 * @return The JSON response as a string.
+	 * @return A SimulationResponse object containing the HTTP status code and JSON response.
 	 * @throws Exception If an I/O error occurs during the process.
 	 */
-	public String buildOverviewJsonResponse(String status) throws IOException {
+	public SimulationResponse buildOverviewJsonResponse(String status) throws IOException {
 		try {
 			// Initialize ServerInfo to hold platform overview
 			// ServerInfo serverInfo = new ServerInfo();
@@ -153,23 +153,25 @@ public class SimulationConnector {
 			List<doip.simulation.api.Platform> platforms = getPlatformOverview(status);
 
 			if (platforms == null) {
-				// Log an error if platform overview retrieval fails
-				logger.error("Failed to retrieve platform overview. Check logs for details.");
-				return "{}"; // Return an empty JSON object or handle it as needed
+				// Log an error if platform overview retrieval fails. Check logs for details.
+				String errorMessage = "Failed to retrieve platform overview";
+				logger.error(errorMessage);
+				return new SimulationResponse(HttpURLConnection.HTTP_NOT_FOUND,buildJsonErrorResponse(errorMessage)); //"{}" Return an empty JSON object or handle it as needed
 			}
 
 			// Process the retrieved platforms and populate serverInfo
 			doip.simulation.http.lib.ServerInfo serverInfo = processOverview(platforms, status);
-
-			// Convert the ServerInfo object to JSON
-			return buildJsonResponse(serverInfo);
+			
+			// Convert the object to JSON
+	        String jsonResponse = buildJsonResponse(serverInfo);
+	        
+			return new SimulationResponse(HttpURLConnection.HTTP_OK,jsonResponse);
 		} catch (Exception e) {
 			// Log an error and return an empty JSON object in case of an exception
 			// logger.error("Error building overview JSON response: {}", e.getMessage(), e);
-			// return "{}";
 			String errorMessage = "Error building overview JSON response: " + e.getMessage();
 			logger.error(errorMessage, e);
-			return buildJsonErrorResponse(errorMessage);
+			return new SimulationResponse(HttpURLConnection.HTTP_INTERNAL_ERROR,buildJsonErrorResponse(errorMessage));
 		}
 	}
 
@@ -178,32 +180,35 @@ public class SimulationConnector {
 	 * name.
 	 *
 	 * @param platformName The name of the platform.
-	 * @return The JSON response as a string.
+	 * @return A SimulationResponse object containing the HTTP status code and JSON response.
 	 * @throws Exception If an I/O error occurs during the process.
 	 */
-	public String buildPlatformJsonResponse(String platformName) throws IOException {
+	public SimulationResponse buildPlatformJsonResponse(String platformName) throws IOException {
 		try {
 			// Retrieve the platform based on the specified platform name
 			doip.simulation.api.Platform platform = getPlatformByName(platformName);
 
 			if (platform == null) {
 				// Log an error if the specified platform is not found
-				logger.error("The specified platform name {} does not exist", platformName);
-				return "{}"; // Return an empty JSON object or handle it as needed!
+				String errorMessage = String.format("The specified platform name {} does not exist", platformName);
+				logger.error(errorMessage);
+				return new SimulationResponse(HttpURLConnection.HTTP_NOT_FOUND,buildJsonErrorResponse(errorMessage)); //"{}" Return an empty JSON object or handle it as needed!
 			}
 
-			// Process the retrieved platform and create a real JSON object Platform
+			// Process the retrieved platform and create a real JSON object Platformstring 
 			doip.simulation.http.lib.Platform platformInfo = processPlatform(platform);
-
+			
 			// Convert the object to JSON
-			return buildJsonResponse(platformInfo);
+			String jsonResponse = buildJsonResponse(platformInfo);
+		
+			return new SimulationResponse(HttpURLConnection.HTTP_OK,jsonResponse);
 		} catch (Exception e) {
 			// Log an error and return an empty JSON object in case of an exception
 			// logger.error("Error building platform JSON response: {}", e.getMessage(), e);
 			// return "{}";
-			String errorMessage = "Error building overview JSON response: " + e.getMessage();
+			String errorMessage = "Error building platform JSON response: " + e.getMessage();
 			logger.error(errorMessage, e);
-			return buildJsonErrorResponse(errorMessage);
+			return new SimulationResponse(HttpURLConnection.HTTP_INTERNAL_ERROR,buildJsonErrorResponse(errorMessage));
 		}
 	}
 
@@ -213,32 +218,34 @@ public class SimulationConnector {
 	 *
 	 * @param platformName The name of the platform.
 	 * @param gatewayName  The name of the gateway.
-	 * @return The JSON response as a string.
+	 * @return A SimulationResponse object containing the HTTP status code and JSON response.
 	 * @throws Exception If an I/O error occurs during the process.
 	 */
-	public String buildGatewayJsonResponse(String platformName, String gatewayName) throws IOException {
+	public SimulationResponse buildGatewayJsonResponse(String platformName, String gatewayName) throws IOException {
 		try {
 			// Retrieve the gateway based on the specified platform and gateway names
 			doip.simulation.api.Gateway gateway = getGatewayByName(platformName, gatewayName);
 
 			if (gateway == null) {
 				// Log an error if the specified gateway is not found
-				logger.error("The specified gateway name {} does not exist", gatewayName);
-				return "{}"; // Return an empty JSON object or handle it as needed
+				String errorMessage = String.format("The specified gateway name {} does not exist",gatewayName);
+				logger.error(errorMessage);
+				return new SimulationResponse(HttpURLConnection.HTTP_NOT_FOUND,buildJsonErrorResponse(errorMessage)); //"{}" Return an empty JSON object or handle it as needed
 			}
 
 			// Process the retrieved gateway and create a real JSON object Gateway
 			doip.simulation.http.lib.Gateway gatewayInfo = processGateway(gateway, platformName);
 
 			// Convert the object to JSON
-			return buildJsonResponse(gatewayInfo);
+			String jsonResponse = buildJsonResponse(gatewayInfo);
+			return new SimulationResponse(HttpURLConnection.HTTP_OK,jsonResponse);
 		} catch (Exception e) {
 			// Log an error and return an empty JSON object in case of an exception
 			// logger.error("Error building gateway JSON response: {}", e.getMessage(), e);
 			// return "{}";
-			String errorMessage = "Error building overview JSON response: " + e.getMessage();
+			String errorMessage = "Error building gateway JSON response: " + e.getMessage();
 			logger.error(errorMessage, e);
-			return buildJsonErrorResponse(errorMessage);
+			return new SimulationResponse(HttpURLConnection.HTTP_INTERNAL_ERROR,buildJsonErrorResponse(errorMessage));
 		}
 	}
 
@@ -503,7 +510,7 @@ public class SimulationConnector {
 		return objectMapper.writeValueAsString(info);
 	}
 
-	private String buildJsonErrorResponse(String errorMessage) {
+	public String buildJsonErrorResponse(String errorMessage) {
 		return "{\"error\": \"" + errorMessage + "\"}";
 	}
 

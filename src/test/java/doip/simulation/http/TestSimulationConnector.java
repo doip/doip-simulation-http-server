@@ -68,7 +68,7 @@ class TestSimulationConnector {
 	public void testBuildOverviewJsonResponse() {
 		logger.info("-------------------------- testBuildOverviewJsonResponse ------------------------------------");
 		// Call the method being tested
-		String jsonResponse = null;
+		SimulationResponse  jsonResponse = null;
 		try {
 			jsonResponse = connector.buildOverviewJsonResponse("RUNNING");
 		} catch (IOException e) {
@@ -76,8 +76,8 @@ class TestSimulationConnector {
 			fail("Unexpected IOException: " + e.getMessage());
 		}
 
-		assertNotNull(jsonResponse);
-		logger.info(jsonResponse);
+		assertNotNull(jsonResponse.getJsonResponse());
+		logger.info(jsonResponse.getJsonResponse());
 	}
 
 	@Test
@@ -85,7 +85,7 @@ class TestSimulationConnector {
 		logger.info(
 				"-------------------------- testBuildOverviewJsonResponseWithStub() ------------------------------------");
 		// Call the method being tested
-		String jsonResponse = null;
+		SimulationResponse  jsonResponse = null;
 		try {
 			jsonResponse = connectorMockito.buildOverviewJsonResponse("RUNNING");
 		} catch (IOException e) {
@@ -93,23 +93,23 @@ class TestSimulationConnector {
 			fail("Unexpected IOException: " + e.getMessage());
 		}
 
-		assertNotNull(jsonResponse);
-		logger.info(jsonResponse);
+		assertNotNull(jsonResponse.getJsonResponse());
+		logger.info(jsonResponse.getJsonResponse());
 	}
 
 	@Test
 	public void testBuildPlatformJsonResponse() {
 		logger.info("-------------------------- testBuildPlatformJsonResponse ------------------------------------");
 		// Call the method being tested
-		String jsonResponse = null;
+		SimulationResponse  jsonResponse = null;
 		try {
 			jsonResponse = connector.buildPlatformJsonResponse(platformName);
 		} catch (IOException e) {
 			logger.error("Unexpected IOException: " + e.getMessage(), e);
 			fail("Unexpected IOException: " + e.getMessage());
 		}
-		assertNotNull(jsonResponse);
-		logger.info(jsonResponse);
+		assertNotNull(jsonResponse.getJsonResponse());
+		logger.info(jsonResponse.getJsonResponse());
 	}
 
 	@Test
@@ -117,15 +117,15 @@ class TestSimulationConnector {
 		logger.info(
 				"-------------------------- testBuildPlatformJsonResponseWithStub ------------------------------------");
 		// Call the method being tested
-		String jsonResponse = null;
+		SimulationResponse  jsonResponse = null;
 		try {
 			jsonResponse = connectorMockito.buildPlatformJsonResponse(platformName);
 		} catch (IOException e) {
 			logger.error("Unexpected IOException: " + e.getMessage(), e);
 			fail("Unexpected IOException: " + e.getMessage());
 		}
-		assertNotNull(jsonResponse);
-		logger.info(jsonResponse);
+		assertNotNull(jsonResponse.getJsonResponse());
+		logger.info(jsonResponse.getJsonResponse());
 	}
 
 	@Test
@@ -133,22 +133,22 @@ class TestSimulationConnector {
 		logger.info(
 				"-------------------------- testBuildJsonResponseUnknownPlatform( ------------------------------------");
 		// Call the method being tested
-		String jsonResponse = null;
+		SimulationResponse  jsonResponse = null;
 		try {
 			jsonResponse = connector.buildPlatformJsonResponse("Unknown");
 		} catch (IOException e) {
 			logger.error("Unexpected IOException: " + e.getMessage(), e);
 			fail("Unexpected IOException: " + e.getMessage());
 		}
-		assertNotNull(jsonResponse);
-		logger.info(jsonResponse);
+		assertNotNull(jsonResponse.getJsonResponse());
+		logger.info(jsonResponse.getJsonResponse());
 	}
 
 	@Test
 	public void testBuildGatewayJsonResponse() {
 		logger.info("-------------------------- testBuildGatewayJsonResponse ------------------------------------");
 
-		String jsonResponse = null;
+		SimulationResponse  jsonResponse = null;
 		try {
 			jsonResponse = connector.buildGatewayJsonResponse(platformName, GatewayName);
 		} catch (IOException e) {
@@ -157,8 +157,8 @@ class TestSimulationConnector {
 			fail("Unexpected IOException: " + e.getMessage());
 		}
 
-		assertNotNull(jsonResponse);
-		logger.info(jsonResponse);
+		assertNotNull(jsonResponse.getJsonResponse());
+		logger.info(jsonResponse.getJsonResponse());
 
 	}
 	
@@ -166,7 +166,7 @@ class TestSimulationConnector {
 	public void testBuildGatewayJsonResponseWithStub() {
 		logger.info("-------------------------- testBuildGatewayJsonResponseWithStub ------------------------------------");
 
-		String jsonResponse = null;
+		SimulationResponse  jsonResponse = null;
 		try {
 			jsonResponse = connectorMockito.buildGatewayJsonResponse(platformName, GatewayName);
 		} catch (IOException e) {
@@ -175,8 +175,8 @@ class TestSimulationConnector {
 			fail("Unexpected IOException: " + e.getMessage());
 		}
 
-		assertNotNull(jsonResponse);
-		logger.info(jsonResponse);
+		assertNotNull(jsonResponse.getJsonResponse());
+		logger.info(jsonResponse.getJsonResponse());
 
 	}
 
@@ -185,7 +185,7 @@ class TestSimulationConnector {
 		logger.info(
 				"-------------------------- testBuildJsonResponseUnknownGateway ------------------------------------");
 
-		String jsonResponse = null;
+		SimulationResponse  jsonResponse = null;
 		try {
 			jsonResponse = connector.buildGatewayJsonResponse(platformName, "Unknown");
 		} catch (IOException e) {
@@ -194,8 +194,8 @@ class TestSimulationConnector {
 			fail("Unexpected IOException: " + e.getMessage());
 		}
 
-		assertNotNull(jsonResponse);
-		logger.info(jsonResponse);
+		assertNotNull(jsonResponse.getJsonResponse());
+		logger.info(jsonResponse.getJsonResponse());
 
 	}
 

@@ -38,22 +38,24 @@ class TestOverviewHandler {
 
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
-		//SimulationManager mockSimulationManager = new MockSimulationManager();
+		// SimulationManager mockSimulationManager = new MockSimulationManager();
 		// Create a mock instance of SimulationManager
 		SimulationManager mockSimulationManager = Mockito.mock(SimulationManager.class);
 
 		server = new DoipHttpServer(PORT, mockSimulationManager);
 
 		customController = new CustomMappingController(server);
-		
+
 //		SimulationConnector connector = new SimulationConnector(server.getSimulationManager(), server.getServerName());
 //		customController.addExternalHandler(SimulationConnector.DOIP_SIMULATION_PATH, new SimulationOverviewHandler(connector));
 //		customController.addExternalHandler(SimulationConnector.PLATFORM_PATH, new PlatformOverviewHandler(connector));
-		
-		
-		SimulationConnector connectorTest = new SimulationConnectorTest(server.getSimulationManager(), server.getServerName());
-		customController.addExternalHandler(SimulationConnector.DOIP_SIMULATION_PATH, new SimulationOverviewHandler(connectorTest));
-		customController.addExternalHandler(SimulationConnector.PLATFORM_PATH, new PlatformOverviewHandler(connectorTest));
+
+		SimulationConnector connectorTest = new SimulationConnectorTest(server.getSimulationManager(),
+				server.getServerName());
+		customController.addExternalHandler(SimulationConnector.DOIP_SIMULATION_PATH,
+				new SimulationOverviewHandler(connectorTest));
+		customController.addExternalHandler(SimulationConnector.PLATFORM_PATH,
+				new PlatformOverviewHandler(connectorTest));
 
 		customController.startHttpServer();
 
@@ -71,27 +73,25 @@ class TestOverviewHandler {
 	@Test
 	void testGetOverviewHandler() throws HttpStatusCodeException, HttpInvalidResponseBodyType, URISyntaxException,
 			IOException, InterruptedException {
-		logger.info("-------------------------- testGetOverviewHandler ------------------------------------");
-
-		// "/doip-simulation?status=RUNNING"
-		HttpResponse<String> response = clientForLocalHost
-				.GET(SimulationConnector.DOIP_SIMULATION_PATH + "?status=RUNNING", String.class);
-		int statusCode = response.statusCode();
-		assertEquals(200, statusCode, "The HTTP status code is not 200");
-
-		String responseBody = response.body();
-		assertNotNull(responseBody, "The response body from server is null");
-
-		// it must work without query parameters
-		response = clientForLocalHost.GET(SimulationConnector.DOIP_SIMULATION_PATH, String.class);
-
-		assertEquals(200, response.statusCode(), "The HTTP status code is not 200");
-
-		assertNotNull(response.body(), "The response body from server is null");
-
-		// TODO Add more assertions if needed
-
-		logger.info("Custom GET test completed.");
+		String method = "void testGetOverviewHandler()";
+		logger.trace(">>> {}", method);
+		try {
+			logger.info("-------------------------- testGetOverviewHandler ------------------------------------");
+			// "/doip-simulation?status=RUNNING"
+			HttpResponse<String> response = clientForLocalHost
+					.GET(SimulationConnector.DOIP_SIMULATION_PATH + "?status=RUNNING", String.class);
+			int statusCode = response.statusCode();
+			assertEquals(200, statusCode, "The HTTP status code is not 200");
+			String responseBody = response.body();
+			assertNotNull(responseBody, "The response body from server is null");
+			// it must work without query parameters
+			response = clientForLocalHost.GET(SimulationConnector.DOIP_SIMULATION_PATH, String.class);
+			assertEquals(200, response.statusCode(), "The HTTP status code is not 200");
+			assertNotNull(response.body(), "The response body from server is null");
+			logger.info("Custom GET test completed.");
+		} finally {
+			logger.trace("<<< {}", method);
+		}
 	}
 
 	@Test
@@ -235,31 +235,32 @@ class TestOverviewHandler {
 
 		logger.info("Custom POST test completed.");
 	}
-	
+
 	@Test
 	void testGetActionPlatformRequestJson() throws HttpStatusCodeException, HttpInvalidResponseBodyType,
 			URISyntaxException, IOException, InterruptedException, HttpInvalidRequestBodyType {
 		logger.info("-------------------------- testGetActionPlatformRequestJson ------------------------------------");
 
-		HttpResponse<String> response = clientForLocalHost.GET(SimulationConnector.PLATFORM_PATH + "/X2024?action=start",
-				String.class);
+		HttpResponse<String> response = clientForLocalHost
+				.GET(SimulationConnector.PLATFORM_PATH + "/X2024?action=start", String.class);
 
 		int statusCode = response.statusCode();
 		assertEquals(200, statusCode, "The HTTP status code is not 200");
 
 		String responseBody = response.body();
 		assertNotNull(responseBody, "The response body from server is null");
-	
+
 		logger.info("Custom POST test completed.");
 	}
-	
+
 	@Test
 	void testGetWrongActionPlatformRequestJson() throws HttpStatusCodeException, HttpInvalidResponseBodyType,
 			URISyntaxException, IOException, InterruptedException, HttpInvalidRequestBodyType {
-		logger.info("-------------------------- testGetWrongActionPlatformRequestJson ------------------------------------");
+		logger.info(
+				"-------------------------- testGetWrongActionPlatformRequestJson ------------------------------------");
 
 		HttpStatusCodeException e = assertThrows(HttpStatusCodeException.class,
-				() -> clientForLocalHost.GET(SimulationConnector.PLATFORM_PATH + "/X2024?action=???",String.class));
+				() -> clientForLocalHost.GET(SimulationConnector.PLATFORM_PATH + "/X2024?action=???", String.class));
 		int statusCode = e.getResponse().statusCode();
 		String statusText = HttpUtils.getStatusText(statusCode);
 		logger.info("Status code = {} ({})", statusCode, statusText);
@@ -268,6 +269,23 @@ class TestOverviewHandler {
 		logger.info("Custom POST test completed.");
 
 		logger.info("Custom POST test completed.");
+	}
+
+	public static String getCallingMethodName() {
+		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+		// Index 0 is getStackTrace, index 1 is this method, index 2 is the calling
+		// method
+		if (stackTrace.length >= 3) {
+			StackTraceElement callingMethod = stackTrace[2]; // Assuming the caller is at index 2
+
+			String methodName = callingMethod.getMethodName();
+			String className = callingMethod.getClassName();
+			String fullMethodName = className + "." + methodName;
+
+			return fullMethodName;
+		} else {
+			return "Unknown";
+		}
 	}
 
 }

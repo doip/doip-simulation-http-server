@@ -83,12 +83,17 @@ public class SimulationOverviewHandler implements HttpHandler {
 				}
 			}
 			// Build the JSON response based on the status
-			String jsonResponse = simulationConnector.buildOverviewJsonResponse(status);
+			SimulationResponse simulationResponse = simulationConnector.buildOverviewJsonResponse(status);
 
 			// Set the response headers and body
-			HttpServerHelper.sendResponse(exchange, jsonResponse, "application/json", HttpURLConnection.HTTP_OK);
-			HttpServerHelper.responseServerLogging(exchange, HttpURLConnection.HTTP_OK, jsonResponse);
-
+			HttpServerHelper.sendResponse(
+			        exchange,
+			        simulationResponse.getJsonResponse(),
+			        "application/json",
+			        simulationResponse.getStatusCode()
+			);
+			HttpServerHelper.responseServerLogging(exchange, simulationResponse.getStatusCode(), simulationResponse.getJsonResponse());
+			
 		} catch (IllegalArgumentException e) {
 			// Handle invalid status
 			logger.error("Invalid status provided: {}", e.getMessage());
