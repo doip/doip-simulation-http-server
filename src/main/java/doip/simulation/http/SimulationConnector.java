@@ -479,28 +479,55 @@ public class SimulationConnector {
 	        return performAction(platform, receivedAction.getAction());
 	    }
 	}
-
+	
+	/**
+	 * Perform the specified action on the given platform.
+	 *
+	 * @param platform The platform on which the action needs to be performed.
+	 * @param action   The action to be performed (start or stop ...).
+	 * @return A SimulationResponse containing the result of the action.
+	 * @throws IOException If an I/O error occurs during the action.
+	 */
 	public SimulationResponse performAction(doip.simulation.api.Platform platform, Action action) throws IOException {
 	    try {
-	    	 switch (action) {
+	        // Switch statement to handle different actions
+	        switch (action) {
 	            case start:
 	                logger.info("Starting the process for platform: {}", platform.getName());
+	                
+	                // Perform the start action
 	                platform.start();
-	                return new SimulationResponse(HttpURLConnection.HTTP_OK, buildJsonResponse("Platform started successfully"));
+	                
+	                String messageStart = String.format("Platform %s started successfully", platform.getName());
+	                logger.info(messageStart);
+	                
+	                return new SimulationResponse(HttpURLConnection.HTTP_OK, buildJsonResponse(messageStart));
 
 	            case stop:
 	                logger.info("Stopping the process for platform: {}", platform.getName());
+	                
+	                // Perform the stop action
 	                platform.stop();
-	                return new SimulationResponse(HttpURLConnection.HTTP_OK, buildJsonResponse("Platform stopped successfully"));
+	                
+	                String messageStop = String.format("Platform %s stopped successfully", platform.getName());
+	                logger.info(messageStop);
+	                
+	                return new SimulationResponse(HttpURLConnection.HTTP_OK, buildJsonResponse(messageStop));
 
 	            default:
+	                // If an unknown action is received, log an error
 	                String errorMessage = "Unknown action: " + action.toString();
 	                logger.error(errorMessage);
+	                
+	                // Return a SimulationResponse with HTTP Bad Request and error message
 	                return new SimulationResponse(HttpURLConnection.HTTP_BAD_REQUEST, buildJsonErrorResponse(errorMessage));
 	        }
 	    } catch (DoipException e) {
+	        // If a DoipException occurs during the action, log an error
 	        String errorMessage = "Failed to perform action on platform: " + e.getMessage();
 	        logger.error(errorMessage);
+	        
+	        // Return a SimulationResponse with HTTP Internal Server Error and error message
 	        return new SimulationResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, buildJsonErrorResponse(errorMessage));
 	    }
 	}

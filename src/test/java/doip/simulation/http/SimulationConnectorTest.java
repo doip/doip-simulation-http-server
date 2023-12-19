@@ -9,6 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import doip.simulation.api.SimulationManager;
+import doip.simulation.http.lib.ActionRequest;
 import doip.simulation.http.lib.Ecu;
 import doip.simulation.http.lib.Gateway;
 import doip.simulation.http.lib.LookupEntry;
@@ -23,6 +24,23 @@ public class SimulationConnectorTest extends SimulationConnector {
 	public SimulationConnectorTest(SimulationManager simulationManager, String alternativeHostName) {
 		// super(doipHttpServer.getSimulationManager(), doipHttpServer.getServerName());
 		super(simulationManager, alternativeHostName);
+	}
+	
+	@Override
+	public SimulationResponse handlePlatformAction(String platformParam, ActionRequest receivedAction) throws IOException {
+	    // Retrieve the platform based on the specified platform name
+	    doip.simulation.api.Platform platform = getPlatformByName(platformParam);
+
+	    if (platform == null) {
+	        // Log an error if the specified platform is not found
+	        logger.error("Action cannot be executed because the specified platform name {} does not exist",
+	                platformParam);
+	        String errorMessage = String.format("The specified platform name %s does not exist", platformParam);
+	        //return new SimulationResponse(HttpURLConnection.HTTP_NOT_FOUND, buildJsonErrorResponse(errorMessage));
+	        return new SimulationResponse(HttpURLConnection.HTTP_OK, buildJsonErrorResponse(errorMessage));
+	    } else {
+	        return performAction(platform, receivedAction.getAction());
+	    }
 	}
 
 	@Override
