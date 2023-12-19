@@ -190,7 +190,7 @@ public class SimulationConnector {
 
 			if (platform == null) {
 				// Log an error if the specified platform is not found
-				String errorMessage = String.format("The specified platform name {} does not exist", platformName);
+				String errorMessage = String.format("The specified platform name %s does not exist", platformName);
 				logger.error(errorMessage);
 				return new SimulationResponse(HttpURLConnection.HTTP_NOT_FOUND,buildJsonErrorResponse(errorMessage)); //"{}" Return an empty JSON object or handle it as needed!
 			}
@@ -228,7 +228,7 @@ public class SimulationConnector {
 
 			if (gateway == null) {
 				// Log an error if the specified gateway is not found
-				String errorMessage = String.format("The specified gateway name {} does not exist",gatewayName);
+				String errorMessage = String.format("The specified gateway name %s does not exist",gatewayName);
 				logger.error(errorMessage);
 				return new SimulationResponse(HttpURLConnection.HTTP_NOT_FOUND,buildJsonErrorResponse(errorMessage)); //"{}" Return an empty JSON object or handle it as needed
 			}

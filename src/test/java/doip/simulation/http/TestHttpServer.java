@@ -1,11 +1,5 @@
 package doip.simulation.http;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-//import static asd.junit.Assertions.assertEquals;
-//import static asd.junit.Assertions.assertNotNull;
-//import static asd.junit.Assertions.assertThrows;
-
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.http.HttpResponse;
@@ -28,6 +22,7 @@ import com.sun.net.httpserver.HttpHandler;
 
 import doip.simulation.api.SimulationManager;
 import doip.simulation.http.helpers.HttpServerHelper;
+import static com.starcode88.jtest.Assertions.*;
 
 class TestHttpServer {
 

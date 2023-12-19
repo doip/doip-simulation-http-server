@@ -1,7 +1,6 @@
 package doip.simulation.http;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static com.starcode88.jtest.Assertions.*;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
