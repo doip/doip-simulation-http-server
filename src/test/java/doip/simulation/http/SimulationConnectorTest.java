@@ -25,22 +25,24 @@ public class SimulationConnectorTest extends SimulationConnector {
 		// super(doipHttpServer.getSimulationManager(), doipHttpServer.getServerName());
 		super(simulationManager, alternativeHostName);
 	}
-	
-	@Override
-	public SimulationResponse handlePlatformAction(String platformParam, ActionRequest receivedAction) throws IOException {
-	    // Retrieve the platform based on the specified platform name
-	    doip.simulation.api.Platform platform = getPlatformByName(platformParam);
 
-	    if (platform == null) {
-	        // Log an error if the specified platform is not found
-	        logger.error("Action cannot be executed because the specified platform name {} does not exist",
-	                platformParam);
-	        String errorMessage = String.format("The specified platform name %s does not exist", platformParam);
-	        //return new SimulationResponse(HttpURLConnection.HTTP_NOT_FOUND, buildJsonErrorResponse(errorMessage));
-	        return new SimulationResponse(HttpURLConnection.HTTP_OK, buildJsonErrorResponse(errorMessage));
-	    } else {
-	        return performAction(platform, receivedAction.getAction());
-	    }
+	@Override
+	public SimulationResponse handlePlatformAction(String platformParam, ActionRequest receivedAction)
+			throws IOException {
+		// Retrieve the platform based on the specified platform name
+		doip.simulation.api.Platform platform = getPlatformByName(platformParam);
+
+		if (platform == null) {
+			// Log an error if the specified platform is not found
+			logger.error("Action cannot be executed because the specified platform name {} does not exist",
+					platformParam);
+			String errorMessage = String.format("The specified platform name %s does not exist", platformParam);
+			// return new SimulationResponse(HttpURLConnection.HTTP_NOT_FOUND,
+			// buildJsonErrorResponse(errorMessage));
+			return new SimulationResponse(HttpURLConnection.HTTP_OK, buildJsonErrorResponse(errorMessage));
+		} else {
+			return performAction(platform, receivedAction.getAction());
+		}
 	}
 
 	@Override
@@ -139,7 +141,9 @@ public class SimulationConnectorTest extends SimulationConnector {
 				String errorMessage = String.format("The specified platform name {} does not exist", platformName);
 				logger.error(errorMessage);
 				if (createMockResponse == false) {
-					return new SimulationResponse(HttpURLConnection.HTTP_NOT_FOUND,buildJsonErrorResponse(errorMessage)); //"{}"; // Return an empty JSON object or handle it as needed
+					return new SimulationResponse(HttpURLConnection.HTTP_NOT_FOUND,
+							buildJsonErrorResponse(errorMessage)); // "{}"; // Return an empty JSON object or handle it
+																	// as needed
 				}
 			}
 
@@ -152,14 +156,14 @@ public class SimulationConnectorTest extends SimulationConnector {
 			}
 			// Convert the object to JSON
 			String jsonResponse = buildJsonResponse(platformInfo);
-			return new SimulationResponse(HttpURLConnection.HTTP_OK,jsonResponse);
+			return new SimulationResponse(HttpURLConnection.HTTP_OK, jsonResponse);
 		} catch (Exception e) {
 			// Log an error and return an empty JSON object in case of an exception
-			//logger.error("Error building platform JSON response: {}", e.getMessage(), e);
-			//return "{}";
+			// logger.error("Error building platform JSON response: {}", e.getMessage(), e);
+			// return "{}";
 			String errorMessage = "Error building platform JSON response: " + e.getMessage();
 			logger.error(errorMessage, e);
-			return new SimulationResponse(HttpURLConnection.HTTP_INTERNAL_ERROR,buildJsonErrorResponse(errorMessage));
+			return new SimulationResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, buildJsonErrorResponse(errorMessage));
 		}
 	}
 
@@ -171,10 +175,12 @@ public class SimulationConnectorTest extends SimulationConnector {
 
 			if (gateway == null) {
 				// Log an error if the specified gateway is not found
-				String errorMessage = String.format("The specified gateway name {} does not exist",gatewayName);
+				String errorMessage = String.format("The specified gateway name {} does not exist", gatewayName);
 				logger.error(errorMessage);
 				if (createMockResponse == false) {
-					return new SimulationResponse(HttpURLConnection.HTTP_NOT_FOUND,buildJsonErrorResponse(errorMessage)); //"{}" Return an empty JSON object or handle it as needed
+					return new SimulationResponse(HttpURLConnection.HTTP_NOT_FOUND,
+							buildJsonErrorResponse(errorMessage)); // "{}" Return an empty JSON object or handle it as
+																	// needed
 				}
 			}
 
@@ -188,14 +194,14 @@ public class SimulationConnectorTest extends SimulationConnector {
 
 			// Convert the object to JSON
 			String jsonResponse = buildJsonResponse(gatewayInfo);
-			return new SimulationResponse(HttpURLConnection.HTTP_OK,jsonResponse);
+			return new SimulationResponse(HttpURLConnection.HTTP_OK, jsonResponse);
 		} catch (Exception e) {
 			// Log an error and return an empty JSON object in case of an exception
-			//logger.error("Error building gateway JSON response: {}", e.getMessage(), e);
-			//return "{}";
+			// logger.error("Error building gateway JSON response: {}", e.getMessage(), e);
+			// return "{}";
 			String errorMessage = "Error building gateway JSON response: " + e.getMessage();
 			logger.error(errorMessage, e);
-			return new SimulationResponse(HttpURLConnection.HTTP_INTERNAL_ERROR,buildJsonErrorResponse(errorMessage));
+			return new SimulationResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, buildJsonErrorResponse(errorMessage));
 		}
 	}
 
