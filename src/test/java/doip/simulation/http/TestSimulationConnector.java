@@ -1,7 +1,6 @@
 package doip.simulation.http;
 
-import static org.junit.jupiter.api.Assertions.*;
-
+import static com.starcode88.jtest.Assertions.*;
 import java.io.IOException;
 
 import org.apache.logging.log4j.LogManager;

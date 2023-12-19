@@ -1,6 +1,6 @@
 package doip.simulation.http;
 
-import static org.junit.jupiter.api.Assertions.*;
+//import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -18,6 +18,7 @@ import com.starcode88.http.HttpUtils;
 import com.starcode88.http.exception.HttpInvalidRequestBodyType;
 import com.starcode88.http.exception.HttpInvalidResponseBodyType;
 import com.starcode88.http.exception.HttpStatusCodeException;
+import static com.starcode88.jtest.Assertions.*;
 
 import doip.simulation.api.SimulationManager;
 
