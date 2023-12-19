@@ -3,8 +3,12 @@ package doip.simulation.http;
 //import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.net.http.HttpResponse;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+import java.lang.reflect.Modifier;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -257,19 +261,23 @@ class TestOverviewHandler {
 	@Test
 	void testGetWrongActionPlatformRequestJson() throws HttpStatusCodeException, HttpInvalidResponseBodyType,
 			URISyntaxException, IOException, InterruptedException, HttpInvalidRequestBodyType {
-		logger.info(
-				"-------------------------- testGetWrongActionPlatformRequestJson ------------------------------------");
+		// String method = getCallingMethodName();
+		String method = getMethodInfo(2);
+		try {
+			logger.trace(">>> {}", method);
 
-		HttpStatusCodeException e = assertThrows(HttpStatusCodeException.class,
-				() -> clientForLocalHost.GET(SimulationConnector.PLATFORM_PATH + "/X2024?action=???", String.class));
-		int statusCode = e.getResponse().statusCode();
-		String statusText = HttpUtils.getStatusText(statusCode);
-		logger.info("Status code = {} ({})", statusCode, statusText);
-		assertEquals(400, e.getResponse().statusCode(), "The status code does not match the value 400");
-
-		logger.info("Custom POST test completed.");
-
-		logger.info("Custom POST test completed.");
+			logger.info(
+					"-------------------------- testGetWrongActionPlatformRequestJson ------------------------------------");
+			HttpStatusCodeException e = assertThrows(HttpStatusCodeException.class, () -> clientForLocalHost
+					.GET(SimulationConnector.PLATFORM_PATH + "/X2024?action=???", String.class));
+			int statusCode = e.getResponse().statusCode();
+			String statusText = HttpUtils.getStatusText(statusCode);
+			logger.info("Status code = {} ({})", statusCode, statusText);
+			assertEquals(400, e.getResponse().statusCode(), "The status code does not match the value 400");
+			logger.info("Custom POST test completed.");
+		} finally {
+			logger.trace("<<< {}", method);
+		}
 	}
 
 	public static String getCallingMethodName() {
@@ -281,12 +289,49 @@ class TestOverviewHandler {
 
 			String methodName = callingMethod.getMethodName();
 			String className = callingMethod.getClassName();
-			String fullMethodName = className + "." + methodName;
-
+			// String fullMethodName = className + "." + methodName;
+			String fullMethodName = methodName;
 			return fullMethodName;
 		} else {
 			return "Unknown";
 		}
 	}
 
+	public static String getMethodInfo(int level) {
+		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+
+		// Make sure there are enough elements in the stack trace
+		if (stackTrace.length > level) {
+			StackTraceElement element = stackTrace[level];
+			String methodName = element.getMethodName();
+			String className = element.getClassName();
+
+			try {
+				Class<?> clazz = Class.forName(className);
+				Method[] methods = clazz.getDeclaredMethods();
+
+				// Find the method with the matching name
+				for (Method method : methods) {
+					if (method.getName().equals(methodName)) {
+						int modifiers = method.getModifiers();
+						String accessModifier = Modifier.toString(modifiers);
+						String returnType = method.getReturnType().getSimpleName();
+						String arguments = Arrays.stream(method.getParameters())
+								.map(parameter -> parameter.getType().getSimpleName() + " " + parameter.getName())
+								.collect(Collectors.joining(", "));
+
+//						return String.format("Method: %s.%s, Access: %s, Return Type: %s, Arguments: %s", className,
+//								methodName, accessModifier, returnType, arguments);
+						return String.format("%s %s %s(%s)", accessModifier, returnType, methodName, arguments);
+					}
+				}
+
+			} catch (ClassNotFoundException e) {
+				// e.printStackTrace();
+				logger.error("Unexpected Exception: " + e.getMessage(), e);
+			}
+		}
+
+		return "Method information not available.";
+	}
 }
