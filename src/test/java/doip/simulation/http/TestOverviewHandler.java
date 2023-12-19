@@ -38,24 +38,24 @@ class TestOverviewHandler {
 
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
-		SimulationManager mockSimulationManager = new MockSimulationManager();
+		//SimulationManager mockSimulationManager = new MockSimulationManager();
 		// Create a mock instance of SimulationManager
-		// SimulationManager mockSimulationManager = Mockito.mock(SimulationManager.class);
+		SimulationManager mockSimulationManager = Mockito.mock(SimulationManager.class);
 
 		server = new DoipHttpServer(PORT, mockSimulationManager);
 
 		customController = new CustomMappingController(server);
 
-		SimulationConnector connector = new SimulationConnector(server.getSimulationManager(), server.getServerName());
-		customController.addExternalHandler(SimulationConnector.DOIP_SIMULATION_PATH, new SimulationOverviewHandler(connector));
-		customController.addExternalHandler(SimulationConnector.PLATFORM_PATH, new PlatformOverviewHandler(connector));
+//		SimulationConnector connector = new SimulationConnector(server.getSimulationManager(), server.getServerName());
+//		customController.addExternalHandler(SimulationConnector.DOIP_SIMULATION_PATH, new SimulationOverviewHandler(connector));
+//		customController.addExternalHandler(SimulationConnector.PLATFORM_PATH, new PlatformOverviewHandler(connector));
 
-//		SimulationConnector connectorTest = new SimulationConnectorTest(server.getSimulationManager(),
-//				server.getServerName());
-//		customController.addExternalHandler(SimulationConnector.DOIP_SIMULATION_PATH,
-//				new SimulationOverviewHandler(connectorTest));
-//		customController.addExternalHandler(SimulationConnector.PLATFORM_PATH,
-//				new PlatformOverviewHandler(connectorTest));
+		SimulationConnector connectorTest = new SimulationConnectorTest(server.getSimulationManager(),
+				server.getServerName());
+		customController.addExternalHandler(SimulationConnector.DOIP_SIMULATION_PATH,
+				new SimulationOverviewHandler(connectorTest));
+		customController.addExternalHandler(SimulationConnector.PLATFORM_PATH,
+				new PlatformOverviewHandler(connectorTest));
 
 		customController.startHttpServer();
 
