@@ -310,7 +310,7 @@ public class PlatformOverviewHandler implements HttpHandler {
 		boolean isValidRequest = actionParam != null && platformParam != null; // && isValidAction(actionParam)
 
 		if (!isValidRequest) {
-			logger.error("Invalid action request. Platform: {}, Action: {}", platformParam, actionParam);
+			//logger.error("Invalid action request. Platform: {}, Action: {}", platformParam, actionParam);
 		}
 
 		return isValidRequest;
