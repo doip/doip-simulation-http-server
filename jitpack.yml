@@ -1,0 +1,4 @@
+# doip-simulation-http-server
+
+jdk:
+  - openjdk11
